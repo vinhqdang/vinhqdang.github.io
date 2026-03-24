@@ -81,3 +81,36 @@ filterButtons.forEach((button) => {
     });
   });
 });
+
+const renderUpdates = () => {
+  const updates = Array.isArray(window.siteUpdates) ? window.siteUpdates : [];
+  const updateLists = document.querySelectorAll("[data-updates-list]");
+
+  updateLists.forEach((list) => {
+    const limit = Number(list.dataset.updatesLimit || updates.length);
+    const items = updates.slice(0, limit);
+
+    list.innerHTML = items
+      .map(
+        (item) => {
+          const isExternal = /^https?:\/\//.test(item.href);
+          const target = isExternal ? ' target="_blank" rel="noreferrer"' : "";
+
+          return `
+          <article class="update-card">
+            <div class="update-topline">
+              <p class="update-date">${item.date}</p>
+              <span class="update-type">${item.type}</span>
+            </div>
+            <h3>${item.title}</h3>
+            <p>${item.summary}</p>
+            <a href="${item.href}"${target}>${item.cta}</a>
+          </article>
+        `;
+        }
+      )
+      .join("");
+  });
+};
+
+renderUpdates();
