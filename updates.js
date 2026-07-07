@@ -1,6 +1,16 @@
 // Add new items to the top of this list.
 window.siteUpdates = [
   {
+    date: "April 2026",
+    type: "Publication",
+    title: "New paper in SN Computer Science on uncertainty-aware intrusion detection",
+    summary:
+      "\"Utilizing Uncertainty Measures to Improve the Performance of Intrusion Detection Systems\" is out in SN Computer Science. It combines nine SPROUT uncertainty measures with distance-based metrics and Isolation Forest to cut false negative rates for minority attack classes by up to 50% on CICIDS 2017 while keeping accuracy above 98%.",
+    href: "https://doi.org/10.1007/s42979-026-04923-8",
+    cta: "Read the paper",
+    featured: true
+  },
+  {
     date: "March 2026",
     type: "Research",
     title: "Research profile passes 900 citations and 60+ Scopus-indexed publications",
