@@ -1,6 +1,16 @@
 // Add new items to the top of this list.
 window.siteUpdates = [
   {
+    date: "May 2026",
+    type: "Publication",
+    title: "New paper at IndabaX Nigeria 2026, published in PMLR",
+    summary:
+      "\"FedFairGNN: A Privacy-Preserving and Fairness-Aware Federated Graph Neural Network for Fraud Detection\" (with Ngoc-Son-An Nguyen) appears in Proceedings of Machine Learning Research, volume 319, pages 74-86, from IndabaX Nigeria 2026 at the University of Ibadan. PMLR is Scopus-indexed, with roughly 92% of its volumes covered.",
+    href: "https://proceedings.mlr.press/v319/dang26a.html",
+    cta: "Read the paper",
+    featured: true
+  },
+  {
     date: "April 2026",
     type: "Publication",
     title: "New paper in SN Computer Science on uncertainty-aware intrusion detection",
