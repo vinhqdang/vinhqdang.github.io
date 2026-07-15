@@ -1,12 +1,21 @@
 const badgeClass = (value) => {
   const v = (value || "").toLowerCase();
+
+  const percentileMatch = v.match(/^(\d+)(st|nd|rd|th) percentile/);
+  if (percentileMatch) {
+    const pct = Number(percentileMatch[1]);
+    if (pct >= 75) return "badge-good";
+    if (pct >= 40) return "badge-mid";
+    return "badge-low";
+  }
+
   if (v.startsWith("q1") || v === "scie" || v === "indexed" || v.startsWith("book series")) {
     return "badge-good";
   }
   if (v.startsWith("q2") || v.startsWith("q3") || v === "esci" || v.includes("ssci")) {
     return "badge-mid";
   }
-  if (v.startsWith("q4") || v === "not confirmed" || v === "uncertain" || v === "not covered") {
+  if (v.startsWith("q4") || v === "not confirmed" || v === "uncertain" || v === "not covered" || v.startsWith("discontinued")) {
     return "badge-low";
   }
   return "badge-neutral";

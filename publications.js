@@ -8,7 +8,7 @@ window.sitePublications = [
     type: "Journal Article",
     href: "https://doi.org/10.1007/s42979-026-04923-8",
     wos: "Not indexed",
-    scopus: "Indexed",
+    scopus: "75th percentile (Computational Theory & Mathematics)",
     scimago: "Q2"
   },
   {
@@ -18,7 +18,7 @@ window.sitePublications = [
     type: "Journal Article",
     href: "https://doi.org/10.29284/zcrk2p65",
     wos: "Not indexed",
-    scopus: "Indexed",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -28,7 +28,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-95-4724-1_23",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -38,7 +38,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-032-22908-3_1",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -48,7 +48,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-032-13254-3_6",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q3"
   },
   {
@@ -58,7 +58,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-95-4724-1_31",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -68,7 +68,7 @@ window.sitePublications = [
     type: "Journal Article",
     href: "https://doi.org/10.3390/informatics13020030",
     wos: "ESCI",
-    scopus: "Indexed",
+    scopus: "95th percentile (Communication)",
     scimago: "Q1"
   },
   {
@@ -78,7 +78,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-95-4724-1_10",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -98,7 +98,7 @@ window.sitePublications = [
     type: "Journal Article",
     href: "https://doi.org/10.1016/j.array.2026.100680",
     wos: "ESCI",
-    scopus: "Indexed",
+    scopus: "86th percentile (Computer Science, misc.)",
     scimago: "Q1"
   },
   {
@@ -108,7 +108,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-95-4721-0_11",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -118,7 +118,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-032-13254-3_13",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q3"
   },
   {
@@ -128,7 +128,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-032-22062-2_7",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -138,7 +138,7 @@ window.sitePublications = [
     type: "Conference Paper",
     href: "https://doi.org/10.1609/aaai.v40i47.41527",
     wos: "Not confirmed",
-    scopus: "Indexed",
+    scopus: "Indexed (no percentile found)",
     scimago: "Not ranked"
   },
   {
@@ -148,7 +148,7 @@ window.sitePublications = [
     type: "Journal Article",
     href: "https://doi.org/10.3390/math14020383",
     wos: "SCIE",
-    scopus: "Indexed",
+    scopus: "92nd percentile (Mathematics, general)",
     scimago: "Q1"
   },
   {
@@ -158,7 +158,7 @@ window.sitePublications = [
     type: "Journal Article",
     href: "https://doi.org/10.1108/JET-07-2025-0052",
     wos: "ESCI",
-    scopus: "Indexed",
+    scopus: "75th percentile (Rehabilitation)",
     scimago: "Q2"
   },
   {
@@ -168,7 +168,7 @@ window.sitePublications = [
     type: "Journal Article",
     href: "https://doi.org/10.1108/JET-03-2026-0018",
     wos: "ESCI",
-    scopus: "Indexed",
+    scopus: "75th percentile (Rehabilitation)",
     scimago: "Q2"
   },
   {
@@ -178,7 +178,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-97-7717-4_50",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -188,7 +188,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-96-4139-0_5",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -198,7 +198,7 @@ window.sitePublications = [
     type: "Journal Article",
     href: "https://doi.org/10.52152/801281",
     wos: "SSCI (delisted 2025)",
-    scopus: "Indexed",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q3"
   },
   {
@@ -208,7 +208,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-96-6929-5_23",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -228,7 +228,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-96-4148-2_38",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -238,7 +238,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-96-6254-8_31",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -258,7 +258,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-99-6586-1_26",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -278,7 +278,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-99-8476-3_3",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -288,7 +288,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-96-0434-0_28",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -298,7 +298,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-031-67195-1_78",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -308,7 +308,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-99-7216-6_2",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -318,7 +318,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-99-7862-5_6",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -328,7 +328,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-99-8296-7_13",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -338,7 +338,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-031-27409-1_102",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -348,7 +348,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-19-7346-8_4",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -358,7 +358,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-19-4960-9_65",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -368,7 +368,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-19-7753-4_48",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -378,7 +378,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-19-7874-6_57",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -388,7 +388,7 @@ window.sitePublications = [
     type: "Journal Article",
     href: "https://doi.org/10.31577/cai_2022_1_12",
     wos: "SCIE",
-    scopus: "Indexed",
+    scopus: "51st percentile (Computational Theory & Mathematics)",
     scimago: "Q3"
   },
   {
@@ -398,7 +398,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-030-93677-8_46",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -408,7 +408,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-16-2380-6_66",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -438,7 +438,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-16-2377-6_66",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -448,7 +448,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-19-8069-5_54",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -458,7 +458,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-030-85799-8_15",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -468,7 +468,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-19-8069-5_55",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -518,7 +518,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-030-49264-9_26",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -528,7 +528,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-030-91387-8_23",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q2"
   },
   {
@@ -538,7 +538,7 @@ window.sitePublications = [
     type: "Journal Article",
     href: "https://doi.org/10.1108/ijwis-03-2021-0022",
     wos: "ESCI",
-    scopus: "Indexed",
+    scopus: "70th percentile (Computer Networks & Communications)",
     scimago: "Q2"
   },
   {
@@ -558,7 +558,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-030-66093-2_4",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -578,7 +578,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-030-63924-2_22",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q2"
   },
   {
@@ -608,7 +608,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-33-4370-2_35",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q4"
   },
   {
@@ -618,7 +618,7 @@ window.sitePublications = [
     type: "Conference Paper",
     href: "https://www.worldcat.org/isbn/9781728153773",
     wos: "Not confirmed",
-    scopus: "Indexed",
+    scopus: "Indexed (no percentile found)",
     scimago: "Not ranked"
   },
   {
@@ -628,7 +628,7 @@ window.sitePublications = [
     type: "Journal Article",
     href: "https://doi.org/10.1145/3329250",
     wos: "SCIE",
-    scopus: "Indexed",
+    scopus: "93rd percentile (Computer Networks & Communications)",
     scimago: "Q1"
   },
   {
@@ -638,7 +638,7 @@ window.sitePublications = [
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-030-35653-8_28",
     wos: "Not confirmed",
-    scopus: "Book series (Indexed)",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q2"
   },
   {
@@ -678,7 +678,7 @@ window.sitePublications = [
     type: "Conference Paper",
     href: "https://doi.org/10.1109/CIC.2018.00-42",
     wos: "Not confirmed",
-    scopus: "Indexed",
+    scopus: "Indexed (no percentile found)",
     scimago: "Not ranked"
   },
   {
@@ -688,7 +688,7 @@ window.sitePublications = [
     type: "Conference Paper",
     href: "https://doi.org/10.1109/CIC.2017.00036",
     wos: "Not confirmed",
-    scopus: "Indexed",
+    scopus: "Indexed (no percentile found)",
     scimago: "Not ranked"
   },
   {
@@ -698,7 +698,7 @@ window.sitePublications = [
     type: "Conference Paper",
     href: "https://doi.org/10.1109/CIC.2016.42",
     wos: "Not confirmed",
-    scopus: "Indexed",
+    scopus: "Indexed (no percentile found)",
     scimago: "Not ranked"
   },
   {
@@ -708,7 +708,7 @@ window.sitePublications = [
     type: "Conference Paper",
     href: "https://doi.org/10.1145/3125433.3125448",
     wos: "Not confirmed",
-    scopus: "Indexed",
+    scopus: "Indexed (no percentile found)",
     scimago: "Not ranked"
   },
   {
@@ -728,7 +728,7 @@ window.sitePublications = [
     type: "Conference Paper",
     href: "https://doi.org/10.1145/2910896.2910917",
     wos: "Not confirmed",
-    scopus: "Indexed",
+    scopus: "Indexed (no percentile found)",
     scimago: "Not ranked"
   },
   {
@@ -738,7 +738,7 @@ window.sitePublications = [
     type: "Conference Paper",
     href: "https://doi.org/10.1109/IFIPNetworking.2016.7497258",
     wos: "Not confirmed",
-    scopus: "Indexed",
+    scopus: "Indexed (no percentile found)",
     scimago: "Not ranked"
   },
   {
@@ -748,7 +748,7 @@ window.sitePublications = [
     type: "Conference Paper",
     href: "https://doi.org/10.1109/CIC.2016.044",
     wos: "Not confirmed",
-    scopus: "Indexed",
+    scopus: "Indexed (no percentile found)",
     scimago: "Not ranked"
   },
   {
