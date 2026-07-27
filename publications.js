@@ -3,6 +3,26 @@
 window.sitePublications = [
   {
     year: "2026",
+    title: "XHBot: eXplainable Heterophily-aware Graph Neural Networks for Social Bot Detection",
+    venue: "EAI Endorsed Transactions on AI and Robotics",
+    type: "Journal Article",
+    href: "https://doi.org/10.4108/airo.12969",
+    wos: "Not indexed",
+    scopus: "83rd percentile",
+    scimago: "Q1"
+  },
+  {
+    year: "2026",
+    title: "Work-integrated learning in Vietnamese higher education: governance models, institutional diversity and graduate employability in the Asian century",
+    venue: "Higher Education, Skills and Work-based Learning",
+    type: "Journal Article",
+    href: "https://doi.org/10.1108/HESWBL-05-2026-0390",
+    wos: "ESCI",
+    scopus: "81st percentile",
+    scimago: "Q2"
+  },
+  {
+    year: "2026",
     title: "Utilizing Uncertainty Measures to Improve the Performance of Intrusion Detection Systems",
     venue: "SN Computer Science",
     type: "Journal Article",

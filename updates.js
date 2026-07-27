@@ -1,6 +1,26 @@
 // Add new items to the top of this list.
 window.siteUpdates = [
   {
+    date: "July 2026",
+    type: "Publication",
+    title: "New paper on work-integrated learning in Vietnamese higher education",
+    summary:
+      "\"Work-integrated learning in Vietnamese higher education: governance models, institutional diversity and graduate employability in the Asian century\" (with Thi-Hong-Hanh Nguyen) is out in Higher Education, Skills and Work-based Learning (Emerald). A comparative case study across six Vietnamese universities identifying five distinct WIL governance models.",
+    href: "https://doi.org/10.1108/HESWBL-05-2026-0390",
+    cta: "Read the paper",
+    featured: true
+  },
+  {
+    date: "July 2026",
+    type: "Publication",
+    title: "New paper on explainable graph neural networks for social bot detection",
+    summary:
+      "\"XHBot: eXplainable Heterophily-aware Graph Neural Networks for Social Bot Detection\" (with Phuong-Lan Nguyen, Dat Le, and Minh Ngoc Dinh) appears in EAI Endorsed Transactions on AI and Robotics. XHBot reaches an F1 of 0.9474 on TwiBot-20, improving over recent baselines by 9.64%, with a forensic explanation module for platform moderation.",
+    href: "https://doi.org/10.4108/airo.12969",
+    cta: "Read the paper",
+    featured: true
+  },
+  {
     date: "May 2026",
     type: "Publication",
     title: "New paper at IndabaX Nigeria 2026, published in PMLR",
