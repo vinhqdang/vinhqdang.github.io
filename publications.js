@@ -9,7 +9,7 @@ window.sitePublications = [
     href: "https://doi.org/10.1016/j.orl.2026.107567",
     wos: "Not confirmed",
     scopus: "Not confirmed",
-    scimago: "Not confirmed"
+    scimago: "Q2"
   },
   {
     year: "2027",
@@ -19,7 +19,7 @@ window.sitePublications = [
     href: "https://doi.org/10.1016/j.orl.2026.107562",
     wos: "Not confirmed",
     scopus: "Not confirmed",
-    scimago: "Not confirmed"
+    scimago: "Q2"
   },
   {
     year: "2026",
@@ -29,7 +29,7 @@ window.sitePublications = [
     href: "https://doi.org/10.1016/j.array.2026.101244",
     wos: "Not confirmed",
     scopus: "Not confirmed",
-    scimago: "Not confirmed"
+    scimago: "Q1"
   },
   {
     year: "2026",
@@ -39,7 +39,7 @@ window.sitePublications = [
     href: "https://doi.org/10.1016/j.array.2026.101335",
     wos: "Not confirmed",
     scopus: "Not confirmed",
-    scimago: "Not confirmed"
+    scimago: "Q1"
   },
   {
     year: "2026",
@@ -49,7 +49,7 @@ window.sitePublications = [
     href: "https://doi.org/10.47852/bonviewJDSIS620210441",
     wos: "Not confirmed",
     scopus: "Not confirmed",
-    scimago: "Not confirmed"
+    scimago: "Q1"
   },
   {
     year: "2026",
@@ -59,7 +59,7 @@ window.sitePublications = [
     href: "https://doi.org/10.47852/bonviewAIA620210609",
     wos: "Not confirmed",
     scopus: "Not confirmed",
-    scimago: "Not confirmed"
+    scimago: "Q1"
   },
   {
     year: "2026",
@@ -69,7 +69,7 @@ window.sitePublications = [
     href: "https://doi.org/10.1007/s44163-026-01778-z",
     wos: "Not confirmed",
     scopus: "Not confirmed",
-    scimago: "Not confirmed"
+    scimago: "Q1"
   },
   {
     year: "2026",
@@ -79,7 +79,7 @@ window.sitePublications = [
     href: "https://doi.org/10.59543/jidmis.v3.819",
     wos: "Not confirmed",
     scopus: "Not confirmed",
-    scimago: "Not confirmed"
+    scimago: "Q1"
   },
   {
     year: "2026",
@@ -88,7 +88,7 @@ window.sitePublications = [
     type: "Journal Article",
     href: "https://doi.org/10.32604/cmc.2026.087848",
     wos: "Not confirmed",
-    scopus: "Not confirmed",
+    scopus: "88th percentile",
     scimago: "Not confirmed"
   },
   {
@@ -99,7 +99,7 @@ window.sitePublications = [
     href: "https://doi.org/10.30538/oms2026.0331",
     wos: "Not confirmed",
     scopus: "Not confirmed",
-    scimago: "Not confirmed"
+    scimago: "Q4"
   },
   {
     year: "2026",
