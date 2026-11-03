@@ -77,7 +77,7 @@ window.sitePublications = [
     type: "Journal Article",
     href: "https://doi.org/10.47852/bonviewAIA620210609",
     wos: "Not confirmed",
-    scopus: "Not confirmed",
+    scopus: "97th percentile",
     scimago: "Q1"
   },
   {
