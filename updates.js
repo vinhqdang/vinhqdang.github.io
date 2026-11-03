@@ -1,6 +1,16 @@
 // Add new items to the top of this list.
 window.siteUpdates = [
   {
+    date: "November 2026",
+    type: "Publication",
+    title: "VOUCH accepted in Machine Learning (Springer)",
+    summary:
+      "\"VOUCH: Anytime-Valid Certificates for Machine Unlearning via Paired-Canary Hypothesis-Betting\" is accepted in Machine Learning. It plants paired ghost canaries before training and uses betting statistics that stay valid however long an auditor watches. An interactive, in-browser explainer walks through the algorithm.",
+    href: "./vouch_explained.html",
+    cta: "Open the explainer",
+    featured: true
+  },
+  {
     date: "July 2026",
     type: "Publication",
     title: "New paper on work-integrated learning in Vietnamese higher education",
