@@ -39,10 +39,12 @@
   const authorsHtml = (p) => {
     if (!p.authors) return "";
     const names = p.authors.split(", ");
-    const fmt = (n) => (isMe(n) ? "<strong>" + esc(n) + "</strong>" : esc(n));
-    if (names.length <= 8) return '<div class="authors">' + names.map(fmt).join(", ") + "</div>";
+    const star = (n) => (p.corresponding && n === p.corresponding ? '<sup title="Corresponding author">*</sup>' : "");
+    const fmt = (n) => (isMe(n) ? "<strong>" + esc(n) + "</strong>" : esc(n)) + star(n);
+    const note = p.corresponding ? ' <span class="corr">* corresponding author</span>' : "";
+    if (names.length <= 8) return '<div class="authors">' + names.map(fmt).join(", ") + note + "</div>";
     return '<details class="authors"><summary>' + names.slice(0, 6).map(fmt).join(", ") +
-      ", … +" + (names.length - 6) + " more</summary>" + names.map(fmt).join(", ") + "</details>";
+      ", … +" + (names.length - 6) + " more</summary>" + names.map(fmt).join(", ") + note + "</details>";
   };
 
   const paint = () => {

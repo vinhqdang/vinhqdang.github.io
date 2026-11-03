@@ -214,3 +214,5 @@ details.method p { margin: 10px 0 0; }
 details.authors summary { cursor: pointer; }
 details.authors summary:hover { color: var(--ink); }
 .work .authors { margin: 0 0 2px; }
+.authors sup { color: var(--accent); font-weight: 700; }
+.authors .corr { font-size: 12.5px; }
