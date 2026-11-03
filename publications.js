@@ -226,7 +226,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "FedFairGNN: A Privacy-Preserving and Fairness-Aware Federated Graph Neural Network for Fraud Detection",
-    authors: "Quang-Vinh Dang, Ngoc-Son-An Nguyen, Sakinat Folorunso, Roseline Ogundokun, Francisca Oladipo",
+    authors: "Quang-Vinh Dang, Ngoc-Son-An Nguyen",
     venue: "Proceedings of IndabaX Nigeria 2026: Building Scalable AI That Works: From Research to Deployment in Resource-Constrained Environments",
     type: "Conference Paper",
     href: "https://proceedings.mlr.press/v319/dang26a.html",
