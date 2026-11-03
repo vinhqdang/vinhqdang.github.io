@@ -81,7 +81,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "CIPHER: A Differentially Private Federated Framework for Privacy-Preserving Multi-Criteria Group Decision Making",
-    authors: "Quang-Vinh Dang",
+    authors: "Quang-Vinh Dang, Minh Ngoc Dinh, Dat Le, Ngoc-Son-An Nguyen",
     venue: "Journal of Intelligent Decision Making and Information Science",
     type: "Journal Article",
     href: "https://doi.org/10.59543/jidmis.v3.819",
