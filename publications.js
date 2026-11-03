@@ -2,6 +2,106 @@
 // See methodology note on publications.html for how indexing columns were sourced.
 window.sitePublications = [
   {
+    year: "2027",
+    title: "Context-gated exponentiated gradient for online forecast combination",
+    venue: "Operations Research Letters",
+    type: "Journal Article",
+    href: "https://doi.org/10.1016/j.orl.2026.107567",
+    wos: "Not confirmed",
+    scopus: "Not confirmed",
+    scimago: "Not confirmed"
+  },
+  {
+    year: "2027",
+    title: "Exact CVaR evaluation in O(p log N) time for single-factor stochastic pickup-and-delivery routing",
+    venue: "Operations Research Letters",
+    type: "Journal Article",
+    href: "https://doi.org/10.1016/j.orl.2026.107562",
+    wos: "Not confirmed",
+    scopus: "Not confirmed",
+    scimago: "Not confirmed"
+  },
+  {
+    year: "2026",
+    title: "Sentiment-aware hierarchical stochastic block modelling with a nested Chinese restaurant process for scalable knowledge graph construction",
+    venue: "Array",
+    type: "Journal Article",
+    href: "https://doi.org/10.1016/j.array.2026.101244",
+    wos: "Not confirmed",
+    scopus: "Not confirmed",
+    scimago: "Not confirmed"
+  },
+  {
+    year: "2026",
+    title: "SPADE: Spline additive-noise DAG estimation for interpretable nonlinear causal discovery in managerial decision support",
+    venue: "Array",
+    type: "Journal Article",
+    href: "https://doi.org/10.1016/j.array.2026.101335",
+    wos: "Not confirmed",
+    scopus: "Not confirmed",
+    scimago: "Not confirmed"
+  },
+  {
+    year: "2026",
+    title: "REIGN: Regime-Enhanced Intelligent Granger Network for Nonstationary Causal Discovery",
+    venue: "Journal of Data Science and Intelligent Systems",
+    type: "Journal Article",
+    href: "https://doi.org/10.47852/bonviewJDSIS620210441",
+    wos: "Not confirmed",
+    scopus: "Not confirmed",
+    scimago: "Not confirmed"
+  },
+  {
+    year: "2026",
+    title: "CAPS: Compositional Attack Path Scoring for LLM Deployment Stacks",
+    venue: "Artificial Intelligence and Applications",
+    type: "Journal Article",
+    href: "https://doi.org/10.47852/bonviewAIA620210609",
+    wos: "Not confirmed",
+    scopus: "Not confirmed",
+    scimago: "Not confirmed"
+  },
+  {
+    year: "2026",
+    title: "Real-time hallucination correction in vision-language models using dynamic knowledge graph verification",
+    venue: "Discover Artificial Intelligence",
+    type: "Journal Article",
+    href: "https://doi.org/10.1007/s44163-026-01778-z",
+    wos: "Not confirmed",
+    scopus: "Not confirmed",
+    scimago: "Not confirmed"
+  },
+  {
+    year: "2026",
+    title: "CIPHER: A Differentially Private Federated Framework for Privacy-Preserving Multi-Criteria Group Decision Making",
+    venue: "Journal of Intelligent Decision Making and Information Science",
+    type: "Journal Article",
+    href: "https://doi.org/10.59543/jidmis.v3.819",
+    wos: "Not confirmed",
+    scopus: "Not confirmed",
+    scimago: "Not confirmed"
+  },
+  {
+    year: "2026",
+    title: "Privacy-Preserving Cryptography for Machine Learning: A Comprehensive Review of Homomorphic Encryption, Differential Privacy, Secure Computation, and Post-Quantum Foundations",
+    venue: "Computers, Materials & Continua",
+    type: "Journal Article",
+    href: "https://doi.org/10.32604/cmc.2026.087848",
+    wos: "Not confirmed",
+    scopus: "Not confirmed",
+    scimago: "Not confirmed"
+  },
+  {
+    year: "2026",
+    title: "Polyhedral theory for the stochastic vehicle routing problem with mixed and signed demands: Valid inequalities and recourse structure",
+    venue: "Open Journal of Mathematical Sciences",
+    type: "Journal Article",
+    href: "https://doi.org/10.30538/oms2026.0331",
+    wos: "Not confirmed",
+    scopus: "Not confirmed",
+    scimago: "Not confirmed"
+  },
+  {
     year: "2026",
     title: "XHBot: eXplainable Heterophily-aware Graph Neural Networks for Social Bot Detection",
     venue: "EAI Endorsed Transactions on AI and Robotics",
