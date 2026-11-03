@@ -61,16 +61,6 @@ window.siteUpdates = [
     featured: true
   },
   {
-    date: "April 2025",
-    type: "Talk",
-    title: "Shared expert perspectives on data strategy and biometrics in banking",
-    summary:
-      "Spoke at the World Financial Innovation Series 2025 on building data culture for banking and the implications of biometric evolution for user experience.",
-    href: "https://www.buv.edu.vn/research/",
-    cta: "Read BUV coverage",
-    featured: true
-  },
-  {
     date: "March 2026",
     type: "Site",
     title: "Personal website launched",
@@ -79,5 +69,15 @@ window.siteUpdates = [
     href: "./updates.html",
     cta: "Browse all updates",
     featured: false
+  },
+  {
+    date: "April 2025",
+    type: "Talk",
+    title: "Shared expert perspectives on data strategy and biometrics in banking",
+    summary:
+      "Spoke at the World Financial Innovation Series 2025 on building data culture for banking and the implications of biometric evolution for user experience.",
+    href: "https://www.buv.edu.vn/research/",
+    cta: "Read BUV coverage",
+    featured: true
   }
 ];

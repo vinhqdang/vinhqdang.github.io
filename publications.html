@@ -4,116 +4,72 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Publications | Vinh Dang</title>
-    <meta
-      name="description"
-      content="Full publication record for Vinh Dang, sourced from ORCID, with Web of Science, Scopus, and Scimago indexing status for each venue."
-    />
+    <meta name="description" content="Full publication record of Vinh Dang: journal articles, conference papers and book chapters on cyber security, graph learning, privacy, explainable AI and LLMs. Searchable and filterable by theme." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="page-glow page-glow-left"></div>
-    <div class="page-glow page-glow-right"></div>
-
     <header class="site-header">
-      <a class="brand" href="./index.html">Vinh Dang</a>
-      <nav class="site-nav" aria-label="Primary">
-        <a href="./index.html#about">About</a>
-        <a href="./index.html#experience">Experience</a>
-        <a href="./index.html#research">Research</a>
-        <a href="./publications.html" aria-current="page">Publications</a>
-        <a href="./updates.html">Updates</a>
-        <a href="./index.html#links">Links</a>
-      </nav>
+      <div class="wrap">
+        <a class="brand" href="./index.html">Vinh Dang</a>
+        <nav class="site-nav" aria-label="Primary">
+          <a href="./index.html#research">Research</a>
+          <a href="./publications.html" aria-current="page">Publications</a>
+          <a href="./updates.html">News</a>
+          <a href="./index.html#about">About</a>
+        </nav>
+      </div>
     </header>
 
-    <main id="top">
-      <section class="hero hero-compact reveal">
-        <div class="hero-copy">
-          <p class="eyebrow">Publications</p>
-          <h1>The full publication record, sourced from ORCID.</h1>
-          <p class="hero-summary">
-            Every entry below is pulled from
-            <a href="https://orcid.org/0000-0002-3877-8024" target="_blank" rel="noreferrer">ORCID iD 0000-0002-3877-8024</a>,
-            with Web of Science, Scopus, and Scimago indexing status noted per venue.
-          </p>
-          <div class="hero-actions">
-            <a class="button button-primary" href="./index.html">Back to home</a>
-            <a class="button button-secondary" href="https://orcid.org/0000-0002-3877-8024" target="_blank" rel="noreferrer">View ORCID record</a>
-          </div>
-        </div>
+    <main class="wrap">
+      <div class="page-head">
+        <p class="eyebrow">Publications</p>
+        <h1>Everything I have published.</h1>
+        <p>
+          Sourced from
+          <a href="https://orcid.org/0000-0002-3877-8024" target="_blank" rel="noreferrer">ORCID 0000-0002-3877-8024</a>.
+          Also on <a href="https://scholar.google.com/citations?hl=en&user=oLXKzkQAAAAJ&view_op=list_works&sortby=pubdate" target="_blank" rel="noreferrer">Google Scholar</a>
+          and <a href="https://dblp.org/pid/181/0669" target="_blank" rel="noreferrer">DBLP</a>.
+        </p>
+      </div>
 
-        <aside class="hero-panel hero-panel-note">
-          <div class="note-card">
-            <p class="profile-role">Methodology</p>
-            <h2>How the indexing columns work</h2>
-            <p>
-              <strong>WoS</strong> shows the Web of Science category (SCIE, ESCI, SSCI) where confirmed.
-              <strong>Scopus</strong> shows the CiteScore percentile (Elsevier's own metric, e.g.
-              &ldquo;92nd percentile&rdquo;) in the venue's best-ranked subject category, where
-              published; Scopus computes a percentile mainly for journals, so most book series and
-              conference proceedings show <em>&ldquo;Indexed (no percentile found)&rdquo;</em> instead
-              &mdash; that reflects how Scopus itself categorizes the source, not a gap in research.
-              <strong>Scimago</strong> shows the best SCImago Journal Rank quartile (Q1&ndash;Q4).
-              Where a venue's status could not be independently confirmed against a primary
-              database at the time of writing, it is marked <em>&ldquo;Not confirmed&rdquo;</em> or
-              <em>&ldquo;Not ranked&rdquo;</em> rather than asserted. Book chapters and conference
-              proceedings are indexed differently from journals; <em>N/A</em> means the metric does
-              not apply to that source type.
-            </p>
-          </div>
-        </aside>
-      </section>
+      <details class="method">
+        <summary>How to read the indexing badges</summary>
+        <p>
+          <strong>WoS</strong> is the Web of Science edition (SCIE, ESCI, SSCI). <strong>Scopus</strong> is the CiteScore
+          percentile in the venue's best-ranked subject category where Scopus publishes one; most book series and proceedings are
+          indexed without a percentile. <strong>SJR</strong> is the best SCImago Journal Rank quartile. A badge appears only where
+          the status was confirmed against the primary database. A missing badge means not indexed, not applicable to that source
+          type, or not confirmed.
+        </p>
+      </details>
 
-      <section class="publications-page">
-        <div class="section-heading">
-          <p class="eyebrow">All publications</p>
-          <h2>Sortable, filterable, and linked to source.</h2>
-        </div>
-
-        <div class="publication-filters" role="tablist" aria-label="Publication type filters">
-          <button class="filter-chip is-active" data-filter="all" type="button" aria-pressed="true">All</button>
-          <button class="filter-chip" data-filter="Journal Article" type="button" aria-pressed="false">Journal Articles</button>
-          <button class="filter-chip" data-filter="Conference Paper" type="button" aria-pressed="false">Conference Papers</button>
-          <button class="filter-chip" data-filter="Book Chapter" type="button" aria-pressed="false">Book Chapters</button>
-        </div>
-
-        <div class="table-scroll">
-          <table class="pubs-table" data-pubs-table>
-            <thead>
-              <tr>
-                <th data-sort="year" aria-sort="descending">Year</th>
-                <th data-sort="title">Title</th>
-                <th data-sort="venue">Venue</th>
-                <th data-sort="type">Type</th>
-                <th data-sort="wos">WoS</th>
-                <th data-sort="scopus">Scopus</th>
-                <th data-sort="scimago">Scimago</th>
-              </tr>
-            </thead>
-            <tbody data-pubs-body></tbody>
-          </table>
-        </div>
-        <p class="pubs-count" data-pubs-count></p>
-      </section>
+      <div class="controls" role="search">
+        <input id="q" class="search" type="search" placeholder="Search title, venue, year" aria-label="Search publications" />
+        <select id="f-type" aria-label="Filter by type"></select>
+        <select id="f-topic" aria-label="Filter by research theme"></select>
+        <select id="f-sort" aria-label="Sort order">
+          <option value="year-desc">Newest first</option>
+          <option value="year-asc">Oldest first</option>
+          <option value="title">Title A–Z</option>
+        </select>
+      </div>
+      <p class="count-line" data-pubs-count aria-live="polite"></p>
+      <div data-pubs-list></div>
+      <noscript><p class="empty">The publication list needs JavaScript. The same record is on <a href="https://orcid.org/0000-0002-3877-8024">ORCID</a> and <a href="https://dblp.org/pid/181/0669">DBLP</a>.</p></noscript>
     </main>
 
     <footer class="site-footer">
-      <p>
-        Publication list generated from ORCID 0000-0002-3877-8024. Indexing status
-        cross-checked against SCImago, the Web of Science Master Journal List, and
-        Scopus source data; entries marked "Not confirmed" could not be independently
-        verified at time of writing.
-      </p>
+      <div class="wrap">
+        <p>Indexing status cross-checked against SCImago, the Web of Science Master Journal List and Scopus source data.</p>
+        <p><a href="./index.html">← Home</a></p>
+      </div>
     </footer>
 
+    <script src="./topics.js"></script>
     <script src="./publications.js"></script>
     <script src="./publications-page.js"></script>
-    <script src="./script.js"></script>
   </body>
 </html>
