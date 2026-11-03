@@ -4,6 +4,7 @@ window.sitePublications = [
   {
     year: "2027",
     title: "Context-gated exponentiated gradient for online forecast combination",
+    authors: "Quang-Vinh Dang",
     venue: "Operations Research Letters",
     type: "Journal Article",
     href: "https://doi.org/10.1016/j.orl.2026.107567",
@@ -14,6 +15,7 @@ window.sitePublications = [
   {
     year: "2027",
     title: "Exact CVaR evaluation in O(p log N) time for single-factor stochastic pickup-and-delivery routing",
+    authors: "Hoang-Viet Vu, Quang-Vinh Dang, Son P. Nguyen",
     venue: "Operations Research Letters",
     type: "Journal Article",
     href: "https://doi.org/10.1016/j.orl.2026.107562",
@@ -24,6 +26,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "Sentiment-aware hierarchical stochastic block modelling with a nested Chinese restaurant process for scalable knowledge graph construction",
+    authors: "Hai Dang Nguyen, Ngoc Minh La, Minh Ngoc Dinh, Quang-Vinh Dang",
     venue: "Array",
     type: "Journal Article",
     href: "https://doi.org/10.1016/j.array.2026.101244",
@@ -34,6 +37,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "SPADE: Spline additive-noise DAG estimation for interpretable nonlinear causal discovery in managerial decision support",
+    authors: "Quang-Vinh Dang, Dat Le, Minh Ngoc Dinh",
     venue: "Array",
     type: "Journal Article",
     href: "https://doi.org/10.1016/j.array.2026.101335",
@@ -44,6 +48,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "REIGN: Regime-Enhanced Intelligent Granger Network for Nonstationary Causal Discovery",
+    authors: "Quang-Vinh Dang, Minh Ngoc Dinh, Dat Le, Dinh-Minh Nguyen",
     venue: "Journal of Data Science and Intelligent Systems",
     type: "Journal Article",
     href: "https://doi.org/10.47852/bonviewJDSIS620210441",
@@ -54,6 +59,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "CAPS: Compositional Attack Path Scoring for LLM Deployment Stacks",
+    authors: "Quang-Vinh Dang, Hoang-Viet Vu, Ngoc-Son-An Nguyen, Minh Ngoc Dinh, Dat Le",
     venue: "Artificial Intelligence and Applications",
     type: "Journal Article",
     href: "https://doi.org/10.47852/bonviewAIA620210609",
@@ -64,6 +70,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "Real-time hallucination correction in vision-language models using dynamic knowledge graph verification",
+    authors: "Quang-Vinh Dang, Ngoc-Son-An Nguyen, Thi-Bich-Diem Vo, Minh Ngoc Dinh, Dat Le, Hoang Viet Vu, Phuong Lan Nguyen",
     venue: "Discover Artificial Intelligence",
     type: "Journal Article",
     href: "https://doi.org/10.1007/s44163-026-01778-z",
@@ -74,6 +81,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "CIPHER: A Differentially Private Federated Framework for Privacy-Preserving Multi-Criteria Group Decision Making",
+    authors: "Quang-Vinh Dang",
     venue: "Journal of Intelligent Decision Making and Information Science",
     type: "Journal Article",
     href: "https://doi.org/10.59543/jidmis.v3.819",
@@ -84,6 +92,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "Privacy-Preserving Cryptography for Machine Learning: A Comprehensive Review of Homomorphic Encryption, Differential Privacy, Secure Computation, and Post-Quantum Foundations",
+    authors: "Quang-Vinh Dang, Dat Le, Minh Ngoc Dinh, Ngoc-Son-An Nguyen",
     venue: "Computers, Materials & Continua",
     type: "Journal Article",
     href: "https://doi.org/10.32604/cmc.2026.087848",
@@ -94,6 +103,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "Polyhedral theory for the stochastic vehicle routing problem with mixed and signed demands: Valid inequalities and recourse structure",
+    authors: "Quang-Vinh Dang, Hoang-Viet Vu",
     venue: "Open Journal of Mathematical Sciences",
     type: "Journal Article",
     href: "https://doi.org/10.30538/oms2026.0331",
@@ -104,6 +114,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "XHBot: eXplainable Heterophily-aware Graph Neural Networks for Social Bot Detection",
+    authors: "Quang-Vinh Dang, Phuong-Lan Nguyen, Dat Le, Minh Ngoc Dinh",
     venue: "EAI Endorsed Transactions on AI and Robotics",
     type: "Journal Article",
     href: "https://doi.org/10.4108/airo.12969",
@@ -114,6 +125,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "Work-integrated learning in Vietnamese higher education: governance models, institutional diversity and graduate employability in the Asian century",
+    authors: "Thi-Hong-Hanh Nguyen, Quang-Vinh Dang",
     venue: "Higher Education, Skills and Work-based Learning",
     type: "Journal Article",
     href: "https://doi.org/10.1108/HESWBL-05-2026-0390",
@@ -124,6 +136,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "Utilizing Uncertainty Measures to Improve the Performance of Intrusion Detection Systems",
+    authors: "Quang-Vinh Dang",
     venue: "SN Computer Science",
     type: "Journal Article",
     href: "https://doi.org/10.1007/s42979-026-04923-8",
@@ -134,6 +147,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "ST-Fedxids: A Spatiotemporal Federated Explainable Intrusion Detection System With Drift-Adaptive Graph Learning For High-Density Public Wifi Environments",
+    authors: "Quang-Vinh Dang, Dat Le, Minh Ngoc Dinh, Ngoc-Son-An Nguyen, Thi-Bich-Diem Vo",
     venue: "INTERNATIONAL JOURNAL OF ADVANCES IN SIGNAL AND IMAGE SCIENCES",
     type: "Journal Article",
     href: "https://doi.org/10.29284/zcrk2p65",
@@ -144,6 +158,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "Predicting the Stock Price Using a Bayesian Graph Neural Networks-Based Architecture",
+    authors: "Quang-Vinh Dang, Ngoc-Son-An Nguyen",
     venue: "Communications in Computer and Information Science",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-95-4724-1_23",
@@ -154,6 +169,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "Integrating a Knowledge Graph Into Malware Detection Systems",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes in Networks and Systems",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-032-22908-3_1",
@@ -164,6 +180,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "Integrating Graph Features for Social Bot Detection",
+    authors: "Ba-Hai-Dang Quang, Tac-Trieu Trinh, Quang-Vinh Dang",
     venue: "Lecture Notes on Data Engineering and Communications Technologies",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-032-13254-3_6",
@@ -174,6 +191,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "Improving the Louvain Algorithm in Community Detection",
+    authors: "Quang-Vinh Dang",
     venue: "Communications in Computer and Information Science",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-95-4724-1_31",
@@ -184,6 +202,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "HierFinRAG—Hierarchical Multimodal RAG for Financial Document Understanding",
+    authors: "Quang-Vinh Dang, Ngoc-Son-An Nguyen, Thi-Bich-Diem Vo",
     venue: "Informatics",
     type: "Journal Article",
     href: "https://doi.org/10.3390/informatics13020030",
@@ -194,6 +213,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "HeteroMalGAT: A Heterogeneous Graph Attention Network Framework for Android Malware Detection via Knowledge Graph Representations",
+    authors: "Quang-Vinh Dang",
     venue: "Communications in Computer and Information Science",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-95-4724-1_10",
@@ -204,6 +224,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "FedFairGNN: A Privacy-Preserving and Fairness-Aware Federated Graph Neural Network for Fraud Detection",
+    authors: "Quang-Vinh Dang, Ngoc-Son-An Nguyen, Sakinat Folorunso, Roseline Ogundokun, Francisca Oladipo",
     venue: "Proceedings of IndabaX Nigeria 2026: Building Scalable AI That Works: From Research to Deployment in Resource-Constrained Environments",
     type: "Conference Paper",
     href: "https://proceedings.mlr.press/v319/dang26a.html",
@@ -214,6 +235,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "FORTRESS-FL: Byzantine-robust and privacy-preserving federated orchestration for next-generation networks",
+    authors: "Quang-Vinh Dang, Thi-Bich-Diem Vo, Ngoc-Son-An Nguyen",
     venue: "Array",
     type: "Journal Article",
     href: "https://doi.org/10.1016/j.array.2026.100680",
@@ -224,6 +246,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "Evaluating the Robustness of Graphs Against Link Prediction Attack Threats",
+    authors: "Tran Nguyen, Quang-Vinh Dang",
     venue: "Communications in Computer and Information Science",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-95-4721-0_11",
@@ -234,6 +257,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "Detecting Windows Malware Using Machine Learning",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes on Data Engineering and Communications Technologies",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-032-13254-3_13",
@@ -244,6 +268,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "Collaborative Multi-agent LLMs for Autonomous Portfolio Management: An Empirical Study of Distributed AI Decision-Making in Financial Markets",
+    authors: "Quang-Vinh Dang, Ngoc-Son-An Nguyen",
     venue: "Communications in Computer and Information Science",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-032-22062-2_7",
@@ -254,6 +279,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "Catching the First Light of Tomorrow: A Hackathon-Based Framework for Introducing High School Students to AI Agents",
+    authors: "Long Nguyen, Duc Nguyen, Quan Bui, Dung Phan, Dung Le, Khanh Nguyen, Quynh Vo, Khang Vo, Nam Duong, Anh Dinh, Tri Trinh, Chi Phan, An Nguyen, Thai Nguyen, Dang Le, Vinh Dang, Tho Quan",
     venue: "Proceedings of the AAAI Conference on Artificial Intelligence",
     type: "Conference Paper",
     href: "https://doi.org/10.1609/aaai.v40i47.41527",
@@ -264,6 +290,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "CONFIDE: CONformal Free Inference for Distribution-Free Estimation in Causal Competing Risks",
+    authors: "Quang-Vinh Dang, Ngoc-Son-An Nguyen, Thi-Bich-Diem Vo",
     venue: "Mathematics",
     type: "Journal Article",
     href: "https://doi.org/10.3390/math14020383",
@@ -274,6 +301,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "Beyond transparency: why explainable AI is essential for educational equity in low-resource language communities",
+    authors: "Quang-Vinh Dang",
     venue: "Journal of Enabling Technologies",
     type: "Journal Article",
     href: "https://doi.org/10.1108/JET-07-2025-0052",
@@ -284,6 +312,7 @@ window.sitePublications = [
   {
     year: "2026",
     title: "Artificial intelligence as assistive technology for disabled students in higher education: a scoping review",
+    authors: "Quang-Vinh Dang",
     venue: "Journal of Enabling Technologies",
     type: "Journal Article",
     href: "https://doi.org/10.1108/JET-03-2026-0018",
@@ -294,6 +323,7 @@ window.sitePublications = [
   {
     year: "2025",
     title: "Utilizing LLM Embedding Technique for Intrusion Detection",
+    authors: "Quang-Vinh Dang, Thai-Ha Pham",
     venue: "Smart Innovation, Systems and Technologies",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-97-7717-4_50",
@@ -304,6 +334,7 @@ window.sitePublications = [
   {
     year: "2025",
     title: "Studying Machine Learning Algorithms to Classify Malware",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes in Networks and Systems",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-96-4139-0_5",
@@ -314,6 +345,7 @@ window.sitePublications = [
   {
     year: "2025",
     title: "ORGANIZATIONAL PERFORMANCE THROUGH STRATEGIC HUMAN RESOURCE PRACTICES AND EMPLOYEE ENGAGEMENT IN FINANCIAL INSTITUTIONS",
+    authors: "Dr.S.Preetham Sridar, Dr.G Jayashree Hareesh, Dr.T.Hemalata, Quang-Vinh Dang",
     venue: "Lex localis - Journal of Local Self-Government",
     type: "Journal Article",
     href: "https://doi.org/10.52152/801281",
@@ -324,6 +356,7 @@ window.sitePublications = [
   {
     year: "2025",
     title: "Multi-modal Retrieval-Augmented Generation for Enhanced E-commerce Search",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes in Networks and Systems",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-96-6929-5_23",
@@ -334,6 +367,7 @@ window.sitePublications = [
   {
     year: "2025",
     title: "Improving the t-Digest Data Structure to Accurately Estimate Quantiles in Online Streaming Data",
+    authors: "Quang-Vinh Dang",
     venue: "Advances in Computational Intelligence and Robotics",
     type: "Book Chapter",
     href: "https://doi.org/10.4018/979-8-3373-0462-5.ch018",
@@ -344,6 +378,7 @@ window.sitePublications = [
   {
     year: "2025",
     title: "Fine-Tuning LLMs to Detect SMS Spam",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes in Networks and Systems",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-96-4148-2_38",
@@ -354,6 +389,7 @@ window.sitePublications = [
   {
     year: "2025",
     title: "Detecting SMS Spam Using LLM Techniques",
+    authors: "Quang-Vinh Dang",
     venue: "Smart Innovation, Systems and Technologies",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-96-6254-8_31",
@@ -364,6 +400,7 @@ window.sitePublications = [
   {
     year: "2024",
     title: "User behaviour’s contribution to better Cyber Security Management",
+    authors: "Quang-Vinh Dang",
     venue: "Library Progress International",
     type: "Journal Article",
     href: "https://bpasjournals.com/library-science/index.php/journal/article/view/2733",
@@ -374,6 +411,7 @@ window.sitePublications = [
   {
     year: "2024",
     title: "Parallel Optimization Technique to Improve the Performance of Lightweight Intrusion Detection Systems",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes in Networks and Systems",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-99-6586-1_26",
@@ -384,6 +422,7 @@ window.sitePublications = [
   {
     year: "2024",
     title: "Multi-modal Retrieval Augmented Generation for Product Query",
+    authors: "Quang-Vinh Dang",
     venue: "Library Progress International",
     type: "Journal Article",
     href: "https://bpasjournals.com/library-science/index.php/journal/article/view/2437",
@@ -394,6 +433,7 @@ window.sitePublications = [
   {
     year: "2024",
     title: "Kernel Methods for Conformal Prediction to Detect Botnets",
+    authors: "Quang-Vinh Dang, Thai-Ha Pham",
     venue: "Lecture Notes in Networks and Systems",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-99-8476-3_3",
@@ -404,6 +444,7 @@ window.sitePublications = [
   {
     year: "2024",
     title: "Intrusion Detection in Internet of Medical Things",
+    authors: "Quang-Vinh Dang",
     venue: "Communications in Computer and Information Science",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-96-0434-0_28",
@@ -414,6 +455,7 @@ window.sitePublications = [
   {
     year: "2024",
     title: "Fuzzy Embedding to Detect Intrusion in Software-Defined Networks",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes in Networks and Systems",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-031-67195-1_78",
@@ -424,6 +466,7 @@ window.sitePublications = [
   {
     year: "2024",
     title: "Detecting Obfuscated Malware Using Graph Neural Networks",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes in Electrical Engineering",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-99-7216-6_2",
@@ -434,6 +477,7 @@ window.sitePublications = [
   {
     year: "2024",
     title: "Detecting IoT Malware Using Federated Learning",
+    authors: "Quang-Vinh Dang, Thai-Ha Pham",
     venue: "Lecture Notes in Networks and Systems",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-99-7862-5_6",
@@ -444,6 +488,7 @@ window.sitePublications = [
   {
     year: "2023",
     title: "Using Transformer Technique for Intrusion Detection",
+    authors: "Quang-Vinh Dang",
     venue: "Communications in Computer and Information Science",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-99-8296-7_13",
@@ -454,6 +499,7 @@ window.sitePublications = [
   {
     year: "2023",
     title: "Multi-layer Intrusion Detection on the USB-IDS-1 Dataset",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes in Networks and Systems",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-031-27409-1_102",
@@ -464,6 +510,7 @@ window.sitePublications = [
   {
     year: "2023",
     title: "Learning to Transfer Knowledge Between Datasets to Enhance Intrusion Detection Systems",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes in Electrical Engineering",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-19-7346-8_4",
@@ -474,6 +521,7 @@ window.sitePublications = [
   {
     year: "2023",
     title: "Evaluating the Contribution of Relationship Information in Detecting Fraud Using Graph Neural Networks",
+    authors: "Quang-Vinh Dang, Ngoc-Son-An Nguyen",
     venue: "Lecture Notes in Networks and Systems",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-19-4960-9_65",
@@ -484,6 +532,7 @@ window.sitePublications = [
   {
     year: "2023",
     title: "Detecting Intrusion in WiFi Network Using Graph Neural Networks",
+    authors: "Quang-Vinh Dang, Tan-Loc Nguyen",
     venue: "Lecture Notes in Electrical Engineering",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-19-7753-4_48",
@@ -494,6 +543,7 @@ window.sitePublications = [
   {
     year: "2023",
     title: "Detecting Frauds in Financial Statements Using Deep-Forest",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes in Networks and Systems",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-19-7874-6_57",
@@ -504,6 +554,7 @@ window.sitePublications = [
   {
     year: "2022",
     title: "Using Machine Learning for Intrusion Detection Systems",
+    authors: "Quang-Vinh Dang",
     venue: "Computing and Informatics",
     type: "Journal Article",
     href: "https://doi.org/10.31577/cai_2022_1_12",
@@ -514,6 +565,7 @@ window.sitePublications = [
   {
     year: "2022",
     title: "Studying the Attack Detection Problem Using the Dataset CIDDS-001",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes in Networks and Systems",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-030-93677-8_46",
@@ -524,6 +576,7 @@ window.sitePublications = [
   {
     year: "2022",
     title: "Reinforcement Learning for the Problem of Detecting Intrusion in a Computer System",
+    authors: "Quang-Vinh Dang, Thanh-Hai Vo",
     venue: "Lecture Notes in Networks and Systems",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-16-2380-6_66",
@@ -534,6 +587,7 @@ window.sitePublications = [
   {
     year: "2022",
     title: "Machine Learning for Intrusion Detection Systems",
+    authors: "Quang-Vinh Dang",
     venue: "Advances in Computational Intelligence and Robotics",
     type: "Book Chapter",
     href: "https://doi.org/10.4018/978-1-7998-9308-0.ch007",
@@ -544,6 +598,7 @@ window.sitePublications = [
   {
     year: "2022",
     title: "Intrusion Detection in Internet of Things Environment",
+    authors: "Industrial University of Ho Chi Minh City, Ho Chi Minh, Vietnam, Quang-Vinh Dang",
     venue: "Advances in Digital Science - ADS 2022",
     type: "Book Chapter",
     href: "https://doi.org/10.33847/978-5-6048575-0-2_2",
@@ -554,6 +609,7 @@ window.sitePublications = [
   {
     year: "2022",
     title: "Group’s Influence Value in Logistic Regression Model and Gradient Boosting Model",
+    authors: "Quang-Vinh Dang, My-Linh Tran, Minh-Hung Dang, Thi-Minh-Trang Tran, Huu-Nghia Nguyen, Thi-Minh-Hue Cai, Thanh-Duyen Phan",
     venue: "Lecture Notes in Networks and Systems",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-16-2377-6_66",
@@ -564,6 +620,7 @@ window.sitePublications = [
   {
     year: "2022",
     title: "Enhancing Obfuscated Malware Detection with Machine Learning Techniques",
+    authors: "Quang-Vinh Dang",
     venue: "Communications in Computer and Information Science",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-19-8069-5_54",
@@ -574,6 +631,7 @@ window.sitePublications = [
   {
     year: "2022",
     title: "Detecting the Attacks to DNS",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes in Networks and Systems",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-030-85799-8_15",
@@ -584,6 +642,7 @@ window.sitePublications = [
   {
     year: "2022",
     title: "Detecting Intrusion Using Multiple Datasets in Software-Defined Networks",
+    authors: "Quang-Vinh Dang",
     venue: "Communications in Computer and Information Science",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-19-8069-5_55",
@@ -594,6 +653,7 @@ window.sitePublications = [
   {
     year: "2021",
     title: "Towards an automatic interior design system using GAN",
+    authors: "Quang-Vinh Dang, Thai-Ha Pham, My-Linh Tran, Minh-Hung Dang, Quoc-Khanh Nguyen, Anh-Nguyen Nguyen",
     venue: "2021 4th International Conference on Data Science and Information Technology",
     type: "Conference Paper",
     href: "https://doi.org/10.1145/3478905.3478939",
@@ -614,6 +674,7 @@ window.sitePublications = [
   {
     year: "2021",
     title: "Studying the Fuzzy Clustering Methods to Understand Employee Performance",
+    authors: "Quang-Vinh Dang, Thanh-Hai Vo",
     venue: "2021 4th International Conference on Artificial Intelligence and Big Data (ICAIBD)",
     type: "Conference Paper",
     href: "https://doi.org/10.1109/icaibd51990.2021.9459006",
@@ -624,6 +685,7 @@ window.sitePublications = [
   {
     year: "2021",
     title: "Right to Be Forgotten in the Age of Machine Learning",
+    authors: "Quang-Vinh Dang",
     venue: "Advances in Intelligent Systems and Computing",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-030-71782-7_35",
@@ -634,6 +696,7 @@ window.sitePublications = [
   {
     year: "2021",
     title: "Link-Sign Prediction in Signed Directed Networks from No Link Perspective",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes in Networks and Systems",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-030-49264-9_26",
@@ -644,6 +707,7 @@ window.sitePublications = [
   {
     year: "2021",
     title: "Intrusion Detection in Software-Defined Networks",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes in Computer Science",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-030-91387-8_23",
@@ -654,6 +718,7 @@ window.sitePublications = [
   {
     year: "2021",
     title: "Improving the performance of the intrusion detection systems by the machine learning explainability",
+    authors: "Quang-Vinh Dang",
     venue: "International Journal of Web Information Systems",
     type: "Journal Article",
     href: "https://doi.org/10.1108/ijwis-03-2021-0022",
@@ -664,6 +729,7 @@ window.sitePublications = [
   {
     year: "2021",
     title: "Evaluating machine learning algorithms for intrusion detection systems using the dataset CIDDS-002",
+    authors: "Quang-Vinh Dang",
     venue: "2021 4th International Conference on Computer Science and Software Engineering (CSSE 2021)",
     type: "Conference Paper",
     href: "https://doi.org/10.1145/3494885.3494906",
@@ -674,6 +740,7 @@ window.sitePublications = [
   {
     year: "2021",
     title: "Citation Recommendation with Random Walking",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes in Networks and Systems",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-030-66093-2_4",
@@ -684,6 +751,7 @@ window.sitePublications = [
   {
     year: "2021",
     title: "Assessing the Quality of Wikipedia Articles",
+    authors: "Quang-Vinh Dang",
     venue: "2021 The 5th International Conference on Machine Learning and Soft Computing",
     type: "Conference Paper",
     href: "https://doi.org/10.1145/3453800.3453801",
@@ -694,6 +762,7 @@ window.sitePublications = [
   {
     year: "2020",
     title: "Understanding the Decision of Machine Learning Based Intrusion Detection Systems",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes in Computer Science",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-030-63924-2_22",
@@ -704,6 +773,7 @@ window.sitePublications = [
   {
     year: "2020",
     title: "Reinforcement Learning in Stock Trading",
+    authors: "Quang-Vinh Dang",
     venue: "Advances in Intelligent Systems and Computing",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-030-38364-0_28",
@@ -714,6 +784,7 @@ window.sitePublications = [
   {
     year: "2020",
     title: "Predicting the Signs of the Links in a Network",
+    authors: "Quang-Vinh Dang",
     venue: "Journal of Digital Science",
     type: "Journal Article",
     href: "https://doi.org/10.33847/2686-8296.2.2_2",
@@ -724,6 +795,7 @@ window.sitePublications = [
   {
     year: "2020",
     title: "Digital Signatures Using Hardware Security Modules for Electronic Bills in Vietnam: Open Problems and Research Directions",
+    authors: "Minh-Tuan Truong, Quang-Vinh Dang",
     venue: "Communications in Computer and Information Science",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-981-33-4370-2_35",
@@ -744,6 +816,7 @@ window.sitePublications = [
   {
     year: "2019",
     title: "The influence of trust score on cooperative behavior",
+    authors: "Claudia-Lavinia Ignat, Quang-Vinh Dang, Valerie L. Shalin",
     venue: "ACM Transactions on Internet Technology",
     type: "Journal Article",
     href: "https://doi.org/10.1145/3329250",
@@ -754,6 +827,7 @@ window.sitePublications = [
   {
     year: "2019",
     title: "Studying Machine Learning Techniques for Intrusion Detection Systems",
+    authors: "Quang-Vinh Dang",
     venue: "Lecture Notes in Computer Science",
     type: "Book Chapter",
     href: "https://doi.org/10.1007/978-3-030-35653-8_28",
@@ -764,6 +838,7 @@ window.sitePublications = [
   {
     year: "2018",
     title: "Utilizing attack enumerations to study SDN/NFV vulnerabilities",
+    authors: "Quang-Vinh Dang, Jerome Francois",
     venue: "2018 4th IEEE Conference on Network Softwarization and Workshops (NetSoft)",
     type: "Conference Paper",
     href: "https://doi.org/10.1109/NETSOFT.2018.8459961",
@@ -774,6 +849,7 @@ window.sitePublications = [
   {
     year: "2018",
     title: "Trust assessment in large-scale collaborative systems",
+    authors: "Quang Vinh Dang",
     venue: "Unpublished report",
     type: "Thesis",
     href: "https://doi.org/10.70675/41eb1e71z62dcz4412z8366z40b7e4c2d09a",
@@ -794,6 +870,7 @@ window.sitePublications = [
   {
     year: "2018",
     title: "Link-Sign prediction in dynamic signed directed networks",
+    authors: "Quang-Vinh Dang, Claudia-Lavinia Ignat",
     venue: "2018 IEEE 4th International Conference on Collaboration and Internet Computing (CIC)",
     type: "Conference Paper",
     href: "https://doi.org/10.1109/CIC.2018.00-42",
@@ -804,6 +881,7 @@ window.sitePublications = [
   {
     year: "2017",
     title: "dTrust: a simple deep learning approach for social recommendation",
+    authors: "Quang-Vinh Dang, Claudia-Lavinia Ignat",
     venue: "2017 IEEE 3rd International Conference on Collaboration and Internet Computing (CIC)",
     type: "Conference Paper",
     href: "https://doi.org/10.1109/CIC.2017.00036",
@@ -814,6 +892,7 @@ window.sitePublications = [
   {
     year: "2017",
     title: "Measuring quality of collaboratively edited documents: The case of Wikipedia",
+    authors: "Quang-Vinh Dang, Claudia-Lavinia Ignat",
     venue: "Proceedings - 2016 IEEE 2nd International Conference on Collaboration and Internet Computing, IEEE CIC 2016",
     type: "Conference Paper",
     href: "https://doi.org/10.1109/CIC.2016.42",
@@ -824,6 +903,7 @@ window.sitePublications = [
   {
     year: "2017",
     title: "An end-to-end learning solution for assessing the quality of Wikipedia articles",
+    authors: "Quang-Vinh Dang, Claudia-Lavinia Ignat",
     venue: "Proceedings of the 13th International Symposium on Open Collaboration",
     type: "Conference Paper",
     href: "https://doi.org/10.1145/3125433.3125448",
@@ -834,6 +914,7 @@ window.sitePublications = [
   {
     year: "2016",
     title: "Quality assessment of Wikipedia articles: a deep learning approach",
+    authors: "Quang Vinh Dang, Claudia-Lavinia Ignat",
     venue: "ACM SIGWEB Newsletter",
     type: "Journal Article",
     href: "https://doi.org/10.1145/2996442.2996447",
@@ -844,6 +925,7 @@ window.sitePublications = [
   {
     year: "2016",
     title: "Quality Assessment of Wikipedia Articles without Feature Engineering",
+    authors: "Quang Vinh Dang, Claudia-Lavinia Ignat",
     venue: "Proceedings of the 16th ACM/IEEE-CS on Joint Conference on Digital Libraries",
     type: "Conference Paper",
     href: "https://doi.org/10.1145/2910896.2910917",
@@ -854,6 +936,7 @@ window.sitePublications = [
   {
     year: "2016",
     title: "Performance of real-time collaborative editors at large scale: User perspective",
+    authors: "Quang-Vinh Dang, Claudia-Lavinia Ignat",
     venue: "2016 IFIP Networking Conference (IFIP Networking) and Workshops",
     type: "Conference Paper",
     href: "https://doi.org/10.1109/IFIPNetworking.2016.7497258",
@@ -864,6 +947,7 @@ window.sitePublications = [
   {
     year: "2016",
     title: "Measuring Quality of Collaboratively Edited Documents: The Case of Wikipedia",
+    authors: "Quang-Vinh Dang, Claudia-Lavinia Ignat",
     venue: "2016 IEEE 2nd International Conference on Collaboration and Internet Computing (CIC)",
     type: "Conference Paper",
     href: "https://doi.org/10.1109/CIC.2016.044",
@@ -874,6 +958,7 @@ window.sitePublications = [
   {
     year: "2016",
     title: "Computational Trust Model for Repeated Trust Games",
+    authors: "Quang-Vinh Dang, Claudia-Lavinia Ignat",
     venue: "2016 IEEE Trustcom/BigDataSE/ISPA",
     type: "Conference Paper",
     href: "https://doi.org/10.1109/TrustCom.2016.0043",

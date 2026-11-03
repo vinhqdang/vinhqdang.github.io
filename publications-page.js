@@ -34,12 +34,23 @@
     return out.length ? `<div class="badges">${out.join("")}</div>` : "";
   };
 
+  // Bold the site owner's name; collapse very long author lists behind a native <details>.
+  const isMe = (n) => /vinh/i.test(n) && /(dang|quang)/i.test(n);
+  const authorsHtml = (p) => {
+    if (!p.authors) return "";
+    const names = p.authors.split(", ");
+    const fmt = (n) => (isMe(n) ? "<strong>" + esc(n) + "</strong>" : esc(n));
+    if (names.length <= 8) return '<div class="authors">' + names.map(fmt).join(", ") + "</div>";
+    return '<details class="authors"><summary>' + names.slice(0, 6).map(fmt).join(", ") +
+      ", … +" + (names.length - 6) + " more</summary>" + names.map(fmt).join(", ") + "</details>";
+  };
+
   const paint = () => {
     const needle = q.value.trim().toLowerCase();
     let items = pubs.filter((p) =>
       (!fType.value || p.type === fType.value) &&
       (!fTopic.value || p.topics.includes(fTopic.value)) &&
-      (!needle || (p.title + " " + p.venue + " " + p.year).toLowerCase().includes(needle))
+      (!needle || (p.title + " " + (p.authors || "") + " " + p.venue + " " + p.year).toLowerCase().includes(needle))
     );
 
     const s = fSort.value;
@@ -56,6 +67,7 @@
             <div class="yr">${esc(p.year)}</div>
             <div>
               <h3>${title}</h3>
+              ${authorsHtml(p)}
               <div class="meta">${esc(p.venue)} · ${esc(p.type)}</div>
               ${badges(p)}
             </div>

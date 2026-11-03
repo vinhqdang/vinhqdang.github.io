@@ -208,3 +208,9 @@ details.method p { margin: 10px 0 0; }
   html { scroll-behavior: auto; }
   * { transition: none !important; }
 }
+
+.authors { font: 14px/1.5 var(--sans); color: var(--muted); margin: 0 0 4px; }
+.authors strong { color: var(--ink); font-weight: 600; }
+details.authors summary { cursor: pointer; }
+details.authors summary:hover { color: var(--ink); }
+.work .authors { margin: 0 0 2px; }
