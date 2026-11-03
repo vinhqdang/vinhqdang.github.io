@@ -26,6 +26,17 @@ window.sitePublications = [
   },
   {
     year: "2026",
+    title: "Numerical Analysis of Nonlinear Differential Equations Using Iterative Approximation Methods",
+    authors: "N. Rajeshwaran, Quang-Vinh Dang, Praveen Srinivasan, M. Manjula, Deepthi Chamkur V",
+    venue: "Acta Innovations",
+    type: "Journal Article",
+    href: "https://doi.org/10.62441/actainnovations.vi.2708",
+    wos: "Not confirmed",
+    scopus: "83rd percentile",
+    scimago: "Not confirmed"
+  },
+  {
+    year: "2026",
     title: "Sentiment-aware hierarchical stochastic block modelling with a nested Chinese restaurant process for scalable knowledge graph construction",
     authors: "Hai Dang Nguyen, Ngoc Minh La, Minh Ngoc Dinh, Quang-Vinh Dang",
     corresponding: "Quang-Vinh Dang",
