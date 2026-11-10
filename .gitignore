@@ -1,0 +1,20 @@
+
+# LaTeX build artifacts (talks/)
+talks/**/*.aux
+talks/**/*.log
+talks/**/*.bbl
+talks/**/*.bcf
+talks/**/*.blg
+talks/**/*.fdb_latexmk
+talks/**/*.fls
+talks/**/*.nav
+talks/**/*.out
+talks/**/*.run.xml
+talks/**/*.snm
+talks/**/*.toc
+talks/**/*.vrb
+talks/**/*.bcf-SAVE-ERROR
+talks/**/*.bbl-SAVE-ERROR
+talks/_bis/
+# Compiled slide PDFs are shared for review, not published until approved
+talks/**/main.pdf

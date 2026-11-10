@@ -1,0 +1,113 @@
+% Shared preamble for the talks (Beamer, Metropolis theme)
+\usetheme[progressbar=frametitle,numbering=fraction,background=light,block=fill,sectionpage=none]{metropolis}
+\usepackage[T1]{fontenc}
+\usepackage{FiraSans}
+\usepackage[scaled=.85]{FiraMono}
+\usepackage{amsmath,amssymb}
+\usefonttheme[onlymath]{serif}
+\usepackage{booktabs,array,tabularx,multirow}
+\usepackage{tikz,pgfplots}
+\usepackage{fontawesome5}
+\usepackage{qrcode}
+\usepackage{xcolor}
+\hyphenpenalty=10000\exhyphenpenalty=10000
+\usepackage{ragged2e}
+\usepackage{adjustbox}
+\usepackage{multicol}
+\newenvironment{sfig}[1][0.80]{\begin{adjustbox}{max width=\linewidth,max totalheight=#1\textheight,center}}{\end{adjustbox}}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,shapes.misc,fit,calc,backgrounds,decorations.pathreplacing,patterns,matrix,chains}
+\usepgfplotslibrary{fillbetween}
+\pgfplotsset{compat=1.17}
+
+% ---- palette (matches vinhqdang.github.io) ----
+\definecolor{tdInk}{HTML}{1D2330}
+\definecolor{tdMuted}{HTML}{5D6678}
+\definecolor{tdLine}{HTML}{D9D5CA}
+\definecolor{tdPaper}{HTML}{FBFAF7}
+\definecolor{tdBlue}{HTML}{2457D6}
+\definecolor{tdGreen}{HTML}{17855A}
+\definecolor{tdAmber}{HTML}{B7791F}
+\definecolor{tdRed}{HTML}{C8362F}
+\definecolor{tdPurple}{HTML}{7A4FD1}
+\setbeamercolor{normal text}{fg=tdInk,bg=tdPaper}
+\setbeamercolor{alerted text}{fg=tdRed}
+\setbeamercolor{example text}{fg=tdGreen}
+\setbeamercolor{frametitle}{bg=tdInk,fg=white}
+\setbeamercolor{progress bar}{fg=tdBlue,bg=tdLine}
+\setbeamercolor{title separator}{fg=tdBlue}
+\setbeamercolor{block title}{bg=tdBlue!12,fg=tdInk}
+\setbeamercolor{block body}{bg=tdBlue!5,fg=tdInk}
+\setbeamercolor{block title alerted}{bg=tdRed!12,fg=tdRed!80!black}
+\setbeamercolor{block body alerted}{bg=tdRed!5,fg=tdInk}
+\setbeamercolor{block title example}{bg=tdGreen!14,fg=tdGreen!70!black}
+\setbeamercolor{block body example}{bg=tdGreen!6,fg=tdInk}
+\setbeamerfont{frametitle}{size=\large,series=\bfseries}
+\setbeamerfont{footnote}{size=\tiny}
+\makeatletter\setlength{\metropolis@frametitle@padding}{1.15ex}\makeatother
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footnote}{\hangindent=0.8em\hangafter=1\insertfootnotetext\par}
+
+% ---- bibliography ----
+\usepackage[backend=biber,style=authoryear-comp,maxcitenames=2,maxbibnames=4,minbibnames=3,uniquelist=false,giveninits=true,doi=false,url=false,isbn=false,eprint=false,date=year]{biblatex}
+\addbibresource{../common/refs.bib}
+\addbibresource{../common/own.bib}
+\renewcommand*{\nameyeardelim}{\addcomma\space}
+\DeclareFieldFormat{doi}{}\renewcommand{\bibfont}{\tiny}
+\setlength{\bibitemsep}{1pt}
+\newcommand{\src}[1]{\par\vfill{\tiny\color{tdMuted}#1}}   % small source line at slide bottom
+\newcommand{\cit}[1]{{\scriptsize\color{tdMuted}\parencite{#1}}}
+
+% ---- tikz styles ----
+\tikzset{>={Stealth[length=2.2mm]},
+  card/.style={rounded corners=4pt,draw=#1!70!black,fill=#1!10,align=center,inner sep=5pt,font=\small},
+  card/.default=tdBlue,
+  pill/.style={rounded corners=7pt,draw=none,fill=#1,text=white,inner sep=3pt,font=\scriptsize\bfseries,align=center},
+  pill/.default=tdBlue,
+  soft/.style={rounded corners=4pt,draw=tdLine,fill=white,align=center,inner sep=4pt,font=\small},
+  lbl/.style={font=\scriptsize,text=tdMuted,align=center},
+  arr/.style={->,thick,draw=tdMuted},
+}
+\pgfplotsset{every axis/.append style={tick label style={font=\scriptsize},label style={font=\scriptsize},legend style={font=\scriptsize,draw=none,fill=none}}}
+
+% small helpers
+\newcommand{\illus}{{\tiny\color{tdMuted}\itshape illustrative}}
+\newcommand{\key}[1]{\textcolor{tdBlue}{\bfseries #1}}
+\newcommand{\bad}[1]{\textcolor{tdRed}{\bfseries #1}}
+\newcommand{\good}[1]{\textcolor{tdGreen}{\bfseries #1}}
+\newcommand{\talkfooter}[1]{\setbeamertemplate{footline}{\hfill\tiny\color{tdMuted}#1\hspace{1.6em}\insertframenumber/\inserttotalframenumber\hspace{0.8em}\vspace{4pt}}}
+\input{../common/data_fan.tex}
+\input{../common/data_wealth.tex}
+\input{../common/data_pubs.tex}
+
+% chip node used in the "research map" slides: \chip{col}{y}{colour}{fill\%}{text}; (col*44mm, y)
+\newcommand{\chip}[4]{\node[rounded corners=3pt,font=\scriptsize,text width=38mm,align=left,inner sep=3pt,draw=#3!70!black,fill=#3!#4,minimum height=8mm] at (#1*44,#2) }
+
+% compact footnote-style citations at the bottom of a slide: \srcc{free text}{bibkey,bibkey,...}
+\DeclareCiteCommand{\scite}
+  {\defcounter{maxnames}{3}\defcounter{minnames}{1}}
+  {\printnames[given-family]{author} (\printfield{year}). \printfield{title}. %
+   \iffieldundef{journaltitle}{\iffieldundef{booktitle}{\iffieldundef{howpublished}{\iffieldundef{institution}{\printfield{note}}{\printfield{institution}}}{\printfield{howpublished}}}{\textit{\printfield{booktitle}}}}{\textit{\printfield{journaltitle}}}.}
+  {\ {\color{tdBlue}$\bullet$}\ }
+  {}
+\setlength{\columnsep}{6pt}
+\newcommand{\srcc}[2]{\par\vfill\begingroup\fontsize{5.2}{6.1}\selectfont\color{tdMuted}\raggedright\setlength{\parindent}{0pt}\begin{multicols}{3}\ifx\relax#1\relax\else #1\ \fi\ifx\relax#2\relax\else\scite{#2}\fi\end{multicols}\vspace{-2pt}\endgroup}
+
+\tikzset{chip/.style={rounded corners=3pt,text width=64mm,align=left,inner sep=3pt,minimum height=7.5mm,anchor=north west},
+  done/.style={chip,draw=#1!70!black,fill=#1!14},wip/.style={chip,draw=#1!70!black,dashed,fill=#1!3},done/.default=tdBlue,wip/.default=tdBlue}
+
+% research-map list helpers
+\newcommand{\pillarhead}[2]{\par\noindent\colorbox{#1}{\textcolor{white}{\strut\ \small\bfseries #2\ }}\par\vspace{1.5mm}}
+\newcommand{\pub}[1]{\par\noindent\hangindent=1.1em\hangafter=1 {\color{tdBlue}$\bullet$}\ #1\par\vspace{0.6mm}}
+\newcommand{\wip}[1]{\par\noindent\hangindent=1.1em\hangafter=1 {\color{tdMuted}$\circ$}\ #1\par\vspace{0.6mm}}
+
+% five-bar comparison panel: \barpanel{title}{max value}{v1,v2,v3,v4,v5}  (bars: ERM, DP-SGD, PF-LD, DP-EDL, TRACER-Med)
+\newcommand{\barpanel}[3]{\begin{tikzpicture}[x=1mm,y=1mm]
+  \node[font=\scriptsize\bfseries,anchor=west,text width=60mm] at (0,47) {#1};
+  \draw[tdMuted] (0,0) -- (62,0);
+  \foreach \bv [count=\bi] in {#3}{%
+    \pgfmathsetmacro{\bh}{\bv/#2*36}\pgfmathsetmacro{\bx}{(\bi-1)*12.5+1}%
+    \ifnum\bi=5 \def\bcol{tdBlue}\else\def\bcol{tdMuted!55}\fi%
+    \fill[\bcol] (\bx,0) rectangle (\bx+9,\bh);%
+    \node[font=\tiny,above] at (\bx+4.5,\bh) {\bv};}%
+  \foreach \bn [count=\bj] in {ERM,DP-SGD,PF-LD,DP-EDL,TRACER}{\node[font=\tiny,below] at ({(\bj-1)*12.5+5.5},0) {\bn};}
+\end{tikzpicture}}

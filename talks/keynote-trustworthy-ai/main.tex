@@ -1,0 +1,753 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\input{../common/preamble}
+\talkfooter{Trustworthy AI for Smart Systems \,|\, Tay Do University, 15 Dec 2026}
+
+\title{Trustworthy AI for Smart Systems}
+\subtitle{From Explainability and Uncertainty to Verification and Resilience}
+\author{Dr.\ Quang-Vinh Dang}
+\institute{British University Vietnam}
+\date{Keynote \,|\, International Conference on Technological Innovation and Sustainable Engineering in the Digital Era\\Tay Do University, 15 December 2026}
+
+\begin{document}
+\begin{frame}[plain]\titlepage\end{frame}
+
+%% ===================================================================
+%%  A. MOTIVATION  (about 5 min)
+%% ===================================================================
+\begin{frame}{Smart systems turn data into physical action}
+\centering
+\begin{sfig}
+\begin{tikzpicture}[node distance=8mm]
+  \node[card=tdAmber,text width=22mm,minimum height=17mm] (s) {{\Large\faMicrochip}\\\textbf{Sensors}\\[-1pt]{\scriptsize electronics}};
+  \node[card=tdBlue,text width=22mm,minimum height=17mm,right=of s] (n) {{\Large\faNetworkWired}\\\textbf{Network, edge}\\[-1pt]{\scriptsize IT}};
+  \node[card=tdPurple,text width=22mm,minimum height=17mm,right=of n] (m) {{\Large\faBrain}\\\textbf{AI models}\\[-1pt]{\scriptsize predict, generate}};
+  \node[card=tdBlue,text width=22mm,minimum height=17mm,right=of m] (d) {{\Large\faBalanceScale}\\\textbf{Decisions}\\[-1pt]{\scriptsize people, automation}};
+  \node[card=tdGreen,text width=22mm,minimum height=17mm,right=of d] (p) {{\Large\faBuilding}\\\textbf{Physical world}\\[-1pt]{\scriptsize construction, plant}};
+  \foreach \a/\b in {s/n,n/m,m/d,d/p}{\draw[arr] (\a) -- (\b);}
+  \draw[arr,dashed,rounded corners=6pt] (p.south) -- ++(0,-6mm) -| (s.south);
+  \node[lbl,fill=tdPaper,inner sep=1pt] at ($(s.south)!0.5!(p.south)+(0,-6mm)$) {actions change what the sensors see next};
+  \foreach \x/\t in {s/{drift, faults,\\spoofed signals},n/{intrusions,\\poisoned updates},m/{overconfident or\\fabricated output},d/{unexplained,\\unaccountable},p/{safety and cost\\of errors}}{
+    \node[lbl,text=tdRed,below=15mm of \x] {\t};}
+\end{tikzpicture}
+\end{sfig}
+
+\vspace{3mm}
+{\large Every arrow is a place where \bad{trust} can break.}
+\end{frame}
+
+\begin{frame}{Accurate is not the same as trustworthy}
+\centering
+\begin{sfig}
+\begin{tikzpicture}[node distance=4mm]
+  \node[card=tdAmber,text width=33mm,minimum height=46mm] (a) {{\Large\color{tdAmber}\faBullseye}\\[2pt]{\bfseries\color{tdAmber!70!black}Overconfident}\\[3pt]{\scriptsize Modern networks are often \textbf{poorly calibrated}: they say ``99\%'' and are right far less often.}\\[5pt]{\tiny\color{tdMuted}Guo et al., 2017}};
+  \node[card=tdPurple,text width=33mm,minimum height=46mm,right=of a] (b) {{\Large\color{tdPurple}\faCommentDots}\\[2pt]{\bfseries\color{tdPurple!70!black}Fabricating}\\[3pt]{\scriptsize Language models produce fluent, \textbf{unsupported} content: hallucination.}\\[5pt]{\tiny\color{tdMuted}Ji et al., 2023}};
+  \node[card=tdRed,text width=33mm,minimum height=46mm,right=of b] (c) {{\Large\color{tdRed}\faBug}\\[2pt]{\bfseries\color{tdRed!70!black}Attackable}\\[3pt]{\scriptsize Tiny input changes, poisoned updates or injected instructions can \textbf{steer} a model.}\\[5pt]{\tiny\color{tdMuted}Szegedy et al., 2014; Greshake et al., 2023}};
+  \node[card=tdBlue,text width=33mm,minimum height=46mm,right=of c] (d) {{\Large\color{tdBlue}\faUserSecret}\\[2pt]{\bfseries\color{tdBlue!70!black}Leaky}\\[3pt]{\scriptsize A model can reveal whether a record was in its training data. \textbf{Forgetting} is hard to verify.}\\[5pt]{\tiny\color{tdMuted}Shokri et al., 2017; Bourtoule et al., 2021}};
+\end{tikzpicture}
+\end{sfig}
+
+\vspace{5mm}
+\large Trust needs \key{evidence}, not just an accuracy number.
+\srcc{}{guo2017,ji2023,szegedy2014,greshake2023,shokri2017,bourtoule2021}
+\end{frame}
+
+\begin{frame}{Four questions a decision-maker should be able to ask}
+\centering
+\begin{sfig}
+\begin{tikzpicture}
+  \node[circle,draw=tdInk,fill=tdInk,text=white,font=\bfseries,align=center,inner sep=3pt] (c) {Trustworthy\\smart\\system};
+  \node[card=tdBlue,text width=50mm,minimum height=20mm,anchor=east] (e) at (-16mm,19mm) {\textbf{\faSearch\ Explainability}\\{\scriptsize ``\emph{Why} did it decide that?''}\\[-1pt]{\scriptsize attributions $\cdot$ evidence subgraphs}};
+  \node[card=tdAmber,text width=50mm,minimum height=20mm,anchor=west] (u) at (16mm,19mm) {\textbf{\faChartArea\ Uncertainty awareness}\\{\scriptsize ``\emph{How sure} are you?''}\\[-1pt]{\scriptsize calibration $\cdot$ conformal $\cdot$ anytime-valid}};
+  \node[card=tdGreen,text width=50mm,minimum height=20mm,anchor=east] (v) at (-16mm,-19mm) {\textbf{\faCheckDouble\ Verification}\\{\scriptsize ``Is it \emph{true}?''}\\[-1pt]{\scriptsize grounding $\cdot$ monitors $\cdot$ certified checks}};
+  \node[card=tdRed,text width=50mm,minimum height=20mm,anchor=west] (r) at (16mm,-19mm) {\textbf{\faUserShield\ Resilience}\\{\scriptsize ``What if it is \emph{attacked}?''}\\[-1pt]{\scriptsize robust aggregation $\cdot$ privacy $\cdot$ unlearning}};
+  \foreach \x in {e,u,v,r}{\draw[tdMuted,thick] (c) -- (\x);}
+\end{tikzpicture}
+\end{sfig}
+
+\vspace{2mm}
+{\small Next: a map of each pillar. Then what we built, and what we learned, in each.}
+\end{frame}
+
+\begin{frame}{Policy now asks for the same things}
+\begin{columns}[T]
+\begin{column}{0.29\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \draw[thick,tdMuted] (3,2) -- (3,-66);
+  \foreach \yy/\yr/\tx/\cc in {-4/2019/{EU High-Level Expert Group:\\\emph{Ethics Guidelines for Trustworthy AI}}/tdBlue,
+                            -30/2023/{NIST \emph{AI Risk Management}\\\emph{Framework} 1.0}/tdPurple,
+                            -56/2024/{EU \emph{AI Act}:\\Regulation (EU) 2024/1689}/tdGreen}{
+    \fill[\cc] (3,\yy) circle (1.6mm);
+    \node[anchor=west,font=\normalsize\bfseries,text=\cc] at (7,\yy+3) {\yr};
+    \node[anchor=north west,font=\scriptsize,align=left,text width=38mm] at (7,\yy) {\tx};}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.69\textwidth}
+\footnotesize\renewcommand{\arraystretch}{1.28}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{EU HLEG requirement} & \textbf{Explain} & \textbf{Uncertainty} & \textbf{Verify} & \textbf{Resilience}\\
+\midrule
+Human agency and oversight & \good{\faCircle} & \good{\faCircle} & \faCircle[regular] & \faCircle[regular]\\
+Technical robustness and safety & \faCircle[regular] & \good{\faCircle} & \good{\faCircle} & \good{\faCircle}\\
+Privacy and data governance & & & \faCircle[regular] & \good{\faCircle}\\
+Transparency & \good{\faCircle} & \faCircle[regular] & \good{\faCircle} & \\
+Diversity, non-discrimination, fairness & \good{\faCircle} & \faCircle[regular] & & \faCircle[regular]\\
+Societal and environmental well-being & & \faCircle[regular] & & \faCircle[regular]\\
+Accountability & \good{\faCircle} & & \good{\faCircle} & \good{\faCircle}\\
+\bottomrule
+\end{tabular}
+
+{\tiny\color{tdMuted}\faCircle\ main contribution \quad \faCircle[regular]\ partial \quad our own mapping of the seven requirements to the four pillars}
+\end{column}
+\end{columns}
+\srcc{}{hleg2019,nist2023,euaiact2024}
+\end{frame}
+
+%% ===================================================================
+%%  B. THE BIG PICTURE  (about 8 min)
+%% ===================================================================
+\begin{frame}{Pillar 1 \,|\, Explainability: show the reasons, and test them}
+\begin{columns}[T]
+\begin{column}{0.50\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[x=1mm,y=1mm,font=\footnotesize]
+  \node[card=tdBlue] (r) at (36,46) {Explanations};
+  \node[card=tdGreen,text width=30mm] (a) at (17,27) {\textbf{Built in}\\interpretable models};
+  \node[card=tdAmber,text width=30mm] (b) at (57,27) {\textbf{Post hoc}\\explain a black box};
+  \draw[tdMuted] (r) -- (a); \draw[tdMuted] (r) -- (b);
+  \node[soft,font=\scriptsize,text width=14mm] (a1) at (8,7) {rules,\\trees};
+  \node[soft,font=\scriptsize,text width=15mm] (a2) at (27,7) {prototypes, additive};
+  \node[soft,font=\scriptsize,text width=15mm] (b1) at (48,7) {local:\\LIME, SHAP};
+  \node[soft,font=\scriptsize,text width=15mm] (b2) at (67,7) {global:\\surrogates};
+  \foreach \p/\q in {a/a1,a/a2,b/b1,b/b2}{\draw[tdMuted] (\p) -- (\q);}
+\end{tikzpicture}
+\end{sfig}
+
+\vspace{2mm}
+{\small\textbf{Rudin (2019):} for high-stakes decisions prefer models that are interpretable by design. Post hoc explanations can be unfaithful.}
+\end{column}
+\begin{column}{0.47\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \node[font=\small\bfseries,anchor=west] at (0,48) {Why was this sensor flagged?};
+  \node[lbl,anchor=west] at (0,43) {\illus\ contributions to the alert score};
+  \draw[tdMuted] (46,2) -- (46,38);
+  \foreach \yy/\nm/\vv in {34/{Vibration RMS}/26,26/{Temperature}/18,18/{Humidity}/6,10/{Packet rate}/-9,2/{Load}/-17}{
+    \node[font=\scriptsize,anchor=east] at (21,\yy) {\nm};
+    \ifdim \vv pt>0pt
+      \fill[tdBlue!80] (46,\yy-2.5) rectangle (46+\vv,\yy+2.5);
+    \else
+      \fill[tdRed!80] (46+\vv,\yy-2.5) rectangle (46,\yy+2.5);
+    \fi}
+  \node[lbl,text=tdRed,anchor=east] at (46,-6) {toward normal};
+  \node[lbl,text=tdBlue,anchor=west] at (46,-6) {toward alarm};
+\end{tikzpicture}
+\end{sfig}
+
+\vspace{1mm}
+{\small An explanation is a \key{claim} about the model. Measure its fidelity.}
+\end{column}
+\end{columns}
+\srcc{Our work:}{lime2016,rudin2019,own2020understandingdecisionmachine,own2026xhbotexplainableheterophily}
+\end{frame}
+
+\begin{frame}{Pillar 2 \,|\, Uncertainty: know what you do not know}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\begin{sfig}[0.66]
+\begin{tikzpicture}
+\begin{axis}[width=8.6cm,height=5.3cm,xlabel={input $x$},ylabel={prediction},ymin=-3.2,ymax=3.6,xmin=0,xmax=10,xtick=\empty,ytick=\empty,axis lines=left,clip=true]
+  \addplot[name path=ue,draw=none] coordinates {\fanUp};
+  \addplot[name path=le,draw=none] coordinates {\fanLo};
+  \addplot[tdAmber!25] fill between[of=ue and le];
+  \addplot[name path=ua,draw=none] coordinates {\fanUpA};
+  \addplot[name path=la,draw=none] coordinates {\fanLoA};
+  \addplot[tdBlue!30] fill between[of=ua and la];
+  \addplot[tdInk,thick] coordinates {\fanMean};
+  \addplot[only marks,mark=*,mark size=0.9pt,tdInk!70] coordinates {\fanPts};
+  \node[font=\tiny,text=tdBlue!70!black,anchor=west] at (axis cs:0.2,-1.85) {aleatoric: noise in the data};
+  \node[font=\tiny,text=tdAmber!60!black,align=center] at (axis cs:5,2.9) {epistemic: no data here};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.44\textwidth}
+\begin{sfig}[0.66]
+\begin{tikzpicture}
+\begin{axis}[width=5.6cm,height=5.3cm,xlabel={stated confidence},ylabel={actual accuracy},xmin=0,xmax=1,ymin=0,ymax=1,xtick={0,0.5,1},ytick={0,0.5,1},axis lines=left,ybar,bar width=0.06,enlarge x limits=0.05]
+  \addplot[fill=tdAmber!70,draw=tdAmber!80!black] coordinates {(0.15,0.12)(0.25,0.20)(0.35,0.28)(0.45,0.37)(0.55,0.44)(0.65,0.50)(0.75,0.57)(0.85,0.63)(0.95,0.70)};
+  \addplot[sharp plot,tdInk,dashed,no marks] coordinates {(0,0)(1,1)};
+  \node[font=\tiny,anchor=north west,text=tdInk] at (axis cs:0.05,0.98) {\illus\ reliability diagram};
+  \node[font=\tiny,anchor=south east,text=tdRed] at (axis cs:0.98,0.05) {gap = overconfidence};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\end{columns}
+\vspace{-1mm}
+{\small \textbf{Two kinds:} irreducible noise (aleatoric) and ignorance that more data can cure (epistemic). Real networks are often \bad{overconfident}, so we must \key{calibrate} and \key{measure} it.}
+\srcc{Our work:}{guo2017,kendall2017,ovadia2019,own2026utilizinguncertaintymeasures}
+\end{frame}
+
+\begin{frame}{Conformal prediction: a coverage guarantee from one calibration set}
+\centering
+\begin{sfig}[0.62]
+\begin{tikzpicture}[x=1.15mm,y=1mm]
+  \draw[->,thick,tdMuted] (0,0) -- (118,0) node[right,font=\small,text=tdInk] {score};
+  \foreach \xx in {6,11,14,19,22,27,31,33,38,42,45,49,52,57,61,66,70,75,83,94}{\fill[tdBlue!75] (\xx,0) circle (1.2mm);}
+  \node[font=\small,anchor=east] at (-2,0) {calibration};
+  \draw[tdRed,very thick] (78,-5) -- (78,7) node[above,font=\small,text=tdRed] {$\hat q$: 95\% of calibration scores lie to its left};
+  \node[font=\small,anchor=east] at (-2,-17) {new input};
+  \foreach \xx/\nm/\cc in {10/cat/tdGreen,29/dog/tdGreen,100/bird/tdRed}{
+     \fill[\cc] (\xx,-17) circle (1.7mm);\node[font=\small,below=1.2mm] at (\xx,-17) {\nm};}
+  \draw[dashed,tdRed] (78,-22) -- (78,-12);
+  \node[card=tdGreen,font=\normalsize] at (59,-36) {prediction set $\mathcal C(x)=\{\text{cat},\text{dog}\}$};
+  \node[card=tdBlue,font=\normalsize,text width=88mm] at (59,-54) {$\mathbb P\big(Y_{\text{new}}\in\mathcal C(X_{\text{new}})\big)\ \ge\ 1-\alpha$\\[1pt]{\small distribution-free, finite-sample, needs only exchangeability}};
+\end{tikzpicture}
+\end{sfig}
+
+\vspace{2mm}
+{\small A model that \key{says ``I am not sure'' with a guarantee}: larger sets when unsure, a single answer when confident.}
+\srcc{Our work:}{vovk2005,angelopoulos2023,own2024kernelmethodsconformal,own2026confideconformalfree}
+\end{frame}
+
+\begin{frame}{Pillar 3 \,|\, Verification: check the output against evidence}
+\begin{sfig}[0.52]
+\begin{tikzpicture}[node distance=6mm]
+  \node[card=tdPurple,text width=26mm] (o) {\faBrain\\\textbf{AI output}\\{\scriptsize answer, report, plan}};
+  \node[card=tdBlue,text width=24mm,right=of o] (c) {\faList\\\textbf{Claims}\\{\scriptsize split into checkable statements}};
+  \node[card=tdAmber,text width=34mm,right=of c] (e) {\faDatabase\\\textbf{Evidence}\\{\scriptsize knowledge graph, documents, sensor data}};
+  \node[card=tdGreen,text width=26mm,right=of e] (v) {\faBalanceScale\\\textbf{Verdict}\\{\scriptsize supported / contradicted / unverifiable}};
+  \foreach \a/\b in {o/c,c/e,e/v}{\draw[arr] (\a) -- (\b);}
+  \node[pill=tdGreen,below=6mm of v,xshift=-10mm] (a1) {accept};
+  \node[pill=tdAmber,right=2mm of a1] (a2) {correct};
+  \node[pill=tdRed,right=2mm of a2] (a3) {abstain};
+  \draw[arr] (v) -- (a2.north);
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+
+\begin{columns}[T]
+\column{0.32\textwidth}\centering{\small\textbf{Statistical}}\\[1pt]{\scriptsize runtime monitors, uncertainty gates}
+\column{0.32\textwidth}\centering{\small\textbf{Semantic}}\\[1pt]{\scriptsize grounding in retrieved or structured evidence}
+\column{0.32\textwidth}\centering{\small\textbf{Formal}}\\[1pt]{\scriptsize SMT checking of small networks}
+\end{columns}
+\srcc{Our work:}{ji2023,lewis2020,own2026realtimehallucination,own2026hierfinraghierarchicalmultimodal}
+\end{frame}
+
+\begin{frame}{Pillar 4 \,|\, Resilience: assume something will go wrong}
+\begin{sfig}[0.78]
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \foreach \i/\t/\c in {0/Data/tdBlue,1/{Training\\(federated)}/tdPurple,2/Model/tdAmber,3/{Deployment\\(agents, tools)}/tdGreen}{
+    \node[pill=\c,minimum width=32mm,minimum height=9mm] at (\i*36,50) {\t};}
+  \foreach \i/\t in {0/{poisoning,\\backdoors},1/{Byzantine clients,\\gradient leakage},2/{adversarial inputs,\\membership inference},3/{prompt injection,\\tool abuse}}{
+    \node[card=tdRed,minimum width=32mm,minimum height=14mm,font=\scriptsize] (a\i) at (\i*36,30) {\t};}
+  \foreach \i/\t in {0/{provenance,\\robust cleaning},1/{robust aggregation,\\differential privacy},2/{rejection by uncertainty,\\unlearning audits},3/{runtime monitors,\\attack-path scoring}}{
+    \node[card=tdGreen,minimum width=32mm,minimum height=14mm,font=\scriptsize] (d\i) at (\i*36,8) {\t};
+    \draw[->,thick,tdMuted] (a\i.south) -- (d\i.north);}
+  \node[lbl,anchor=east] at (-18,30) {attacks};
+  \node[lbl,anchor=east] at (-18,8) {defences};
+\end{tikzpicture}
+\end{sfig}
+
+{\small Federated learning keeps data local; it does not make training safe. We still need robust aggregation, privacy accounting and audits.}
+\srcc{Our work:}{mcmahan2017,blanchard2017,greshake2023,own2024detectingiotmalware,own2021rightbeforgotten}
+\end{frame}
+
+\begin{frame}{Monitoring without fooling yourself: anytime-valid evidence}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+\begin{axis}[width=8.8cm,height=5.8cm,xlabel={observations},ylabel={evidence $\log_{10}W_t$},xmin=0,xmax=160,ymin=-1.6,ymax=3.2,axis lines=left,ytick={-1,0,1,2,3},clip=true]
+  \foreach \n in {A,B,C,D,E,F,G,H}{\addplot[tdMuted!55,thin,no marks] coordinates {\csname wealthNull\n\endcsname};}
+  \addplot[tdRed,very thick,no marks] coordinates {\wealthAlt};
+  \draw[tdBlue,dashed,thick] (axis cs:0,1.301) -- (axis cs:160,1.301) node[above left,font=\tiny,text=tdBlue] {alarm threshold $1/\alpha=20$};
+  \node[font=\tiny,text=tdRed,anchor=east] at (axis cs:48,2.7) {shifted stream: evidence grows};
+  \node[font=\tiny,text=tdMuted,anchor=west,fill=tdPaper,inner sep=1pt] at (axis cs:78,0.55) {healthy streams: rarely cross};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.38\textwidth}
+{\small
+Evidence is a \key{betting wealth} $W_t$ that cannot grow in expectation if nothing is wrong.
+
+\vspace{2mm}
+\textbf{Ville's inequality:}
+\[\mathbb P\big(\exists t:\ W_t\ge 1/\alpha\big)\le\alpha\]
+\vspace{-2mm}
+
+\good{Peeking is safe}: look every day, stop whenever you like, the false-alarm budget still holds.}
+\vspace{1mm}
+
+{\tiny\illus: simulated Gaussian streams, 8 healthy runs (grey) and one run with a small shift (red).}
+\end{column}
+\end{columns}
+\srcc{}{shafer2021,ramdas2023,vovkwang2021}
+\end{frame}
+
+%% ===================================================================
+%%  C. MY RESEARCH  (about 14 min)
+%% ===================================================================
+\begin{frame}{From trust in collaborative systems to trustworthy AI}
+\begin{columns}[T]
+\begin{column}{0.62\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+\begin{axis}[width=9.4cm,height=5.8cm,ybar,bar width=7pt,ymin=0,ymax=34,xtick={2016,2018,2020,2022,2024,2026},xticklabel style={/pgf/number format/1000 sep=},ylabel={publications per year},enlarge x limits=0.07,axis lines=left,
+ xticklabels={2016,2018,2020,2022,2024,2026}]
+  \addplot[fill=tdBlue!75,draw=tdBlue!90!black] coordinates {\pubsPerYear};
+  \node[font=\tiny,anchor=south] at (axis cs:2026,30.5) {30};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+{\tiny ORCID record of 89 publications (2027 print dates counted in 2026). Google Scholar: more than 1,000 citations.}
+\end{column}
+\begin{column}{0.36\textwidth}
+\small
+\textbf{2014--2018} PhD (Inria, Nancy): \emph{trust assessment} in large-scale collaborative systems\\[2pt]
+\textbf{2019} trust scores change cooperation \cit{dang2019toit}\\[2pt]
+\textbf{2020--2025} intrusion and malware detection, graphs, explanation, conformal methods\\[2pt]
+\textbf{2026} one programme: explainable, uncertainty-aware, verifiable, resilient AI
+\end{column}
+\end{columns}
+\srcc{Selected earlier work:}{own2018trustassessmentlarge,own2019influencetrustscore,own2023detectingintrusionwifi,own2024detectingobfuscatedmalware}
+\end{frame}
+
+\begin{frame}{Our work, mapped to the four pillars}
+\begin{columns}[T]
+\begin{column}{0.49\textwidth}\footnotesize
+\pillarhead{tdBlue}{Explainability}
+\pub{\textbf{XHBot}: explainable bot detection (EAI AIR 2026)}
+\pub{\textbf{Explaining IDS decisions} (2020, 2021)}
+\wip{Relation-camouflage theory}
+\vspace{0mm}
+\pillarhead{tdGreen}{Verification}
+\pub{\textbf{CMVKG-Guard}: hallucination correction (Discover AI 2026)}
+\pub{HierFinRAG: financial document QA (Informatics 2026)}
+\wip{\textbf{CCRC}: certified correction}
+\end{column}
+\begin{column}{0.49\textwidth}\footnotesize
+\pillarhead{tdAmber}{Uncertainty}
+\pub{\textbf{Uncertainty-aware IDS} (SN Comput.\ Sci.\ 2026)}
+\pub{\textbf{CONFIDE}: conformal causal survival (Mathematics 2026)}
+\wip{\textbf{PHASE}: anytime-valid structural monitoring}
+\vspace{0mm}
+\pillarhead{tdRed}{Resilience}
+\pub{\textbf{FORTRESS-FL}: robust federated learning (Array 2026)}
+\pub{\textbf{VOUCH}: unlearning certificates (Machine Learning, accepted)}
+\pub{\textbf{CAPS}: LLM attack-path scoring (2026)}
+\wip{\textbf{SENTRY-Fuse}: agent-trace monitoring}
+\end{column}
+\end{columns}
+\srcc{Filled: published or accepted. Hollow: in progress. Papers shown (selection):}{own2026xhbotexplainableheterophily,own2026confideconformalfree,own2026realtimehallucination,own2026fortressflbyzantine}
+\end{frame}
+
+\begin{frame}{Explainability \,|\, XHBot: bots that hide among friends}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \foreach \i/\xx/\yy in {1/10/46,2/30/50,3/52/44,4/18/28,5/40/30,6/62/28,7/8/10,8/30/12,9/54/10}{\node[circle,fill=tdBlue!70,minimum size=5mm,inner sep=0] (g\i) at (\xx,\yy) {};}
+  \foreach \a/\b in {1/2,2/3,1/4,2/5,3/5,3/6,4/5,5/6,4/7,5/8,6/9,7/8,8/9,5/9}{\draw[tdBlue!50] (g\a) -- (g\b);}
+  \foreach \i/\xx/\yy in {1/34/20,2/74/40,3/72/16}{\node[diamond,fill=tdRed,minimum size=6mm,inner sep=0] (b\i) at (\xx,\yy) {};}
+  \foreach \a/\b in {1/4,1/5,1/8,1/6,1/9,2/3,2/6,2/5,3/6,3/9,3/5}{\draw[tdRed!70,thick] (b\a) -- (g\b);}
+  \node[font=\footnotesize,text=tdBlue!70!black,anchor=west] at (0,58) {\textbf{genuine} users};
+  \node[font=\footnotesize,text=tdRed,anchor=west] at (36,58) {\textbf{bots} follow genuine users};
+\end{tikzpicture}
+\end{sfig}
+
+\vspace{1mm}
+{\small\textbf{Relation camouflage:} averaging over neighbours fails when a bot's neighbours look genuine (\emph{heterophily}).}
+\end{column}
+\begin{column}{0.47\textwidth}
+{\small
+\textbf{XHBot} couples three ideas:\\[2pt]
+\key{SGTR} spectral filter down-weights camouflage edges\\
+\key{THCA} separate homophilic, heterophilic and self signals\\
+\key{CPD} decouple behaviour from social position\\[3pt]
+\textbf{HFE}: instance-level evidence subgraphs and community-level motifs, scored by fidelity and sparsity.}
+
+\vspace{2mm}
+\begin{center}
+\begin{sfig}[0.62]
+\begin{tikzpicture}
+  \node[card=tdGreen,minimum width=48mm,inner sep=4pt] {{\huge\bfseries\color{tdGreen!70!black}0.9474}\ {\small F1 on TwiBot-20}\\[1pt]{\scriptsize +9.64\% over recent baselines}};
+\end{tikzpicture}
+\end{sfig}
+\end{center}
+\end{column}
+\end{columns}
+\srcc{Also on TwiBot-22 and Cresci-2017.}{own2026xhbotexplainableheterophily,own2026integratinggraphfeatures,twibot20}
+\end{frame}
+
+\begin{frame}{Explainability \,|\, When does looking at neighbours stop helping?}
+\begin{columns}[T]
+\begin{column}{0.58\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+\begin{axis}[width=8.6cm,height=5.8cm,xlabel={mean neighbourhood size $D$},ylabel={camouflage threshold $\rho^\star$},xmin=2,xmax=100,ymin=0,ymax=0.95,axis lines=left,legend pos=south east,xmode=log,log basis x=10]
+  \addplot[domain=2:100,samples=60,thick,tdBlue] {(1-1/sqrt(x))/(1+1)};
+  \addplot[domain=2:100,samples=60,thick,tdAmber] {(1-1/sqrt(x))/(1+0.5)};
+  \addplot[domain=2:100,samples=60,thick,tdRed] {(1-1/sqrt(x))/(1+0.1)};
+  \legend{$c=1$,$c=0.5$,$c=0.1$}
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.4\textwidth}
+{\small
+Share $\rho$ of a bot's ties aimed at genuine users. Above
+\[\rho^\star=\frac{1-D^{-1/2}}{1+c}\]
+averaging over neighbours is \bad{worse than ignoring the graph}. $c$ = minority-to-majority ratio.
+
+\vspace{2mm}
+\textbf{Prevalence acts as protection:} the more bots there are, the less camouflage each one needs.}
+\end{column}
+\end{columns}
+\srcc{Closed-form threshold from our relation-camouflage manuscript (in progress), not an experiment.}{zhu2020}
+\end{frame}
+
+\begin{frame}{Uncertainty \,|\, Intrusion detection: fewer misses, and honest about transfer}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\begin{sfig}[0.46]
+\begin{tikzpicture}[node distance=5mm,font=\footnotesize]
+  \node[card=tdBlue,text width=16mm] (f) {network flow};
+  \node[card=tdAmber,text width=34mm,right=6mm of f] (u) {classifier score\\+ \textbf{9 uncertainty measures}\\+ distance + Isolation Forest};
+  \node[card=tdGreen,text width=22mm,above right=1mm and 6mm of u,yshift=4mm] (a) {confident\\$\rightarrow$ act};
+  \node[card=tdRed,text width=22mm,below right=1mm and 6mm of u,yshift=-4mm] (h) {unsure\\$\rightarrow$ analyst};
+  \draw[arr] (f) -- (u); \draw[arr] (u) -- (a); \draw[arr] (u) -- (h);
+\end{tikzpicture}
+\end{sfig}
+
+\vspace{3mm}
+{\small \key{Result:} up to \good{50\% fewer false negatives} for minority attack classes on CICIDS 2017, accuracy above 98\%.}
+\end{column}
+\begin{column}{0.45\textwidth}
+\begin{sfig}[0.46]
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \node[font=\small\bfseries,anchor=west] at (0,60) {Transfer to another network};
+  \draw[tdMuted] (6,0) -- (6,52); \draw[tdMuted] (6,0) -- (66,0);
+  \foreach \v in {0.5,0.75,1.0}{\pgfmathsetmacro{\yy}{(\v-0.4)*83}\draw[tdLine] (6,\yy) -- (66,\yy);\node[font=\tiny,anchor=east] at (5,\yy) {\v};}
+  \node[font=\tiny,rotate=90] at (-3,26) {ROC-AUC};
+  \fill[tdBlue!75] (10,0) rectangle (24,{(0.985-0.4)*83}); \node[font=\scriptsize\bfseries,above] at (17,{(0.985-0.4)*83}) {0.985};
+  \fill[tdRed!75] (28,0) rectangle (42,{(0.55-0.4)*83}); \node[font=\scriptsize\bfseries,above] at (35,{(0.55-0.4)*83}) {0.54--0.56};
+  \fill[tdMuted!60] (46,0) rectangle (60,{(0.5-0.4)*83}); \node[font=\scriptsize\bfseries,above] at (53,{(0.5-0.4)*83}) {0.50};
+  \node[font=\scriptsize,align=center] at (17,-6) {same\\dataset}; \node[font=\scriptsize,align=center] at (35,-6) {other\\dataset}; \node[font=\scriptsize,align=center] at (53,-6) {chance};
+\end{tikzpicture}
+\end{sfig}
+
+\vspace{4mm}
+{\small Trained on one network, a detector \bad{falls to chance} on another (7 public datasets).}
+\end{column}
+\end{columns}
+\srcc{Transfer benchmark: our repository cross\_ids.}{own2026utilizinguncertaintymeasures,own2023learningtransferknowledge,cicids2018}
+\end{frame}
+
+\begin{frame}{Uncertainty \,|\, Structures: the false-alarm problem of ``monitoring forever''}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+\begin{axis}[width=8.4cm,height=5.8cm,xlabel={monitoring epochs (e.g.\ one per few hours)},ylabel={P(at least one false alarm)},xmin=0,xmax=3000,ymin=0,ymax=1.05,axis lines=left]
+  \addplot[domain=0:3000,samples=80,very thick,tdRed] {1-(1-0.0027)^x};
+  \addplot[domain=0:3000,thick,tdGreen,dashed] {0.05};
+  \node[font=\scriptsize,text=tdRed,anchor=east] at (axis cs:2900,0.8) {fixed $3\sigma$ chart};
+  \node[font=\scriptsize,text=tdGreen!70!black,anchor=south west] at (axis cs:60,0.07) {anytime-valid budget $\alpha=0.05$};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+{\tiny\illus: independent epochs, $3\sigma$ limit ($p=0.27\%$ per epoch). Real residuals are correlated, but the message holds.}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small
+Bridges and buildings now produce \key{streams}. A threshold that is fine for one test is applied every few hours for years.
+
+\vspace{2mm}
+In our simulations, a $3\sigma$ chart gave its first false alarm after a \bad{median of 2 days}, in \bad{every one} of 300 undamaged records.
+
+\vspace{2mm}
+Alarms nobody trusts are eventually ignored, and every false alarm costs an inspection.}
+\end{column}
+\end{columns}
+\srcc{Our PHASE manuscript.}{shafer2021,ramdas2023}
+\end{frame}
+
+\begin{frame}{Uncertainty \,|\, PHASE: physics tells the monitor where damage can hide}
+\centering
+\begin{sfig}[0.22]
+\begin{tikzpicture}[node distance=4mm,font=\footnotesize]
+  \node[card=tdAmber,text width=26mm] (t) {predict \textbf{temperature, load} effects};
+  \node[card=tdBlue,text width=20mm,right=of t] (r) {score the \textbf{residual}};
+  \node[card=tdPurple,text width=34mm,right=of r] (c) {keep the \textbf{damage cone}: stiffness loss lowers frequencies};
+  \node[card=tdGreen,text width=20mm,right=of c] (e) {betting \textbf{e-process}};
+  \node[card=tdRed,text width=14mm,right=of e] (a) {alarm at $1/\alpha$};
+  \foreach \p/\q in {t/r,r/c,c/e,e/a}{\draw[arr] (\p) -- (\q);}
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \foreach \yy/\nm/\vv/\lb in {28/{5\% loss, storey 3}/100/{100\% (150/150)},19/{5\% loss after 2 healthy years}/66/{66\%},10/{2\% stiffness loss}/34/{34\%}}{
+    \node[font=\scriptsize,anchor=east] at (36,\yy) {\nm};
+    \fill[tdGreen!70] (38,\yy-3) rectangle (38+\vv*0.45,\yy+3);
+    \node[font=\scriptsize\bfseries,anchor=west] at (38+\vv*0.45+1,\yy) {\lb};}
+  \draw[tdMuted] (38,5) -- (38,33);
+  \node[lbl] at (60,0) {detection rate in simulated frame records};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.42\textwidth}\raggedright
+{\small \good{0 false alarms} in 300 undamaged records at 1 and at 3 years (95\% upper limit 1.2\%). A 5\% loss is found with a median delay of 59 days.}
+\end{column}
+\end{columns}
+\vspace{1mm}
+
+\begin{alertblock}{Where it breaks (we report it)}
+{\tiny\raggedright 30--60 days of commissioning destroys false-alarm control. On the real KW51 bridge a reduced version alarmed before the retrofit in most hourly settings (Z24: silent). The guarantee is conditional, and missed detections are not controlled.}
+\end{alertblock}
+\srcc{PHASE: our manuscript.}{ramdas2023}
+\end{frame}
+
+\begin{frame}{Verification \,|\, CMVKG-Guard: correct hallucinations while the model is writing}
+\begin{sfig}[0.40]
+\begin{tikzpicture}[node distance=5mm]
+  \node[card=tdPurple,text width=22mm] (v) {\textbf{VLM} writes token by token};
+  \node[card=tdBlue,text width=36mm,right=of v] (k) {\textbf{scene knowledge graph}\\from the image\\+ Wikidata, ConceptNet};
+  \node[card=tdAmber,text width=42mm,right=of k] (x) {\textbf{three-layer check}\\visual--text 30\% $\cdot$ graph 40\% $\cdot$ reasoning 30\%};
+  \node[card=tdGreen,text width=34mm,right=of x] (s) {\textbf{replace} low-score tokens by grounded ones (look-ahead beam)};
+  \foreach \p/\q in {v/k,k/x,x/s}{\draw[arr] (\p) -- (\q);}
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+
+\begin{columns}[T]
+\column{0.3\textwidth}\centering{\Huge\bfseries\color{tdGreen!70!black}84\%}\\[-1pt]{\scriptsize fewer object hallucinations (CHAIR)}
+\column{0.3\textwidth}\centering{\Huge\bfseries\color{tdGreen!70!black}91.5\%}\\[-1pt]{\scriptsize F1 on POPE, +5.8 points over the best training-free baseline}
+\column{0.3\textwidth}\centering{\Huge\bfseries\color{tdGreen!70!black}12\,ms}\\[-1pt]{\scriptsize median extra latency per token (A100)}
+\end{columns}
+\vspace{2mm}
+
+{\small \key{Training-free}: it wraps an existing model, so it can be added to a deployed system.}
+\srcc{Six benchmarks, eight baselines.}{own2026realtimehallucination,own2025multimodalretrieval,pope2023}
+\end{frame}
+
+\begin{frame}{Verification \,|\, CCRC: can we \emph{certify} the correction?}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+\begin{axis}[width=8.2cm,height=5.8cm,xlabel={base error rate $\mu$ of the model},ylabel={forced abstention $\ge(\mu-\alpha)/(1-\alpha)$},xmin=0,xmax=0.6,ymin=0,ymax=0.7,axis lines=left]
+  \addplot[domain=0.05:0.6,very thick,tdRed,samples=40] {(x-0.05)/(1-0.05)};
+  \node[font=\scriptsize,text=tdRed,anchor=east] at (axis cs:0.58,0.28) {accept-or-abstain only};
+  \node[font=\scriptsize,anchor=west] at (axis cs:0.02,0.62) {target error $\alpha=0.05$};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.43\textwidth}
+{\small
+\textbf{Impossibility:} if a model may only \emph{emit or abstain} its own answer, whenever $\mu>\alpha$ it must refuse at least this fraction, whatever its score.
+
+\vspace{2mm}
+\textbf{CCRC:} also allow \emph{substituting} an answer from an \key{independent evidence channel}, and certify the error of everything emitted at level $\alpha$.
+
+\vspace{2mm}
+\good{Honest finding:} of a 66.8-point gain, \textbf{64.5 come from the correctness score}, only 2.3 from our procedure.}
+\end{column}
+\end{columns}
+\srcc{CCRC: our work in progress (five benchmarks, 400+ paired splits).}{bates2021,angelopoulos2024crc}
+\end{frame}
+
+\begin{frame}{Resilience \,|\, FORTRESS-FL: federated learning that expects bad participants}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[x=1mm,y=1mm,font=\footnotesize]
+  \foreach \i/\yy/\cc/\tx in {1/48/tdBlue/{operator 1},2/32/tdBlue/{operator 2},3/16/tdBlue/{operator 3},4/0/tdRed/{operator 4 (Byzantine)}}{
+    \node[card=\cc,minimum width=30mm] (o\i) at (15,\yy) {\tx};}
+  \node[card=tdGreen,minimum width=36mm,minimum height=46mm,text width=34mm,align=center] (s) at (70,24) {\textbf{coordinator}\\[2pt]verify commitments\\spectral clustering\\reputation weights\\DP noise on aggregate\\hash-chained ledger};
+  \foreach \i in {1,2,3}{\draw[arr] (o\i.east) -- (s.west |- o\i);}
+  \draw[arr,tdRed] (o4.east) -- (s.west |- o4);
+  \node[font=\scriptsize,text=tdRed,align=center] at (40,-7) {outlier update is down-weighted};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.45\textwidth}
+{\small
+Multi-operator networks cannot pool raw data and cannot trust every participant.
+
+\vspace{2mm}
+\textbf{Governance layer:} signed forgetting certificates, consent registry, per-round checkpoints.
+
+\vspace{2mm}
+\good{Cost:} audited recovery used \textbf{56--97\% less client energy} than retraining for a fixed 60 rounds, but not always less than early-stopped retraining.
+
+\vspace{2mm}
+\bad{Limit:} little power for small models; certifies canary memorisation, not parameter erasure.}
+\end{column}
+\end{columns}
+\srcc{Unlearning layer: our follow-up manuscript.}{own2026fortressflbyzantine,own2026stfedxidsspatiotemporal,blanchard2017}
+\end{frame}
+
+\begin{frame}{Resilience \,|\, VOUCH: a certificate that data was really forgotten}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[x=1mm,y=1mm,font=\footnotesize]
+  \node[card=tdBlue,minimum width=18mm] (a) at (6,34) {twin A};
+  \node[card=tdBlue,minimum width=18mm] (b) at (6,10) {twin B};
+  \node[circle,draw=tdInk,fill=white,font=\scriptsize,align=center,inner sep=1pt] (coin) at (30,22) {fair\\coin};
+  \draw[arr] (a) -- (coin); \draw[arr] (b) -- (coin);
+  \node[card=tdGreen,minimum width=28mm] (t) at (64,34) {one twin is\\\textbf{trained on}};
+  \node[card=tdAmber,minimum width=28mm] (g) at (64,10) {the other is\\a \textbf{ghost}};
+  \draw[arr] (coin) -- (t); \draw[arr] (coin) -- (g);
+  \node[card=tdPurple,minimum width=40mm] (u) at (46,-14) {after unlearning the twin\\scores must be \textbf{symmetric}};
+  \draw[arr,dashed] (t.east) -- ++(7,0) |- (u.east);
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.45\textwidth}
+{\small
+Paired \emph{ghost canaries} give an exact null with no shadow models. A betting e-process then issues a certificate valid at \textbf{any stopping time}, or \bad{revokes} it.
+
+\vspace{2mm}
+\textbf{Real models} (GPT-2, Pythia, Phi-1.5; up to 5.1B parameters): un-unlearned models revoked in \good{16/18} runs; retraining, gradient ascent and NPO certified in \good{18/18} at $\varepsilon=0.2$.
+
+\vspace{2mm}
+\bad{Scope:} equivalence is supported at $\varepsilon=0.2$, not yet at 0.1 or 0.05.}
+\end{column}
+\end{columns}
+\srcc{Interactive explainer on vinhqdang.github.io.}{dang2026vouch,own2021rightbeforgotten,bourtoule2021}
+\end{frame}
+
+\begin{frame}{Resilience \,|\, LLM agents: score the whole attack path, then watch the trace}
+\centering
+\begin{sfig}[0.62]
+\begin{tikzpicture}[node distance=4mm,font=\footnotesize]
+  \node[card=tdRed,text width=24mm] (i) {web page with \textbf{injected text}};
+  \node[card=tdAmber,text width=20mm,right=of i] (r) {RAG retriever};
+  \node[card=tdPurple,text width=18mm,right=of r] (l) {LLM agent};
+  \node[card=tdBlue,text width=16mm,right=of l] (q) {SQL tool};
+  \node[card=tdGreen,text width=20mm,right=of q] (d) {customer data};
+  \foreach \a/\b in {i/r,r/l,l/q,q/d}{\draw[arr,tdRed] (\a) -- (\b);}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}\raggedright
+{\small \textbf{CAPS} multiplies exposure along the path, attenuates it by guardrails, and ranks mitigations by risk removed per unit cost.
+
+\vspace{3mm}
+\textbf{Autonomous-agent benchmark:}\\component-wise (CVSS-style) score \bad{85.0}\\CAPS critical-path score \good{51.3}\\[2pt]{\scriptsize chained low-risk steps are neither independent nor additive}}
+\end{column}
+\begin{column}{0.47\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \node[font=\small\bfseries,anchor=west] at (0,52) {SENTRY-Fuse: recall at 5\% false alarms};
+  \draw[tdMuted] (6,0) -- (6,44); \draw[tdMuted] (6,0) -- (66,0);
+  \foreach \v in {0,0.5,1.0}{\pgfmathsetmacro{\yy}{\v*42}\draw[tdLine] (6,\yy) -- (66,\yy);\node[font=\tiny,anchor=east] at (5,\yy) {\v};}
+  \fill[tdAmber!70] (12,0) rectangle (28,{0.709*42}); \draw[thick,tdAmber!60!black] (20,{(0.709-0.357)*42}) -- (20,{(0.709+0.357)*42}); \node[font=\scriptsize\bfseries,anchor=west] at (29,{0.709*42}) {0.71 $\pm$ 0.36};
+  \fill[tdGreen!70] (12,-0.1) rectangle (28,0); 
+  \fill[tdGreen!70] (40,0) rectangle (56,{0.898*42}); \draw[thick,tdGreen!60!black] (48,{(0.898-0.02)*42}) -- (48,{(0.898+0.02)*42}); \node[font=\scriptsize\bfseries,anchor=south] at (48,{(0.898+0.02)*42+1}) {0.90 $\pm$ 0.02};
+  \node[font=\scriptsize,align=center] at (20,-6) {one signal};\node[font=\scriptsize,align=center] at (48,-6) {SENTRY-Fuse};
+\end{tikzpicture}
+\end{sfig}
+
+{\scriptsize 90 compromised agent traces (AgentDojo), 10 splits. The gain is mostly \key{stability}.}
+\end{column}
+\end{columns}
+\srcc{SENTRY-Fuse: our work in progress.}{own2026capscompositionalattack,greshake2023,debenedetti2024}
+\end{frame}
+
+\begin{frame}{What did \emph{not} work is part of the evidence}
+\centering
+\begin{sfig}[0.80]
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \foreach \i/\c/\t/\s in {
+    0/tdRed/{Intrusion detectors do not transfer}/{ROC-AUC 0.985 on the same dataset, 0.54--0.56 on another},
+    1/tdRed/{A fancier statistic lost to a threshold}/{SENTRY: the e-process was beaten by a fixed threshold, so we dropped it},
+    2/tdAmber/{A guarantee that is vacuous when data are scarce}/{private conformal sets are empty below about 1,300 calibration records},
+    3/tdAmber/{Short commissioning breaks the guarantee}/{PHASE with 30--60 days of baseline: false-alarm control is lost},
+    4/tdBlue/{Writing the proof found our bug}/{SEAL: a composition bound we had violated in code, fixed by proving it},
+    5/tdBlue/{Complexity that did not pay}/{TRACER-Med: subgroup-calibrated clipping gave no consistent benefit}}{
+    \pgfmathsetmacro{\col}{mod(\i,2)}\pgfmathsetmacro{\row}{floor(\i/2)}
+    \node[card=\c,text width=62mm,minimum height=16mm,align=left,font=\footnotesize,anchor=north west] at (\col*70,-\row*21) {\textbf{\t}\\\s};}
+\end{tikzpicture}
+\end{sfig}
+
+\vspace{2mm}
+\large Report them. \key{Trust is a property of the evidence}, and honest limits are evidence.
+\end{frame}
+
+%% ===================================================================
+%%  D. SYNTHESIS  (about 3 min)
+%% ===================================================================
+\begin{frame}{A practical checklist for trustworthy smart systems}
+\footnotesize\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\bfseries}p{23mm}>{\raggedright}p{36mm}>{\raggedright}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+\normalsize Pillar & \normalsize Ask the vendor or the team & \normalsize Evidence to demand & \normalsize Starting tools\\
+\midrule
+\textcolor{tdBlue}{Explain} & Why this decision? & fidelity and sparsity of explanations; interpretable baseline & attributions, evidence subgraphs\\
+\textcolor{tdAmber}{Uncertainty} & How sure, and how do you know? & calibration curves; coverage on held-out sites & conformal sets, anytime-valid alarms\\
+\textcolor{tdGreen}{Verify} & Is the output supported? & grounding rate; what is checked, what is not & knowledge-graph checks, runtime monitors\\
+\textcolor{tdRed}{Resilience} & What if a participant or input is hostile? & red-team results; privacy budget; deletion audit & robust aggregation, DP, unlearning certificates\\
+\midrule
+\textbf{All four} & Does it still work \emph{here}? & transfer tests on \emph{your} data (not the vendor's) & held-out-site validation\\
+\bottomrule
+\end{tabularx}
+\end{frame}
+
+\begin{frame}{Working together}
+\centering
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+  \node[card=tdBlue,text width=40mm,minimum height=38mm] (a) {{\Large\faFlask}\\[2pt]\textbf{Joint research}\\[3pt]{\scriptsize datasets from construction monitoring and IoT; joint papers; shared benchmarks}};
+  \node[card=tdGreen,text width=40mm,minimum height=38mm,right=6mm of a] (b) {{\Large\faChalkboardTeacher}\\[2pt]\textbf{Teaching and mentoring}\\[3pt]{\scriptsize faculty seminars; student projects; co-supervision; academic exchange}};
+  \node[card=tdAmber,text width=40mm,minimum height=38mm,right=6mm of b] (c) {{\Large\faIndustry}\\[2pt]\textbf{Applied pilots}\\[3pt]{\scriptsize a trustworthy-AI review of a smart-building, plant or IoT deployment}};
+\end{tikzpicture}
+\end{sfig}
+\vspace{3mm}
+
+{\small The most useful contribution you can make: a \key{real stream of data and a real decision} to test against.}
+\end{frame}
+
+\begin{frame}{Take-aways}
+\Large
+\begin{enumerate}
+\item \key{Accurate is not trustworthy.} Ask for explanation, uncertainty, verification and resilience.
+\item \key{Guarantees must hold while you watch}: calibrate, use conformal and anytime-valid methods.
+\item \key{Test where it will run}: transfer, small calibration sets and hostile participants are where claims fail.
+\item \key{Publish the failures} too.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[plain]
+\centering\vfill
+{\Huge\bfseries Thank you}\\[6mm]
+{\large Questions and discussion}\\[8mm]
+\begin{columns}[c]
+\column{0.38\textwidth}\raggedleft
+\qrcode[height=26mm]{https://vinhqdang.github.io}
+\column{0.58\textwidth}\raggedright\small
+\textbf{Dr.\ Quang-Vinh Dang}\\British University Vietnam\\[3pt]
+\faGlobe\ vinhqdang.github.io\\
+\faGithub\ github.com/vinhqdang\\[3pt]
+{\scriptsize Interactive teaching demos and the VOUCH explainer are on the website.}
+\end{columns}
+\vfill
+\end{frame}
+
+%% ===================================================================
+%%  REFERENCES
+%% ===================================================================
+\end{document}

@@ -227,3 +227,14 @@ details.authors summary:hover { color: var(--ink); }
 .lesson p { color: var(--muted); margin: 0 0 12px; max-width: 46em; }
 .lesson-tag { font: 600 11px var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
 .lesson-go { font: 600 14px var(--sans); color: var(--accent); }
+
+/* ---------- talks ---------- */
+.talk-list { display: grid; gap: 18px; }
+.talk { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+.talk h2 { font-size: 1.5rem; line-height: 1.25; margin: 8px 0 6px; }
+.talk p { color: var(--muted); max-width: 52em; margin: 0 0 10px; }
+.talk-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font: 600 12px var(--sans); letter-spacing: 0.08em; text-transform: uppercase; }
+.talk-date { color: var(--accent); }
+.talk-role { background: var(--accent-soft); color: var(--accent); border-radius: 99px; padding: 3px 10px; }
+.talk-event { font: 500 14.5px var(--sans); color: var(--ink) !important; }
+.talk-status { font: 500 13px var(--sans); color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; margin-top: 12px !important; }

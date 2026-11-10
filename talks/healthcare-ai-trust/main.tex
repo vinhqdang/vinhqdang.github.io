@@ -1,0 +1,558 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\input{../common/preamble}
+\talkfooter{Trustworthy healthcare AI \,|\, Q.-V. Dang, British University Vietnam}
+
+\title{Towards Trustworthy Healthcare AI}
+\subtitle{From Collaborative Learning to Reliable and Secure AI Assistants}
+\author{Quang-Vinh Dang}
+\institute{British University Vietnam, Hung Yen, Vietnam}
+\date{}
+
+\begin{document}
+\begin{frame}[plain]\titlepage\end{frame}
+
+%% ===================================================================
+%%  A. MOTIVATION
+%% ===================================================================
+\begin{frame}{Trustworthy healthcare AI is a lifecycle problem, not a model problem}
+\centering
+\begin{sfig}[0.72]
+\begin{tikzpicture}[node distance=5mm]
+  \node[card=tdBlue,text width=34mm,minimum height=46mm] (a) {{\Large\color{tdBlue}\faHeartbeat}\\[1pt]{\bfseries Q1\ Clinical models}\\[3pt]{\scriptsize How can a model balance \textbf{performance, privacy, fairness and uncertainty}?}};
+  \node[card=tdGreen,text width=34mm,minimum height=46mm,right=of a] (b) {{\Large\color{tdGreen}\faHospital}\\[1pt]{\bfseries Q2\ Collaboration}\\[3pt]{\scriptsize How can institutions \textbf{learn together} when their data differ?}};
+  \node[card=tdAmber,text width=34mm,minimum height=46mm,right=of b] (c) {{\Large\color{tdAmber}\faUserLock}\\[1pt]{\bfseries Q3\ Data owners}\\[3pt]{\scriptsize What has been \textbf{disclosed}, and was data really \textbf{forgotten}?}};
+  \node[card=tdRed,text width=34mm,minimum height=46mm,right=of c] (d) {{\Large\color{tdRed}\faRobot}\\[1pt]{\bfseries Q4\ AI assistants}\\[3pt]{\scriptsize Are answers \textbf{grounded}, and do they \textbf{resist malicious instructions}?}};
+  \foreach \p/\q in {a/b,b/c,c/d}{\draw[arr] (\p) -- (\q);}
+\end{tikzpicture}
+\end{sfig}
+
+\vspace{4mm}
+{\large Each question is a place where a clinical AI system can lose the trust of patients and clinicians.}
+\end{frame}
+
+\begin{frame}{Why this matters: lessons already in the literature}
+\centering
+\begin{sfig}[0.72]
+\begin{tikzpicture}[node distance=4mm]
+  \node[card=tdRed,text width=34mm,minimum height=50mm] (a) {{\Large\color{tdRed}\faBalanceScale}\\[1pt]{\bfseries Bias in a deployed algorithm}\\[3pt]{\scriptsize At the same risk score, Black patients were \textbf{sicker} than White patients. The algorithm used \textbf{cost as a proxy for need}.}\\[3pt]{\tiny\color{tdMuted}Obermeyer et al., 2019}};
+  \node[card=tdBlue,text width=34mm,minimum height=50mm,right=of a] (b) {{\Large\color{tdBlue}\faDatabase}\\[1pt]{\bfseries Data silos}\\[3pt]{\scriptsize Medical data sit in \textbf{silos}, and privacy concerns restrict access. Federated learning is one route.}\\[3pt]{\tiny\color{tdMuted}Rieke et al., 2020}};
+  \node[card=tdAmber,text width=34mm,minimum height=50mm,right=of b] (c) {{\Large\color{tdAmber}\faSearch}\\[1pt]{\bfseries Explanations and doubt}\\[3pt]{\scriptsize Current explanation methods may give \textbf{false hope} in health care, and clinical decisions need \textbf{uncertainty} estimates.}\\[3pt]{\tiny\color{tdMuted}Ghassemi et al., 2021; Begoli et al., 2019}};
+  \node[card=tdPurple,text width=34mm,minimum height=50mm,right=of c] (d) {{\Large\color{tdPurple}\faSyringe}\\[1pt]{\bfseries Assistants can be hijacked}\\[3pt]{\scriptsize Prompt injection compromised \textbf{all four} vision-language models tested, in 594 attacks on medical tasks.}\\[3pt]{\tiny\color{tdMuted}Clusmann et al., 2025}};
+\end{tikzpicture}
+\end{sfig}
+\srcc{}{obermeyer2019,rieke2020,ghassemi2021,begoli2019,clusmann2025}
+\end{frame}
+
+%% ===================================================================
+%%  B. THE BIG PICTURE
+%% ===================================================================
+\begin{frame}{Q1 \,|\, A trilemma: privacy, fairness and uncertainty pull against each other}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}[x=1mm,y=1mm,font=\footnotesize]
+  \node[card=tdBlue,minimum width=34mm] (p) at (0,52) {\textbf{Privacy}\\\scriptsize differential privacy};
+  \node[card=tdGreen,minimum width=34mm] (f) at (-34,0) {\textbf{Fairness}\\\scriptsize equal error rates};
+  \node[card=tdAmber,minimum width=34mm] (u) at (34,0) {\textbf{Uncertainty}\\\scriptsize calibrated, set-valued};
+  \draw[thick,tdMuted] (p) -- (f); \draw[thick,tdMuted] (p) -- (u); \draw[thick,tdMuted] (f) -- (u);
+  \node[lbl,text width=36mm,fill=tdPaper,inner sep=1pt] at (-24,28) {clipping and noise hurt \textbf{minority} groups most};
+  \node[lbl,text width=36mm,fill=tdPaper,inner sep=1pt] at (26,28) {noise corrupts evidence and \textbf{quantiles}};
+  \node[lbl,text width=40mm,fill=tdPaper,inner sep=1pt] at (0,-3) {group-wise coverage needs \textbf{enough samples} per group};
+  \node[circle,draw=tdInk,fill=tdInk,text=white,font=\scriptsize\bfseries,inner sep=2pt,align=center] at (0,16) {clinical\\model};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small
+\textbf{Privacy:} DP-SGD clips and noises gradients \cit{abadi2016}.\\[3pt]
+\textbf{Fairness:} equal opportunity across groups \cit{hardt2016}; but differential privacy can have a \emph{disparate impact} on accuracy \cit{bagdasaryan2019}.\\[3pt]
+\textbf{Uncertainty:} evidential networks \cit{sensoy2018}; conformal sets with coverage guarantees \cit{angelopoulos2023}.
+
+\vspace{2mm}
+Optimising one in isolation tends to break another.}
+\end{column}
+\end{columns}
+\srcc{Our related work:}{abadi2016,bagdasaryan2019,angelopoulos2023,own2026cipherdifferentiallyprivate}
+\end{frame}
+
+\begin{frame}{Q1 \,|\, Clinicians need ``how sure'', not just ``what''}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.66]
+\begin{tikzpicture}[x=1mm,y=1mm,font=\footnotesize]
+  \node[font=\small\bfseries,anchor=west] at (0,50) {Model output for one patient};
+  \node[lbl,anchor=west] at (0,45) {\illus};
+  \foreach \yy/\nm/\vv/\cc in {36/Diagnosis A/0.46/tdBlue,24/Diagnosis B/0.41/tdBlue,12/Diagnosis C/0.10/tdMuted,2/Other/0.03/tdMuted}{
+    \node[anchor=east,font=\scriptsize] at (22,\yy) {\nm};
+    \fill[\cc!70] (24,\yy-3) rectangle (24+\vv*60,\yy+3);
+    \node[anchor=west,font=\scriptsize] at (24+\vv*60+1,\yy) {\vv};}
+  \draw[tdBlue,thick,rounded corners=3pt] (1,19) rectangle (62,42);
+  \node[lbl,text=tdBlue] at (31,16) {prediction set $\{\text{A},\text{B}\}$ at 90\% coverage};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.47\textwidth}
+{\small
+A single top-1 label hides that A and B are nearly tied.
+
+\vspace{2mm}
+A \key{set-valued} prediction says so, and comes with a \key{coverage guarantee}: the true diagnosis is in the set at least 90\% of the time.
+
+\vspace{2mm}
+\textbf{Use:} a singleton $\rightarrow$ proceed; a larger set $\rightarrow$ order a test or \bad{defer to the clinician}.
+
+\vspace{2mm}
+Explanations help only if they are \emph{faithful}; show uncertainty alongside.}
+\end{column}
+\end{columns}
+\srcc{Our work:}{begoli2019,angelopoulos2023,own2026confideconformalfree}
+\end{frame}
+
+\begin{frame}{Q2 \,|\, Federated learning: learn together, share no patient records}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\begin{sfig}[0.72]
+\begin{tikzpicture}[x=1mm,y=1mm,font=\footnotesize]
+  \foreach \i/\yy/\cc in {1/46/tdBlue,2/30/tdGreen,3/14/tdAmber,4/-2/tdPurple}{
+    \node[card=\cc,minimum width=36mm,minimum height=11mm,align=left] (h\i) at (0,\yy) {{\large\faHospital}\ hospital \i\\[-1pt]{\scriptsize own patients, own coding}};}
+  \node[card=tdBlue,minimum width=26mm,minimum height=34mm] (s) at (62,22) {\textbf{server}\\[2pt]\scriptsize aggregate\\updates\\(no raw data)};
+  \foreach \i in {1,2,3,4}{\draw[<->,thick,draw=tdMuted] (h\i.east) -- (s.west |- h\i);}
+  \node[lbl] at (36,-12) {updates up, global model down};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small
+Ten institutions reached \textbf{99\% of centralised model quality} without sharing data (brain-tumour segmentation) \cit{sheller2020}.
+
+\vspace{2mm}
+\textbf{But sites differ:} populations, equipment, even labelling conventions. A single global model may fit nobody well; \emph{clustered} federated learning groups similar sites \cit{sattler2021}.
+
+\vspace{2mm}
+\bad{Open:} fairness across sites, robustness to a faulty participant, privacy of the updates.}
+\end{column}
+\end{columns}
+\srcc{Our related work:}{sheller2020,sattler2021,own2026fortressflbyzantine,dang2026fedfairgnn}
+\end{frame}
+
+\begin{frame}{Q3 \,|\, Data owners: what leaks, and was it really forgotten?}
+\centering
+\begin{sfig}[0.55]
+\begin{tikzpicture}[node distance=5mm,font=\footnotesize]
+  \node[card=tdBlue,text width=24mm] (t) {{\large\faDatabase}\\\textbf{train}\\on patient data};
+  \node[card=tdAmber,text width=26mm,right=of t] (m) {{\large\faCloud}\\\textbf{deploy}\\the model};
+  \node[card=tdRed,text width=30mm,right=of m] (l) {{\large\faUserSecret}\\\textbf{leakage}\\membership inference, extraction};
+  \node[card=tdPurple,text width=26mm,right=of l] (r) {{\large\faEraser}\\\textbf{erasure request}\\``forget me''};
+  \node[card=tdGreen,text width=28mm,right=of r] (v) {{\large\faQuestion}\\\textbf{verify?}\\the owner cannot see inside};
+  \foreach \a/\b in {t/m,m/l,l/r,r/v}{\draw[arr] (\a) -- (\b);}
+\end{tikzpicture}
+\end{sfig}
+\vspace{3mm}
+
+\begin{columns}[T]
+\column{0.3\textwidth}\centering{\small\textbf{Leakage is real}}\\[2pt]{\scriptsize models can reveal whether a record was in training, and can emit memorised text}
+\column{0.3\textwidth}\centering{\small\textbf{Erasure is a legal right}}\\[2pt]{\scriptsize GDPR gives a right to erasure; retraining from scratch is often too costly}
+\column{0.3\textwidth}\centering{\small\textbf{Compliance is unverifiable}}\\[2pt]{\scriptsize the operator has no incentive to prove non-compliance}
+\end{columns}
+\srcc{Our related work:}{shokri2017,bourtoule2021,gdpr2016,own2021rightbeforgotten}
+\end{frame}
+
+\begin{frame}{Q4 \,|\, AI assistants: capable, fluent and attackable}
+\begin{sfig}[0.46]
+\begin{tikzpicture}[node distance=5mm,font=\footnotesize]
+  \node[card=tdBlue,text width=26mm] (u) {{\large\faUserMd}\\\textbf{clinician or patient}\\question + image};
+  \node[card=tdPurple,text width=28mm,right=of u] (a) {{\large\faRobot}\\\textbf{assistant}\\language or vision-language model};
+  \node[card=tdAmber,text width=30mm,right=of a] (k) {{\large\faFileMedical}\\\textbf{sources and tools}\\records, guidelines, web};
+  \node[card=tdGreen,text width=26mm,right=of k] (o) {{\large\faClipboardCheck}\\\textbf{answer}\\to the care team};
+  \foreach \p/\q in {u/a,a/k,k/a,a/o}{\draw[arr] (\p) -- (\q);}
+  \node[pill=tdRed,above=3mm of k,xshift=-4mm] {hidden instructions in a document};
+  \node[pill=tdRed,below=3mm of u] {sub-visual text in an image};
+  \node[pill=tdRed,below=3mm of o] {fabricated finding};
+\end{tikzpicture}
+\end{sfig}
+\vspace{3mm}
+
+{\small Judging clinical knowledge needed a benchmark \emph{and} human evaluation of factuality, harm and bias \cit{singhal2023}. Hidden instructions in images compromised all four medical VLMs tested \cit{clusmann2025}.}
+\srcc{Our related work:}{singhal2023,clusmann2025,own2026realtimehallucination}
+\end{frame}
+
+%% ===================================================================
+%%  C. MY RESEARCH
+%% ===================================================================
+\begin{frame}{Our work, organised by the four questions}
+\begin{columns}[T]
+\begin{column}{0.49\textwidth}\footnotesize
+\pillarhead{tdBlue}{Q1\ Clinical models}
+\pub{\textbf{TRACER-Med}: private, fair, uncertainty-aware (biomedical benchmarks)}
+\pub{\textbf{CONFIDE}: conformal causal competing risks (Mathematics 2026)}
+\wip{conformal survival analysis, small calibration cohorts}
+\vspace{1.5mm}
+\pillarhead{tdAmber}{Q3\ Data owners}
+\pub{\textbf{VOUCH}: unlearning certificates (Machine Learning, accepted)}
+\wip{\textbf{SEAL}: erasure audit under mutual distrust}
+\wip{\textbf{SHADE}: semantic disclosure estimator}
+\end{column}
+\begin{column}{0.49\textwidth}\footnotesize
+\pillarhead{tdGreen}{Q2\ Collaboration}
+\pub{\textbf{FedFairGNN}: fair, private, robust federated graph learning (PMLR 2026)}
+\pub{\textbf{FORTRESS-FL}: Byzantine-robust federated learning (Array 2026)}
+\wip{\textbf{DisCo-CFL}: concept-based client clustering}
+\vspace{1.5mm}
+\pillarhead{tdRed}{Q4\ AI assistants}
+\pub{\textbf{CMVKG-Guard}: hallucination correction (Discover AI 2026)}
+\wip{\textbf{CCRC}: certified correction of hallucinations}
+\wip{\textbf{SENTRY-Fuse}: agent-trace monitoring}
+\wip{activation-gated defences under new framings}
+\end{column}
+\end{columns}
+{\tiny\color{tdMuted}{\color{tdBlue}$\bullet$} published or accepted \quad $\circ$ preprint or in progress. \emph{Only TRACER-Med and CONFIDE are on clinical or biomedical data; the rest are methods validated in other domains.}}
+\srcc{Published papers shown:}{own2026confideconformalfree,own2026fortressflbyzantine,dang2026fedfairgnn,own2026realtimehallucination}
+\end{frame}
+
+\begin{frame}{Q1 \,|\, TRACER-Med: privacy, fairness and uncertainty in one clinical model}
+\begin{sfig}[0.5]
+\begin{tikzpicture}[node distance=4mm,font=\footnotesize]
+  \node[card=tdPurple,text width=30mm] (e) {\textbf{Evidential} Dirichlet network\\{\scriptsize doubt = ignorance, not noise}};
+  \node[card=tdBlue,text width=30mm,right=of e] (d) {\textbf{Subgroup-calibrated} DP-SGD\\{\scriptsize private, minority-aware clipping}};
+  \node[card=tdGreen,text width=28mm,right=of d] (f) {\textbf{Prototype} alignment\\{\scriptsize fairness without per-sample leakage}};
+  \node[card=tdAmber,text width=30mm,right=of f] (c) {\textbf{Private conformal} sets per group\\{\scriptsize coverage guarantees}};
+  \foreach \p/\q in {e/d,d/f,f/c}{\draw[arr] (\p) -- (\q);}
+  \node[card=tdRed,text width=100mm,below=5mm of d,xshift=18mm] (x) {\textbf{Dual-channel attribution:} separate \emph{what raises disease risk} from \emph{what raises clinical doubt}};
+  \draw[arr] (c.south) |- (x.east);
+\end{tikzpicture}
+\end{sfig}
+\vspace{3mm}
+
+\begin{columns}[T]
+\column{0.5\textwidth}{\small\textbf{Evaluated on} Statlog Heart ($N{=}270$), Pima Diabetes ($N{=}768$), a real 20,000-patient readmission cohort (UCI Diabetes 130-US Hospitals) and a simulated inpatient cohort ($N{=}10{,}000$).}
+\column{0.46\textwidth}{\small\textbf{Against} ERM, DP-SGD, a fairness-aware DP method, PF-LD (adapted), evidential learning and DP-EDL, with an exact R\'enyi privacy accountant.}
+\end{columns}
+\srcc{TRACER-Med: our work in progress.}{abadi2016,sensoy2018}
+\end{frame}
+
+\begin{frame}{Q1 \,|\, TRACER-Med: what the experiments actually show}
+\begin{columns}[c]
+\column{0.32\textwidth}\begin{sfig}[0.55]\barpanel{Calibration error, 20k real cohort (lower is better)}{0.09}{0.018,0.079,0.080,0.039,0.011}\end{sfig}
+\column{0.32\textwidth}\begin{sfig}[0.55]\barpanel{Equalized-odds gap, Pima (lower is better)}{0.30}{0.285,0.221,0.092,0.266,0.264}\end{sfig}
+\column{0.32\textwidth}\begin{sfig}[0.55]\barpanel{Membership-inference AUC, Statlog Heart (0.5 = no leak)}{0.7}{0.611,0.539,0.521,0.543,0.523}\end{sfig}
+\end{columns}
+\vspace{2mm}
+
+\begin{columns}[T]
+\column{0.48\textwidth}{\small \good{Better:} calibration on the two larger cohorts (ECE 0.011--0.013 vs 0.026--0.080 for private baselines) and low membership-inference leakage, at a cost of about 0.02 ROC-AUC.}
+\column{0.48\textwidth}{\small \bad{Not better:} fairness. On small cohorts the adapted PF-LD closes the equalized-odds gap more (0.09--0.11 vs 0.26 on Pima), and subgroup-calibrated clipping gave no consistent benefit.}
+\end{columns}
+\srcc{Results from our TRACER-Med experiments (default noise level; three-fold cross-validation). A numerical audit of the paper's own claims corrected several statements of an earlier version.}{}
+\end{frame}
+
+\begin{frame}{Q1 \,|\, Small calibration cohorts: where coverage guarantees fray}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\begin{sfig}[0.66]
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \node[font=\small\bfseries,anchor=west] at (0,55) {Conformal survival: coverage at 90\% target};
+  \draw[tdMuted] (6,0) -- (6,48); \draw[tdMuted] (6,0) -- (70,0);
+  \foreach \v in {0,0.5,1.0}{\pgfmathsetmacro{\yy}{\v*45}\draw[tdLine] (6,\yy) -- (70,\yy);\node[font=\tiny,anchor=east] at (5,\yy) {\v};}
+  \foreach \xx/\vv/\nm/\nn in {10/0.86/BMT/{$n{=}137$},31/0.67/Melanoma/{$n{=}205$},52/0.14/PBC/{$n{=}418$}}{
+    \fill[tdBlue!70] (\xx,0) rectangle (\xx+14,\vv*45);
+    \node[font=\scriptsize\bfseries,above] at (\xx+7,\vv*45) {\vv};
+    \node[font=\tiny,align=center,below] at (\xx+7,0) {\nm\\\nn};}
+  \draw[tdRed,thick,dashed] (6,40.5) -- (70,40.5) node[above left,font=\tiny,text=tdRed] {target 0.90};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.43\textwidth}
+{\small
+\textbf{Preliminary} (our repository, public competing-risk datasets): the method ranks patients well (C-index 0.83 on PBC) yet \bad{misses the coverage target} with small calibration sets.
+
+\vspace{2mm}
+In TRACER-Med the PAC variant of the private conformal layer is \bad{vacuous below about 1,300 calibration records}.
+
+\vspace{2mm}
+\key{Lesson:} guarantees need data. Report calibration size, and fall back to clinician review when coverage cannot be certified.}
+\end{column}
+\end{columns}
+\srcc{CONFIDE is published; the coverage experiments are preliminary results from our repository.}{own2026confideconformalfree,angelopoulos2023}
+\end{frame}
+
+\begin{frame}{Q2 \,|\, Fair, private and robust federated learning on graphs}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}[x=1mm,y=1mm,font=\footnotesize]
+  \node[font=\small\bfseries,anchor=west] at (0,55) {Demographic-parity gap (budget 0.03)};
+  \draw[tdMuted] (6,0) -- (6,48); \draw[tdMuted] (6,0) -- (70,0);
+  \foreach \v in {0,0.04,0.08}{\pgfmathsetmacro{\yy}{\v*500}\draw[tdLine] (6,\yy) -- (70,\yy);\node[font=\tiny,anchor=east] at (5,\yy) {\v};}
+  \foreach \xx/\a/\b/\nm in {8/0.071/0.018/{graph 1},28/0.042/0.026/{graph 2},48/0.052/0.028/{graph 3}}{
+    \fill[tdMuted!55] (\xx,0) rectangle (\xx+8,\a*500); \fill[tdBlue!75] (\xx+9,0) rectangle (\xx+17,\b*500);
+    \node[font=\tiny,above] at (\xx+4,\a*500) {\a}; \node[font=\tiny,above] at (\xx+13,\b*500) {\b};
+    \node[font=\tiny,below] at (\xx+8.5,0) {\nm};}
+  \draw[tdRed,dashed,thick] (6,15) -- (70,15);
+  \node[font=\tiny,text=tdMuted!70!black,anchor=west] at (36,46) {grey: no fairness control};
+  \node[font=\tiny,text=tdBlue,anchor=west] at (36,42) {blue: with fairness control};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.45\textwidth}
+{\small
+\textbf{Idea:} the server sees only validated sums. One broadcast multiplier enforces a parity budget; secure aggregation and noise protect the statistics.
+
+\vspace{2mm}
+\good{Result:} gaps cut to 0.018--0.028 at AUC within 0.01. Under fairness poisoning: 0.025--0.049 vs 0.11--0.20 for FedAvg.
+
+\vspace{2mm}
+\bad{Limits:} loose Byzantine bounds; fails on small graphs; one falsified client can switch it off.}
+\end{column}
+\end{columns}
+\srcc{Follow-up (CLAMP): our work in progress; fraud and social graphs, not clinical data.}{dang2026fedfairgnn,hardt2016}
+\end{frame}
+
+\begin{frame}{Q2 \,|\, DisCo-CFL: group clients by \emph{concept}, not by label counts}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[x=1mm,y=1mm,font=\footnotesize]
+  \foreach \i/\xx/\cc in {1/6/tdBlue,2/24/tdBlue,3/42/tdRed,4/60/tdRed}{
+    \node[card=\cc,minimum width=13mm,font=\scriptsize] (c\i) at (\xx,30) {site \i};}
+  \node[font=\scriptsize,text=tdBlue!70!black] at (15,40) {coding A};
+  \node[font=\scriptsize,text=tdRed] at (51,40) {coding B (labels swapped)};
+  \node[card=tdAmber,minimum width=60mm,font=\scriptsize] (s) at (33,10) {one count-sketched gradient per class, once};
+  \foreach \i in {1,2,3,4}{\draw[arr] (c\i) -- (s);}
+  \node[card=tdGreen,minimum width=60mm,font=\scriptsize] at (33,-6) {calibrated similarity $\rightarrow$ clusters, with a certificate};
+  \draw[arr] (s) -- (33,-1);
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.47\textwidth}
+{\small
+Sites may share images but \emph{label them differently} (coding conventions). Averaging them hurts everyone.
+
+\vspace{2mm}
+\textbf{Result:} groups recovered (ARI 0.94--1.00) on small image benchmarks; on CIFAR-100 with label-swap groups \good{63.0\%} vs \bad{55.5\%} for FedAvg.
+
+\vspace{2mm}
+\bad{Fails} to separate groups on Office-Home and rotated CIFAR-100, where clustering gains under one point.}
+\end{column}
+\end{columns}
+\srcc{DisCo-CFL: our work in progress. Clustered federated learning:}{sattler2021,ghosh2020}
+\end{frame}
+
+\begin{frame}{Q3 \,|\, SHADE: how much can an adversary reconstruct from the pieces?}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\begin{sfig}[0.68]
+\begin{tikzpicture}[x=1mm,y=1mm,font=\footnotesize]
+  \node[card=tdBlue,minimum width=26mm,minimum height=26mm] (k) at (0,24) {sensitive\\knowledge\\base};
+  \foreach \i/\yy/\cc in {1/46/tdAmber,2/24/tdGreen,3/2/tdPurple}{
+    \node[card=\cc,minimum width=30mm,font=\scriptsize] (p\i) at (58,\yy) {shard \i $\rightarrow$ LLM provider \i};
+    \draw[arr] (k.east) -- (p\i.west);}
+  \node[lbl,text width=40mm] at (58,-9) {each provider answers queries; none may reconstruct the whole};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.43\textwidth}
+{\small
+\textbf{SHADE} measures the \emph{semantic disclosure} of a shard: an axiomatised measure with an LLM-oracle form and a cheap embedding-coverage proxy.
+
+\vspace{2mm}
+\textbf{CoShard} partitions the corpus on a graph, adding the disclosure penalty to trace the \key{coherence versus secrecy} frontier.
+
+\vspace{2mm}
+Datasets include a synthetic HR corpus, \textbf{MedQA} and LegalBench.}
+\end{column}
+\end{columns}
+\srcc{SHADE and CoShard: our work in progress (code released).}{carlini2021,shokri2017}
+\end{frame}
+
+\begin{frame}{Q3 \,|\, Auditing erasure: certificates when owner and operator distrust each other}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[x=1mm,y=1mm,font=\footnotesize]
+  \node[card=tdBlue,minimum width=18mm] (a) at (6,32) {twin A};
+  \node[card=tdBlue,minimum width=18mm] (b) at (6,10) {twin B};
+  \node[circle,draw=tdInk,fill=white,font=\scriptsize,align=center,inner sep=1pt] (coin) at (30,21) {fair\\coin};
+  \draw[arr] (a) -- (coin); \draw[arr] (b) -- (coin);
+  \node[card=tdGreen,minimum width=26mm] (t) at (60,32) {one is \textbf{trained on}};
+  \node[card=tdAmber,minimum width=26mm] (g) at (60,10) {one is a \textbf{ghost}};
+  \draw[arr] (coin) -- (t); \draw[arr] (coin) -- (g);
+  \node[card=tdPurple,minimum width=48mm] (u) at (40,-8) {after unlearning, scores must be \textbf{symmetric}};
+  \draw[arr,dashed] (t.east) -- ++(6,0) |- (u.east);
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+
+{\small \textbf{VOUCH:} un-unlearned models revoked in \good{16/18} runs; retraining, gradient ascent and NPO certified 18/18 at $\varepsilon=0.2$.}
+\end{column}
+\begin{column}{0.47\textwidth}
+\begin{sfig}[0.55]
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \node[font=\small\bfseries,anchor=west] at (0,52) {SEAL-W: catching an operator who filters the audit query};
+  \draw[tdMuted] (6,0) -- (6,44); \draw[tdMuted] (6,0) -- (60,0);
+  \foreach \v in {0,0.5,1.0}{\pgfmathsetmacro{\yy}{\v*40}\draw[tdLine] (6,\yy) -- (60,\yy);\node[font=\tiny,anchor=east] at (5,\yy) {\v};}
+  \fill[tdRed!70] (12,0) rectangle (26,0.4); \node[font=\scriptsize\bfseries,above] at (19,0.4) {0\%};
+  \fill[tdGreen!70] (36,0) rectangle (50,0.93*40); \node[font=\scriptsize\bfseries,above] at (43,0.93*40) {93\%};
+  \node[font=\tiny,align=center,below] at (19,0) {single-query\\check};\node[font=\tiny,align=center,below] at (43,0) {full\\SEAL-W};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+
+{\small \bad{Honest note:} a composition bound was \emph{violated in our own code} and fixed by writing the proof. The audit has little power for small models.}
+\end{column}
+\end{columns}
+\srcc{VOUCH: accepted in Machine Learning. SEAL: our work in progress.}{dang2026vouch,bourtoule2021,own2021rightbeforgotten}
+\end{frame}
+
+\begin{frame}{Q4 \,|\, CMVKG-Guard: correct hallucinations while the model is writing}
+\begin{sfig}[0.40]
+\begin{tikzpicture}[node distance=5mm,font=\footnotesize]
+  \node[card=tdPurple,text width=24mm] (v) {\textbf{VLM} writes token by token};
+  \node[card=tdBlue,text width=38mm,right=of v] (k) {\textbf{scene knowledge graph}\\from the image\\+ Wikidata, ConceptNet};
+  \node[card=tdAmber,text width=44mm,right=of k] (x) {\textbf{three-layer check}\\visual--text 30\% $\cdot$ graph 40\% $\cdot$ reasoning 30\%};
+  \node[card=tdGreen,text width=36mm,right=of x] (s) {\textbf{replace} low-score tokens with grounded ones};
+  \foreach \p/\q in {v/k,k/x,x/s}{\draw[arr] (\p) -- (\q);}
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+
+\begin{columns}[T]
+\column{0.3\textwidth}\centering{\huge\bfseries\color{tdGreen!70!black}84\%}\\[-1pt]{\scriptsize fewer object hallucinations (CHAIR)}
+\column{0.3\textwidth}\centering{\huge\bfseries\color{tdGreen!70!black}91.5\%}\\[-1pt]{\scriptsize F1 on POPE, +5.8 points over the best training-free baseline}
+\column{0.3\textwidth}\centering{\huge\bfseries\color{tdGreen!70!black}12\,ms}\\[-1pt]{\scriptsize median extra latency per token}
+\end{columns}
+\vspace{2mm}
+
+{\small Training-free, so it can wrap a deployed model. \bad{Not yet tested} on radiology images or clinical reports: general-domain benchmarks only.}
+\srcc{Six benchmarks, eight baselines.}{own2026realtimehallucination,pope2023,ji2023}
+\end{frame}
+
+\begin{frame}{Q4 \,|\, CCRC: can a correction be \emph{certified}?}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\begin{sfig}[0.66]
+\begin{tikzpicture}
+\begin{axis}[width=8cm,height=5.4cm,xlabel={base error rate $\mu$},ylabel={forced abstention},xmin=0,xmax=0.6,ymin=0,ymax=0.7,axis lines=left]
+  \addplot[domain=0.05:0.6,very thick,tdRed,samples=40] {(x-0.05)/(1-0.05)};
+  \node[font=\scriptsize,text=tdRed,anchor=east] at (axis cs:0.58,0.28) {emit-or-abstain only};
+  \node[font=\scriptsize,anchor=west] at (axis cs:0.02,0.62) {target error $\alpha=0.05$};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.45\textwidth}
+{\small
+\textbf{Impossibility:} a model that can only emit its own answer or abstain must refuse at least $(\mu-\alpha)/(1-\alpha)$ of inputs when $\mu>\alpha$.
+
+\vspace{2mm}
+\textbf{CCRC} may also \key{substitute} an answer from an independent evidence channel and certifies the error of everything emitted.
+
+\vspace{2mm}
+\good{Honest finding:} of a 66.8-point gain, 64.5 come from the correctness \emph{score}, 2.3 from the procedure.
+
+\vspace{2mm}
+\bad{Scope:} general vision-language benchmarks.}
+\end{column}
+\end{columns}
+\srcc{CCRC: our work in progress (five benchmarks, two backbones, 400+ paired splits).}{bates2021,angelopoulos2024crc}
+\end{frame}
+
+\begin{frame}{Q4 \,|\, Agents: watch the trace, and recalibrate your guards}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.5]
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \node[font=\small\bfseries,anchor=west] at (0,52) {SENTRY-Fuse: recall at 5\% false alarms};
+  \draw[tdMuted] (6,0) -- (6,44); \draw[tdMuted] (6,0) -- (66,0);
+  \foreach \v in {0,0.5,1.0}{\pgfmathsetmacro{\yy}{\v*42}\draw[tdLine] (6,\yy) -- (66,\yy);\node[font=\tiny,anchor=east] at (5,\yy) {\v};}
+  \fill[tdAmber!70] (12,0) rectangle (28,{0.709*42}); \draw[thick,tdAmber!60!black] (20,{(0.709-0.357)*42}) -- (20,{(0.709+0.357)*42});
+  \node[font=\scriptsize\bfseries,anchor=west] at (29,{0.709*42}) {0.71$\pm$0.36};
+  \fill[tdGreen!70] (40,0) rectangle (56,{0.898*42}); \draw[thick,tdGreen!60!black] (48,{(0.898-0.02)*42}) -- (48,{(0.898+0.02)*42});
+  \node[font=\scriptsize\bfseries,anchor=south] at (48,{(0.898+0.02)*42+1}) {0.90$\pm$0.02};
+  \node[font=\scriptsize,align=center] at (20,-6) {one signal};\node[font=\scriptsize,align=center] at (48,-6) {SENTRY-Fuse};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+
+{\small Flags a hijacked agent from its action trace (90 traces). The gain is mostly \key{stability}.}
+\end{column}
+\begin{column}{0.47\textwidth}
+\begin{sfig}[0.5]
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \node[font=\small\bfseries,anchor=west] at (0,52) {Activation-gated guards, new framings};
+  \draw[tdMuted] (6,0) -- (6,44); \draw[tdMuted] (6,0) -- (66,0);
+  \foreach \v in {0,50,100}{\pgfmathsetmacro{\yy}{\v*0.42}\draw[tdLine] (6,\yy) -- (66,\yy);\node[font=\tiny,anchor=east] at (5,\yy) {\v\%};}
+  \fill[tdRed!25] (12,0) rectangle (28,{17*0.42}); \fill[tdRed!75] (12,0) rectangle (28,{0*0.42+0.4});
+  \node[font=\scriptsize\bfseries,anchor=south] at (20,{17*0.42}) {0--17\%};
+  \fill[tdGreen!25] (40,{83*0.42}) rectangle (56,{94*0.42}); \fill[tdGreen!75] (40,0) rectangle (56,{83*0.42});
+  \node[font=\scriptsize\bfseries,anchor=south] at (48,{94*0.42}) {83--94\%};
+  \node[font=\scriptsize,align=center] at (20,-6) {as designed};\node[font=\scriptsize,align=center] at (48,-6) {recalibrated};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+
+{\small Recall at 1\% false positives on \emph{withheld} jailbreak framings. The signal remains (AUROC 0.95--1.00); the \bad{threshold} was miscalibrated.}
+\end{column}
+\end{columns}
+\srcc{SENTRY-Fuse and the activation-gate study: our work in progress.}{greshake2023,debenedetti2024,clusmann2025}
+\end{frame}
+
+%% ===================================================================
+%%  D. INTEGRATION
+%% ===================================================================
+\begin{frame}{An integrated view: evaluate all four properties at every stage}
+\footnotesize\renewcommand{\arraystretch}{1.08}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\bfseries}p{26mm}>{\centering}X>{\centering}X>{\centering}X>{\centering\arraybackslash}X@{}}
+\toprule
+\normalsize Stage & \normalsize Privacy & \normalsize Fairness & \normalsize Uncertainty & \normalsize Security\\
+\midrule
+Data and training & \textcolor{tdBlue}{DP-SGD, SC-DP} (TRACER-Med) & subgroup clipping, prototypes & evidential doubt & poisoning checks\\
+Collaboration & secure aggregation, DP statistics & parity budget (FedFairGNN) & site-level coverage & Byzantine-robust (FORTRESS-FL)\\
+Disclosure and erasure & disclosure score (SHADE) & -- & anytime-valid certificates (VOUCH) & erasure audits (SEAL)\\
+Deployment and assistants & -- & -- & certified selective answers (CCRC) & trace monitors (SENTRY), guards\\
+\bottomrule
+\end{tabularx}
+
+\vspace{1mm}
+{\scriptsize \faHeartbeat\ validated on \textbf{biomedical} data: TRACER-Med, CONFIDE \quad \faProjectDiagram\ validated on \textbf{other domains}: federated graphs, FL, assistants \quad \faHandshake\ \textbf{needs validation} with healthcare partners}
+\end{frame}
+
+\begin{frame}{What clinical validation would need, and where we need partners}
+\centering
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+  \node[card=tdBlue,text width=40mm,minimum height=42mm] (a) {{\Large\faDatabase}\\[2pt]\textbf{Real multi-site data}\\[3pt]{\scriptsize retrospective cohorts with site labels, subgroup variables and enough calibration records}};
+  \node[card=tdGreen,text width=40mm,minimum height=42mm,right=5mm of a] (b) {{\Large\faUserMd}\\[2pt]\textbf{Clinician-in-the-loop}\\[3pt]{\scriptsize do sets and doubt scores change decisions? Is deferral workload acceptable?}};
+  \node[card=tdAmber,text width=40mm,minimum height=42mm,right=5mm of b] (c) {{\Large\faGavel}\\[2pt]\textbf{Governance}\\[3pt]{\scriptsize ethics approval, privacy budgets agreed with data owners, audit trails}};
+\end{tikzpicture}
+\end{sfig}
+\vspace{3mm}
+
+{\small We invite \key{interdisciplinary collaboration}: healthcare partners to test these tools on real data, and to tell us where they fail.}
+\end{frame}
+
+\begin{frame}{Take-aways}
+\Large
+\begin{enumerate}
+\item \key{Trust spans the lifecycle}: data, collaboration, disclosure and assistants all need evidence.
+\item \key{Privacy, fairness and uncertainty interact}: test them together, on small cohorts too.
+\item \key{Guarantees need data and honest scope}: report calibration size, and defer when you cannot certify.
+\item \key{Most of our tools are not yet clinically validated}: that is the collaboration we are asking for.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[plain]
+\centering\vfill
+{\Huge\bfseries Thank you}\\[6mm]
+{\large Questions and discussion}\\[8mm]
+\begin{columns}[c]
+\column{0.38\textwidth}\raggedleft
+\qrcode[height=26mm]{https://vinhqdang.github.io}
+\column{0.58\textwidth}\raggedright\small
+\textbf{Quang-Vinh Dang}\\British University Vietnam, Hung Yen, Vietnam\\[3pt]
+\faGlobe\ vinhqdang.github.io\\
+\faGithub\ github.com/vinhqdang\\[3pt]
+{\scriptsize Code and manuscripts for the work shown are in the public repositories.}
+\end{columns}
+\vfill
+\end{frame}
+\end{document}
