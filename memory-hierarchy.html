@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Memory Hierarchy | Teaching | Vinh Dang</title>
+    <meta name="description" content="Interactive memory hierarchy: registers, L1, L2, L3 cache, RAM and SSD. See cache hits and misses, locality, and the Von Neumann bottleneck. For British University Vietnam students in Introduction to Computing Science." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./fetch-execute.css" />
+    <link rel="stylesheet" href="./memory-hierarchy.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="./index.html">Vinh Dang</a>
+        <nav class="site-nav" aria-label="Primary">
+          <a href="./index.html#research">Research</a>
+          <a href="./publications.html">Publications</a>
+          <a href="./teaching.html" aria-current="page">Teaching</a>
+          <a href="./updates.html">News</a>
+          <a href="./index.html#about">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap fe mh">
+      <p class="crumbs"><a href="./teaching.html">Teaching</a> / Memory hierarchy</p>
+      <div class="page-head">
+        <p class="eyebrow">Interactive lesson</p>
+        <h1>The Memory Hierarchy</h1>
+        <p>
+          The CPU is fast and memory is slow, so computers stack several kinds of memory between them: small and fast near the CPU, big and slow far away.
+          Ask for data and watch where it is found, what it costs, and how it moves up. Then change the program’s habits and see the cost change.
+        </p>
+        <p class="course-note">
+          This page supports <strong>British University Vietnam</strong> students in the module
+          <strong>Introduction to Computing Science</strong> (2024–2027 and onwards). It follows the Week 8 “Systems” lecture and continues from the
+          <a href="./fetch-execute.html">Fetch–Execute cycle</a> lesson.
+        </p>
+      </div>
+
+      <noscript><p class="empty">This simulator needs JavaScript.</p></noscript>
+
+      <section class="lab" aria-label="Memory hierarchy simulator">
+        <div class="toolbar pat-bar" role="group" aria-label="Access pattern">
+          <label class="field">The program reads memory like this
+            <select id="pattern"></select>
+          </label>
+          <label class="field w-w" id="wrap-w" hidden>Working set: <output id="w-out">6</output> blocks
+            <input id="w" type="range" min="1" max="64" value="6" />
+          </label>
+          <label class="field w-s" id="wrap-s" hidden>Stride (words)
+            <input id="stride" type="number" min="1" max="255" value="16" />
+          </label>
+          <label class="field w-n">Accesses
+            <input id="n" type="number" min="1" max="2000" value="64" />
+          </label>
+          <label class="field w-p">Predict L1 hit rate
+            <select id="predict">
+              <option value="">no prediction</option>
+              <option value="high">mostly hits (over 80%)</option>
+              <option value="mid">in between</option>
+              <option value="low">mostly misses (under 20%)</option>
+            </select>
+          </label>
+        </div>
+        <label class="field" id="wrap-custom" hidden style="margin:8px 0">Addresses (0–255), separated by spaces or commas
+          <textarea id="custom" rows="2" spellcheck="false">0 1 2 3 4 5 6 7 0 1 2 3 100 100 100 200</textarea>
+        </label>
+        <p class="preset-desc" id="pattern-desc"></p>
+
+        <div class="toolbar" role="group" aria-label="Controls">
+          <button class="btn btn-primary" id="btn-run" type="button">▶ Run</button>
+          <button class="btn" id="btn-step" type="button">Access once ▶</button>
+          <button class="btn" id="btn-clear-stats" type="button" title="Zero the counters but keep what is cached (compare a cold run with a warm run)">Clear counters</button>
+          <button class="btn" id="btn-reset" type="button" title="Empty every cache and zero the counters">↺ Reset everything</button>
+          <label class="field inline">Speed
+            <input id="speed" type="range" min="0" max="5" step="1" value="2" />
+            <output id="speed-label">1×</output>
+          </label>
+        </div>
+        <div class="toolbar cfg-bar" role="group" aria-label="Machine settings">
+          <label class="check"><input type="checkbox" id="cfg-caches" checked /> Caches switched on</label>
+          <label class="check"><input type="checkbox" id="cfg-prefetch" /> Prefetch next block</label>
+          <label class="field inline">L1 size
+            <select id="cfg-l1"><option value="2">2 lines</option><option value="4" selected>4 lines</option><option value="8">8 lines</option></select>
+          </label>
+          <label class="field inline">L1 placement
+            <select id="cfg-map"><option value="fa" selected>any slot (fully associative)</option><option value="dm">one fixed slot (direct-mapped)</option></select>
+          </label>
+        </div>
+
+        <div class="mh-grid">
+          <div class="hier-wrap">
+            <p class="scroll-hint">Each box is one level of memory. Small squares are cache lines holding a block of 4 words.</p>
+            <div class="hier" id="hier">
+              <div class="chip" id="chip" aria-hidden="true"></div>
+
+              <div class="level lv-cpu" data-level="cpu">
+                <div class="lv-head"><b>CPU</b><span class="muted">registers: ~1 cycle</span></div>
+                <div class="regs">
+                  <div class="regbox"><span>R1</span><code id="reg-r1">—</code></div>
+                  <div class="req" id="req-text">idle</div>
+                </div>
+              </div>
+
+              <div class="level lv-l1" data-level="l1">
+                <div class="lv-head"><b>L1 cache</b><span class="muted" id="meta-l1"></span><span class="verdict" id="vd-l1"></span></div>
+                <div class="cells" id="cells-l1"></div>
+              </div>
+              <div class="level lv-l2" data-level="l2">
+                <div class="lv-head"><b>L2 cache</b><span class="muted" id="meta-l2"></span><span class="verdict" id="vd-l2"></span></div>
+                <div class="cells" id="cells-l2"></div>
+              </div>
+              <div class="level lv-l3" data-level="l3">
+                <div class="lv-head"><b>L3 cache</b><span class="muted" id="meta-l3"></span><span class="verdict" id="vd-l3"></span></div>
+                <div class="cells" id="cells-l3"></div>
+              </div>
+              <div class="level lv-ram" data-level="ram">
+                <div class="lv-head"><b>RAM</b><span class="muted" id="meta-ram"></span><span class="verdict" id="vd-ram"></span></div>
+                <div class="cells" id="cells-ram"></div>
+              </div>
+              <div class="level lv-ssd" data-level="ssd">
+                <div class="lv-head"><b>SSD (storage)</b><span class="muted" id="meta-ssd"></span><span class="verdict" id="vd-ssd"></span></div>
+                <div class="ssd-note">Holds all 64 blocks. RAM starts out holding blocks 0–31 (the program has just been loaded); reading any other block is a <i>page fault</i> served from here.</div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="side">
+            <div class="card">
+              <h2 class="card-title">Memory map <span class="muted small-text">click a block to read its first word</span></h2>
+              <div class="mapgrid" id="mapgrid" role="group" aria-label="64 memory blocks"></div>
+              <div class="legend" id="map-legend"></div>
+              <div class="manual">
+                <label class="field inline">Read word <input id="addr-in" type="number" min="0" max="255" value="37" /></label>
+                <button class="btn small" id="btn-read" type="button">Read</button>
+                <span class="muted small-text" id="addr-info"></span>
+              </div>
+            </div>
+            <div class="card" id="stats-card">
+              <h2 class="card-title">Results</h2>
+              <div class="bigstats">
+                <div><span class="k">L1 hit rate</span><span class="v" id="s-hit">—</span></div>
+                <div><span class="k">Average cost per access</span><span class="v" id="s-amat">—</span></div>
+                <div><span class="k">CPU waiting</span><span class="v" id="s-wait">—</span></div>
+              </div>
+              <div class="stack" id="s-stack" aria-label="Where accesses were served"></div>
+              <dl class="kv2" id="s-list"></dl>
+            </div>
+          </aside>
+        </div>
+
+        <div class="card narr">
+          <h2 class="card-title">What just happened</h2>
+          <p id="narr" aria-live="polite">Pick an access pattern and press <b>Run</b>, or click blocks in the memory map. Every access starts at the CPU and goes down the levels until the data is found.</p>
+          <h3 class="card-sub">Last 80 accesses: where each one was served</h3>
+          <div class="strip" id="strip" aria-label="History of accesses"></div>
+          <div class="legend" id="strip-legend"></div>
+          <p class="muted small-text" id="verdict-run"></p>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2 class="h2">How slow is “slow”?</h2>
+        <p class="muted">Typical figures for a desktop CPU at about 3 GHz. Real machines differ, but the <em>ratios</em> are what matter.
+          Tick the box to stretch time so that one CPU cycle lasts one second.</p>
+        <label class="check" style="margin:6px 0 10px"><input type="checkbox" id="human" /> Human scale (1 cycle = 1 second)</label>
+        <div class="table-scroll"><table class="log lat" id="lat-table">
+          <thead><tr><th>Level</th><th>Typical size</th><th>Latency (cycles)</th><th id="lat-th">Real time</th><th>Relative (log scale)</th></tr></thead>
+          <tbody id="lat-body"></tbody>
+        </table></div>
+        <p class="muted small-text" style="margin-top:10px">Going to RAM costs about 60 L1 hits; going to an SSD costs about 40,000. A CPU that waits for the SSD could have run hundreds of thousands of instructions.</p>
+      </section>
+
+      <section class="block ideas">
+        <h2 class="h2">Key ideas</h2>
+        <div class="idea-grid">
+          <div class="card"><h3>Hit and miss</h3>
+            <p>A <b>cache hit</b> means the data is already in that level. A <b>cache miss</b> means it is not, so the request goes one level further down and the block is copied back up on the way. The <b>hit rate</b> is hits ÷ accesses.</p></div>
+          <div class="card"><h3>Blocks, not words</h3>
+            <p>Memory moves in <b>blocks</b> (cache lines). Here a block is 4 words; real CPUs use 64 bytes. Reading word 37 brings words 36–39 with it, so the next three reads are free.</p></div>
+          <div class="card"><h3>Temporal locality</h3>
+            <p>Data used <em>recently</em> is likely to be used again soon (a loop counter, a total). Caches keep recently used blocks and evict the <b>least recently used</b> one when full.</p></div>
+          <div class="card"><h3>Spatial locality</h3>
+            <p>Data <em>next to</em> what you just used is likely to be used soon (the next array element). Fetching whole blocks pays off when you walk memory in order.</p></div>
+          <div class="card"><h3>Average access time</h3>
+            <p>Average cost = Σ (share served by each level × that level’s latency). With 95% L1 hits at 4 cycles and 5% from RAM at 250 cycles: 0.95×4 + 0.05×250 = <b>16.3 cycles</b>. A small miss rate dominates the cost.</p></div>
+          <div class="card"><h3>Three kinds of miss</h3>
+            <p><b>Cold</b>: first ever touch of a block. <b>Capacity</b>: the cache is too small to keep it. <b>Conflict</b>: there was room, but the placement rule (direct-mapped) forces two blocks into one slot. The results panel counts each kind for L1.</p></div>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2 class="h2">How to avoid cache misses</h2>
+        <ol class="try">
+          <li><b>Walk memory in order.</b> Use the <em>row by row</em> and <em>column by column</em> patterns on the same 16×8 table: the same 128 reads, very different costs.</li>
+          <li><b>Keep the working set small.</b> Slide the <em>working set</em> up and watch the cliffs: it falls out of L1, then L2, then L3, then RAM. Past RAM, every access is an SSD page fault.</li>
+          <li><b>Reuse data while it is hot.</b> Do all the work on a block before moving on (loop tiling or “blocking”), instead of sweeping the whole data set several times.</li>
+          <li><b>Prefer contiguous data.</b> Arrays are friendly; linked lists and scattered objects behave like the <em>random access</em> pattern.</li>
+          <li><b>Let the prefetcher help.</b> Tick <em>Prefetch next block</em> on a sequential scan, then on random access: prefetching only works when the pattern is predictable.</li>
+          <li><b>Add the right memory.</b> If the working set slightly exceeds RAM, performance collapses (thrashing). More RAM, or a smaller data set, fixes it.</li>
+        </ol>
+      </section>
+
+      <section class="block">
+        <h2 class="h2">The Von Neumann bottleneck</h2>
+        <p>
+          In a Von Neumann computer, instructions and data live in the same memory and travel to the CPU over the same bus. The CPU can do work far faster than that bus can deliver, so it spends much of its time waiting.
+          The memory hierarchy is the main fix: most accesses are answered by a fast cache close to the CPU. Switch <em>Caches</em> off in the simulator and compare the “CPU waiting” figure.
+        </p>
+        <div class="card bn">
+          <h3>One shared path or two?</h3>
+          <p class="muted small-text">Each instruction needs one trip to fetch itself (I) and, if it reads or writes data, another (D). Drag to change how many instructions touch data.</p>
+          <label class="field inline">Instructions that access data: <output id="f-out">40%</output>
+            <input id="f" type="range" min="0" max="100" step="10" value="40" />
+          </label>
+          <div class="bus-compare" id="bus-compare"></div>
+        </div>
+        <p>
+          Modern CPUs soften this with <b>separate L1 caches for instructions and data</b> (a “modified Harvard” design), so the CPU can fetch both at once, while main memory stays Von Neumann.
+          Other tricks: wider and faster buses, prefetching, and running other work while waiting.
+        </p>
+      </section>
+
+      <section class="block">
+        <h2 class="h2">Things to try</h2>
+        <ol class="try">
+          <li><b>Cold start.</b> Reset, choose <em>Scan an array in order</em> and run 64 accesses. Why is the L1 hit rate exactly 75%? (One miss per 4-word block.) Which level served those misses?</li>
+          <li><b>Warm vs cold.</b> Run <em>One variable repeatedly</em>. Press <em>Clear counters</em> (keeping the cache contents) and run again. What changed?</li>
+          <li><b>Find the cliffs.</b> Use <em>Loop over a working set</em> and raise the size from 1 to 64 blocks. At which sizes does each level stop helping? How do they relate to the L1, L2, L3 and RAM sizes shown?</li>
+          <li><b>Same work, different order.</b> Run <em>16×8 table, row by row</em> then <em>column by column</em>. Compare the average cost per access, and which level serves the column-by-column reads.</li>
+          <li><b>Conflict misses.</b> Choose <em>My own list</em> and enter <code>0 16 32 0 16 32 0 16 32</code>: three blocks that all map to the same L1 slot. Run it with L1 “one fixed slot”, then with “any slot”, and compare the conflict count.</li>
+          <li><b>Thrashing.</b> Loop over 33 blocks, then 32. RAM only holds 32 blocks. Why does one extra block make such a huge difference to the cost of every pass?</li>
+          <li><b>Remove the caches.</b> Switch caches off and run anything. How long would the CPU spend waiting, as a percentage?</li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>Simplified model: reads only, block = 4 words, 256 words of address space (64 blocks). L1/L2/L3/RAM hold 4 (or 2, 8) / 8 / 16 / 32 blocks with least-recently-used replacement, and RAM starts with blocks 0–31 loaded. Real sizes are millions of times bigger but the behaviour is the same.</p>
+        <p><a href="./teaching.html">← Teaching</a></p>
+      </div>
+    </footer>
+
+    <script src="./memory-hierarchy.js"></script>
+  </body>
+</html>
