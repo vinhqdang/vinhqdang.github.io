@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fetch–Execute Cycle | Teaching | Vinh Dang</title>
+    <meta name="description" content="Interactive Von Neumann machine: watch the fetch-execute cycle move data between the PC, MAR, MDR, CIR, accumulator, ALU, Control Unit and memory. Design your own memory and see what happens when the program is wrong. For British University Vietnam students in Introduction to Computing Science." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./fetch-execute.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="./index.html">Vinh Dang</a>
+        <nav class="site-nav" aria-label="Primary">
+          <a href="./index.html#research">Research</a>
+          <a href="./publications.html">Publications</a>
+          <a href="./teaching.html" aria-current="page">Teaching</a>
+          <a href="./updates.html">News</a>
+          <a href="./index.html#about">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap fe">
+      <p class="crumbs"><a href="./teaching.html">Teaching</a> / Fetch–Execute cycle</p>
+      <div class="page-head">
+        <p class="eyebrow">Interactive lesson</p>
+        <h1>The Fetch–Execute Cycle</h1>
+        <p>
+          A working Von Neumann computer you can take apart. Step through the cycle one register transfer at a time,
+          change the program in memory, and see what the Control Unit, ALU and registers do. Then break it on purpose.
+        </p>
+        <p class="course-note">
+          This page supports <strong>British University Vietnam</strong> students in the module
+          <strong>Introduction to Computing Science</strong> (2024–2027 and onwards). It accompanies the Week 8 “Systems” lecture.
+        </p>
+      </div>
+
+      <noscript><p class="empty">This simulator needs JavaScript.</p></noscript>
+
+      <section class="lab" aria-label="Fetch-execute simulator">
+        <div class="preset-row">
+          <label class="field">Program
+            <select id="preset"></select>
+          </label>
+          <button class="btn small" id="btn-restore" type="button" title="Reload this program, discarding your edits">Restore program</button>
+        </div>
+        <p class="preset-desc" id="preset-desc"></p>
+        <details id="spoiler" class="spoiler" hidden>
+          <summary>What’s the bug? (spoiler)</summary>
+          <p id="spoiler-text"></p>
+        </details>
+
+        <div class="toolbar" role="group" aria-label="Controls">
+          <button class="btn" id="btn-back" type="button">◀ Back</button>
+          <button class="btn btn-primary" id="btn-step" type="button">Step ▶</button>
+          <button class="btn" id="btn-next" type="button">Next instruction ⏭</button>
+          <button class="btn" id="btn-run" type="button">▶ Run</button>
+          <button class="btn" id="btn-reset" type="button">↺ Reset</button>
+          <label class="field inline">Speed
+            <input id="speed" type="range" min="0" max="5" step="1" value="2" aria-describedby="speed-label" />
+            <output id="speed-label">1×</output>
+          </label>
+          <label class="field inline">Start PC
+            <input id="start-pc" type="number" min="0" max="15" value="1" />
+          </label>
+          <fieldset class="notation">
+            <legend>Show registers in</legend>
+            <label><input type="radio" name="notation" value="bin" checked /> Binary</label>
+            <label><input type="radio" name="notation" value="dec" /> Decimal</label>
+            <label><input type="radio" name="notation" value="hex" /> Hex</label>
+          </fieldset>
+        </div>
+
+        <p class="scroll-hint">On a narrow screen, scroll the diagram sideways.</p>
+        <div class="machine-scroll">
+          <div class="machine" id="machine">
+            <svg class="bus-layer" id="bus-layer" aria-hidden="true"></svg>
+            <div class="chip" id="chip" aria-hidden="true"></div>
+
+            <div class="cpu panel">
+              <h2 class="panel-title">CPU</h2>
+
+              <div class="node cu" data-node="cu">
+                <div class="node-head"><b>Control Unit</b><span class="muted">the “boss”: runs the cycle</span></div>
+                <div class="phase-pills" id="phase-pills">
+                  <span class="pill ph-fetch" data-phase="Fetch">Fetch</span>
+                  <span class="pill ph-decode" data-phase="Decode">Decode</span>
+                  <span class="pill ph-execute" data-phase="Execute">Execute</span>
+                </div>
+                <dl class="kv">
+                  <div><dt>Opcode</dt><dd id="cu-opcode">—</dd></div>
+                  <div><dt>Operand</dt><dd id="cu-operand">—</dd></div>
+                  <div><dt>Instructions run</dt><dd id="cu-cycles">0</dd></div>
+                </dl>
+              </div>
+
+              <div class="node reg" data-node="pc">
+                <span class="reg-name">PC</span><span class="reg-full">Program Counter</span>
+                <code class="reg-val" id="v-pc"></code><span class="reg-alt" id="a-pc"></span>
+              </div>
+              <div class="node reg" data-node="mar">
+                <span class="reg-name">MAR</span><span class="reg-full">Memory Address Register</span>
+                <code class="reg-val" id="v-mar"></code><span class="reg-alt" id="a-mar"></span>
+              </div>
+              <div class="node reg" data-node="cir">
+                <span class="reg-name">CIR</span><span class="reg-full">Current Instruction Register</span>
+                <code class="reg-val" id="v-cir"></code><span class="reg-alt" id="a-cir"></span>
+                <span class="reg-asm" id="v-cir-asm"></span>
+              </div>
+              <div class="node reg" data-node="mdr">
+                <span class="reg-name">MDR</span><span class="reg-full">Memory Data Register</span>
+                <code class="reg-val" id="v-mdr"></code><span class="reg-alt" id="a-mdr"></span>
+              </div>
+
+              <div class="node alu" data-node="alu">
+                <div class="node-head"><b>ALU</b><span class="muted">arithmetic / logic</span></div>
+                <dl class="kv">
+                  <div><dt>A</dt><dd id="alu-a">—</dd></div>
+                  <div><dt>B</dt><dd id="alu-b">—</dd></div>
+                  <div><dt>Operation</dt><dd id="alu-op">—</dd></div>
+                  <div><dt>Result</dt><dd id="alu-res">—</dd></div>
+                  <div><dt>Zero flag</dt><dd id="alu-zero">—</dd></div>
+                </dl>
+              </div>
+              <div class="node reg acc" data-node="acc">
+                <span class="reg-name">ACC</span><span class="reg-full">Accumulator</span>
+                <code class="reg-val" id="v-acc"></code><span class="reg-alt" id="a-acc"></span>
+              </div>
+            </div>
+
+            <div class="mem panel" data-node="mem">
+              <h2 class="panel-title">Main memory <span class="muted">16 cells × 8 bits. Instructions and data share it.</span></h2>
+              <table class="mem-table">
+                <thead><tr><th></th><th>Address</th><th>Contents</th><th>Meaning (edit me)</th><th></th></tr></thead>
+                <tbody id="mem-body"></tbody>
+              </table>
+              <p class="mem-help">
+                Type an instruction (<code>LOAD 8</code>, <code>ADD 9</code>, <code>JZ 6</code>, <code>OUT</code>, <code>HLT</code>) or a number
+                (<code>25</code>, <code>0b1010</code>, <code>0x1F</code>). The ▶ marks the PC. The CPU only ever sees bits.
+              </p>
+            </div>
+
+            <div class="io">
+              <div class="node io-box" data-node="in">
+                <b>Input</b>
+                <label class="muted">number <input id="input-val" type="number" min="0" max="255" value="7" /></label>
+              </div>
+              <div class="node io-box" data-node="out">
+                <b>Output</b>
+                <div class="out-list" id="out-list" aria-live="polite"></div>
+                <span class="muted" id="out-empty">nothing yet</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="edit-tools">
+          <button class="btn small" id="btn-clear" type="button">Clear memory</button>
+          <button class="btn small" id="btn-chaos" type="button" title="Fill memory with random bytes">🎲 Random memory</button>
+          <details class="port">
+            <summary>Save / load a program as text</summary>
+            <textarea id="port-text" rows="7" spellcheck="false" aria-label="Program text" placeholder="; one cell per line&#10;start 0&#10;0: LOAD 8&#10;1: ADD 9&#10;2: OUT&#10;3: HLT&#10;8: 10&#10;9: 5"></textarea>
+            <div class="port-actions">
+              <button class="btn small" id="btn-export" type="button">Show current program</button>
+              <button class="btn small" id="btn-copy" type="button">Copy</button>
+              <button class="btn small" id="btn-import" type="button">Load from text</button>
+              <span class="muted" id="port-msg" role="status"></span>
+            </div>
+          </details>
+        </div>
+
+        <div class="grid2">
+          <div class="card now">
+            <h2 class="card-title">What is happening</h2>
+            <p class="now-title" id="now-title">Ready</p>
+            <p id="now-text" aria-live="polite"></p>
+            <h3 class="card-sub" id="steps-head">Instruction 1: micro-steps</h3>
+            <ol class="steps" id="steps"></ol>
+          </div>
+          <div class="card warn-card">
+            <h2 class="card-title">Bug watch <span class="badge-count" id="warn-count">0</span></h2>
+            <p class="muted small-text">
+              The computer never checks that your design makes sense. This panel points out what it silently did that you may not have meant.
+            </p>
+            <ul class="warn-list" id="warn-list" aria-live="polite"></ul>
+            <p class="muted" id="warn-empty">No problems noticed yet.</p>
+          </div>
+        </div>
+
+        <div class="card trace">
+          <h2 class="card-title">Instruction trace
+            <span class="stats">Instructions: <b id="stat-instr">0</b> · Memory accesses: <b id="stat-mem">0</b></span>
+          </h2>
+          <p class="muted small-text">
+            Every instruction needs at least one memory access to be fetched. LOAD, STO, ADD and the rest need another.
+            All of it goes through one bus: the <i>Von Neumann bottleneck</i>.
+          </p>
+          <div class="table-scroll">
+            <table class="log">
+              <thead><tr><th>#</th><th>Cell</th><th>Instruction</th><th>Effect</th></tr></thead>
+              <tbody id="log-body"></tbody>
+            </table>
+          </div>
+          <p class="muted" id="log-empty">Nothing has run yet.</p>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2 class="h2">Instruction set of this machine</h2>
+        <p class="muted">Each instruction is one 8-bit word: the top 4 bits are the opcode, the bottom 4 bits are the operand (usually an address). Cells holding 0 decode as HLT. Opcodes 11–15 do not exist.</p>
+        <div class="table-scroll">
+          <table class="log isa">
+            <thead><tr><th>Opcode</th><th>Mnemonic</th><th>Effect</th><th>Notes</th></tr></thead>
+            <tbody id="isa-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2 class="h2">Things to try</h2>
+        <ol class="try">
+          <li><b>Predict, then check.</b> Load the lecture example. Before each instruction, write down what ACC and memory will hold afterwards.</li>
+          <li><b>Change the operands.</b> Edit <code>ADD 5</code> to <code>SUB 5</code> in the lecture example. What is 101 − 143 in 8 bits?</li>
+          <li><b>Execute data.</b> Set <em>Start PC</em> to 4 so the CPU fetches the number 101. Which instruction is <code>0110 0101</code>? Remember: the “As code” column shows how the CPU would read every data cell.</li>
+          <li><b>Design a program.</b> Use <em>Blank memory</em> to compute (a + b) − c, or to double a number, and print the answer.</li>
+          <li><b>Diagnose the five bugs</b> in the <em>Bugs to diagnose</em> group. Run each, find what went wrong from the Bug watch and the trace, fix it by editing memory, and run it again.</li>
+          <li><b>Count memory accesses.</b> How many trips to memory does the multiplication program make? Why would a separate memory for instructions and data (the Harvard model) help?</li>
+          <li><b>Break it your way.</b> Press 🎲 Random memory and Run. Is a random program more likely to halt, fault or loop forever? Why?</li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>Teaching machine: 16 cells of 8 bits with 4-bit addresses, so addresses wrap at 16 and numbers at 256. Real CPUs use 32- or 64-bit registers and addresses, but follow the same cycle.</p>
+        <p><a href="./teaching.html">← Teaching</a></p>
+      </div>
+    </footer>
+
+    <script src="./fetch-execute.js"></script>
+  </body>
+</html>

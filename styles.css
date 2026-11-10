@@ -216,3 +216,14 @@ details.authors summary:hover { color: var(--ink); }
 .work .authors { margin: 0 0 2px; }
 .authors sup { color: var(--accent); font-weight: 700; }
 .authors .corr { font-size: 12.5px; }
+
+/* ---------- teaching ---------- */
+.course-note { font: 14.5px/1.55 var(--sans); background: var(--accent-soft); border-left: 3px solid var(--accent); padding: 10px 14px; border-radius: 0 8px 8px 0; color: var(--ink) !important; }
+.crumbs { font: 13.5px var(--sans); color: var(--muted); margin: 28px 0 0; }
+.lesson-list { display: grid; gap: 16px; }
+.lesson { display: block; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px; color: var(--ink); transition: border-color 0.15s, transform 0.15s; }
+.lesson:hover { text-decoration: none; border-color: var(--accent); transform: translateY(-2px); }
+.lesson h2 { font-size: 1.6rem; margin: 6px 0 8px; }
+.lesson p { color: var(--muted); margin: 0 0 12px; max-width: 46em; }
+.lesson-tag { font: 600 11px var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+.lesson-go { font: 600 14px var(--sans); color: var(--accent); }
