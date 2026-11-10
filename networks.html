@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Networks and the Internet | Teaching | Vinh Dang</title>
+    <meta name="description" content="Interactive lesson on networks: graphs of nodes and links, redundancy, LAN, MAN, WAN and the Internet, tracing a route with TTL, and how the Internet grew. For British University Vietnam students in Introduction to Computing Science." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./fetch-execute.css" />
+    <link rel="stylesheet" href="./network.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="./index.html">Vinh Dang</a>
+        <nav class="site-nav" aria-label="Primary">
+          <a href="./index.html#research">Research</a>
+          <a href="./publications.html">Publications</a>
+          <a href="./teaching.html" aria-current="page">Teaching</a>
+          <a href="./updates.html">News</a>
+          <a href="./index.html#about">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap fe net">
+      <p class="crumbs"><a href="./teaching.html">Teaching</a> / Networks and the Internet</p>
+      <div class="page-head">
+        <p class="eyebrow">Interactive lesson</p>
+        <h1>Networks and the Internet</h1>
+        <p>
+          A network is nodes sending data to each other. Build one, break it, zoom out from a home network to the whole Internet,
+          follow a message hop by hop, and see how fast it all grew.
+        </p>
+        <p class="course-note">
+          This page supports <strong>British University Vietnam</strong> students in the module
+          <strong>Introduction to Computing Science</strong> (2024–2027 and onwards). It accompanies the Week 8 “Networks” lecture.
+          The next lesson, <a href="./protocols.html">Network protocols</a>, shows how the data actually travels.
+        </p>
+      </div>
+
+      <noscript><p class="empty">These visualisations need JavaScript.</p></noscript>
+
+      <!-- 1. graph -->
+      <section class="block" id="graph">
+        <p class="eyebrow">1 · What is a network?</p>
+        <h2 class="h2">Nodes and arcs: a network is a graph</h2>
+        <p class="muted">
+          Networks consist of <b>nodes</b> (N) and <b>arcs</b> (A). Writing a network as a graph lets a computer analyse it:
+          <i>if we start at N3, can we get to N2?</i> The same maths describes rail networks, flights and social networks.
+          Redundancy matters too: failures should not bring down the whole system.
+        </p>
+        <div class="toolbar" role="group" aria-label="Graph tools">
+          <label class="field inline">Network
+            <select id="g-preset"></select>
+          </label>
+          <fieldset class="notation" style="margin-left:0">
+            <legend>Click does</legend>
+            <label><input type="radio" name="g-mode" value="move" checked /> Move nodes</label>
+            <label><input type="radio" name="g-mode" value="link" /> Add / remove links</label>
+            <label><input type="radio" name="g-mode" value="fail" /> Break / repair</label>
+          </fieldset>
+          <button class="btn small" id="g-addnode" type="button">+ Node</button>
+          <button class="btn small" id="g-reset" type="button">↺ Reset</button>
+        </div>
+        <p class="preset-desc" id="g-hint"></p>
+        <div class="two">
+          <div class="svg-card"><svg id="g-svg" viewBox="0 0 640 360" role="img" aria-label="Network graph"></svg></div>
+          <div class="side">
+            <div class="card">
+              <h3 class="card-title">Can I get there?</h3>
+              <div class="route-q">
+                <label class="field inline">From <select id="g-from"></select></label>
+                <label class="field inline">to <select id="g-to"></select></label>
+              </div>
+              <p class="verdictline" id="g-route" aria-live="polite"></p>
+              <label class="check"><input type="checkbox" id="g-crit" /> Show single points of failure</label>
+              <p class="muted small-text" id="g-crit-note"></p>
+            </div>
+            <div class="card">
+              <h3 class="card-title">Mathematical representation</h3>
+              <pre class="math" id="g-math"></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. scales -->
+      <section class="block" id="scales">
+        <p class="eyebrow">2 · How big can a network be?</p>
+        <h2 class="h2">LAN → MAN → WAN → Internet</h2>
+        <p class="muted">Lots of LANs form a MAN, lots of MANs form a WAN, and the Internet is a collection of networks. Move the slider to zoom out.</p>
+        <div class="toolbar" role="group" aria-label="Scale">
+          <label class="field inline scale-slider">Scale
+            <input type="range" id="s-range" min="0" max="3" step="1" value="0" aria-valuetext="LAN" />
+          </label>
+          <span class="steps-lbl" id="s-labels"></span>
+          <fieldset class="notation" id="s-lanmode" style="margin-left:auto">
+            <legend>LAN type</legend>
+            <label><input type="radio" name="s-lan" value="cs" checked /> Client / server</label>
+            <label><input type="radio" name="s-lan" value="p2p" /> Peer-to-peer</label>
+          </fieldset>
+          <button class="btn small" id="s-send" type="button">✉ Send a message</button>
+        </div>
+        <div class="two wide-left">
+          <div class="svg-card"><svg id="s-svg" viewBox="0 0 700 340" role="img" aria-label="Scales of networks"></svg></div>
+          <div class="card" id="s-card"></div>
+        </div>
+      </section>
+
+      <!-- 3. traceroute -->
+      <section class="block" id="trace">
+        <p class="eyebrow">3 · How do we navigate it?</p>
+        <h2 class="h2">tracert: following a message hop by hop</h2>
+        <p class="muted">
+          The <code>tracert</code> (or <code>traceroute</code>) command shows the nodes between you and a site. It sends probes with a <b>TTL</b> (time to live)
+          of 1, 2, 3, … Each router subtracts 1; the router where TTL reaches 0 discards the packet and reports back. The list of replies is the route.
+          Addresses below are made-up examples.
+        </p>
+        <div class="toolbar" role="group" aria-label="Traceroute controls">
+          <label class="field inline">Destination
+            <select id="t-dest">
+              <option value="near">A web server in the same city</option>
+              <option value="far">A website on another continent</option>
+            </select>
+          </label>
+          <button class="btn btn-primary" id="t-step" type="button">Send next probe (TTL +1)</button>
+          <button class="btn" id="t-run" type="button">▶ Run all</button>
+          <button class="btn" id="t-reset" type="button">↺ Reset</button>
+        </div>
+        <div class="svg-card"><svg id="t-svg" viewBox="0 0 900 190" role="img" aria-label="Route to the destination"></svg></div>
+        <div class="two">
+          <div class="card"><h3 class="card-title">What is happening</h3><p id="t-narr" class="narr-p" aria-live="polite"></p></div>
+          <div class="card"><h3 class="card-title">tracert output</h3><pre class="term" id="t-term"></pre></div>
+        </div>
+      </section>
+
+      <!-- 4. internet -->
+      <section class="block" id="internet">
+        <p class="eyebrow">4 · The biggest network</p>
+        <h2 class="h2">The Internet: how it grew, and who is on it</h2>
+        <div class="idea-grid">
+          <div class="card"><h3>In the beginning</h3>
+            <p>A US military communications network of the late 1960s and 70s, designed to be <b>robust</b> even against attack. ARPANET used <b>packet switching</b> rather than an operator connecting wires, with distributed control. Its first four nodes used <em>different protocols</em>; only when people moved jobs between universities did the machines really learn to talk.</p></div>
+          <div class="card"><h3>The Internet is not “the web”</h3>
+            <p>The World Wide Web is just one service that runs on the Internet. Email, file transfer, online games and video calls use the same network but different protocols.</p></div>
+          <div class="card"><h3>Why so fast?</h3>
+            <p><b>Accessibility:</b> cheap devices, batteries, Wi-Fi to share one connection. <b>Need:</b> social media, business competition, taxes, gaming and media, shopping, education.</p></div>
+        </div>
+        <h3 class="h3">Hosts on the Internet (log scale)</h3>
+        <div class="svg-card"><svg id="grow-svg" viewBox="0 0 720 320" role="img" aria-label="Chart of Internet hosts over time"></svg></div>
+        <p class="muted small-text">Each step up is ten times more hosts. From 111 hosts in 1977 to a billion in 2014: growth of about 9,000,000×. Values from the lecture (2001 is quoted as 150–175 million).</p>
+
+        <h3 class="h3">The “world-wide” web? Who is connected</h3>
+        <p class="muted">Internet users as a share of each region’s population (Sept 2020 estimates in the lecture slide). Access is far from equal.</p>
+        <div class="bars" id="pen-bars"></div>
+        <p class="muted small-text">Access inequality has more causes than infrastructure: cost, language, and rules such as national filtering (for example the “Great Firewall of China”) change what people can reach.</p>
+      </section>
+
+      <section class="block">
+        <h2 class="h2">Things to try</h2>
+        <ol class="try">
+          <li><b>Reachability.</b> In the lecture network, ask whether N3 can reach N2. Break link a3 and ask again: is there still a route? How many routes are there?</li>
+          <li><b>Single points of failure.</b> Tick <em>Show single points of failure</em> on the <em>Star</em> and then the <em>Ring</em>. Which is more fragile? Why do real networks add extra links?</li>
+          <li><b>Design a robust network.</b> Start from <em>Chain</em> and add links until no node or link is critical. What is the fewest you need?</li>
+          <li><b>Peer-to-peer or client/server?</b> In the LAN scale, switch the type and send a message. What happens if the server fails? What if one peer fails?</li>
+          <li><b>Zoom out.</b> At which scale does a message first leave your own organisation’s network? Which scale is the Internet?</li>
+          <li><b>Trace it.</b> Compare the near and far destinations. Why can some hops show “Request timed out”, yet the trace carries on?</li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>Addresses in the traceroute use ranges reserved for documentation (RFC 5737). Host and user figures are from the Week 8 lecture.</p>
+        <p><a href="./teaching.html">← Teaching</a></p>
+      </div>
+    </footer>
+
+    <script src="./networks.js"></script>
+  </body>
+</html>

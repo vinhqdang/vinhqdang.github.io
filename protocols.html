@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Network Protocols | Teaching | Vinh Dang</title>
+    <meta name="description" content="Interactive lesson on network protocols: the TCP/IP stack and encapsulation, packet switching versus circuit switching, IPv4 and IPv6 addresses, and HTTP. For British University Vietnam students in Introduction to Computing Science." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./fetch-execute.css" />
+    <link rel="stylesheet" href="./network.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="./index.html">Vinh Dang</a>
+        <nav class="site-nav" aria-label="Primary">
+          <a href="./index.html#research">Research</a>
+          <a href="./publications.html">Publications</a>
+          <a href="./teaching.html" aria-current="page">Teaching</a>
+          <a href="./updates.html">News</a>
+          <a href="./index.html#about">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap fe net">
+      <p class="crumbs"><a href="./teaching.html">Teaching</a> / Network protocols</p>
+      <div class="page-head">
+        <p class="eyebrow">Interactive lesson</p>
+        <h1>Network Protocols</h1>
+        <p>
+          Computers are physically linked by cables, radio or light, yet applications behave as if they talk to each other directly.
+          Protocols make that possible. Send a message down the stack, race packets across a network that breaks, and follow a web request from URL to page.
+        </p>
+        <p class="course-note">
+          This page supports <strong>British University Vietnam</strong> students in the module
+          <strong>Introduction to Computing Science</strong> (2024–2027 and onwards). It accompanies the Week 8 “Networks” lecture and continues from
+          <a href="./networks.html">Networks and the Internet</a>.
+        </p>
+      </div>
+
+      <noscript><p class="empty">These visualisations need JavaScript.</p></noscript>
+
+      <!-- 1. stack -->
+      <section class="block" id="stack">
+        <p class="eyebrow">1 · Where do protocols fit in?</p>
+        <h2 class="h2">The protocol stack: a virtual link on top of a physical one</h2>
+        <p class="muted">
+          Only the bottom layer is physically connected. Every layer above talks to its <b>partner layer on the other computer</b> (the dashed “virtual links”) by handing its message to the layer below,
+          which wraps it in a <b>header</b>. The Internet’s base protocol set is <b>IP</b> at the bottom with <b>TCP</b> on top. Higher-level protocols (HTTP, FTP, SMTP) sit on top of TCP.
+        </p>
+        <div class="stack-form">
+          <label class="field">Message<input id="st-msg" type="text" value="GET /index.html" maxlength="40" /></label>
+          <label class="field">Source IP<input id="st-src" type="text" value="192.0.2.10" /></label>
+          <label class="field">Destination IP<input id="st-dst" type="text" value="203.0.113.80" /></label>
+          <label class="field">Dest. port<input id="st-port" type="number" min="1" max="65535" value="80" /></label>
+          <label class="field">TCP sequence no.<input id="st-seq" type="number" min="0" max="999999" value="1" /></label>
+          <label class="check"><input type="checkbox" id="st-corrupt" /> Corrupt one bit on the wire</label>
+        </div>
+        <div class="toolbar" role="group" aria-label="Stack controls">
+          <button class="btn btn-primary" id="st-step" type="button">Next step ▶</button>
+          <button class="btn" id="st-run" type="button">▶ Run all</button>
+          <button class="btn" id="st-reset" type="button">↺ Reset</button>
+          <span class="steps-lbl" id="st-stage"></span>
+        </div>
+        <div class="stack-grid" id="st-grid" aria-label="Protocol stack of two computers"></div>
+        <div class="two">
+          <div class="card"><h3 class="card-title" id="st-title">Ready</h3><p class="narr-p" id="st-narr" aria-live="polite"></p></div>
+          <div class="card"><h3 class="card-title">The packet right now</h3><div class="pktview" id="st-pkt"></div><p class="muted small-text" id="st-size"></p></div>
+        </div>
+        <div class="idea-grid" style="margin-top:14px">
+          <div class="card"><h3>IP: just deliver it</h3><p>The Internet Protocol is only tasked with sending packets from one node to another. It does <b>not</b> handle lost, damaged or out-of-order packets.</p></div>
+          <div class="card"><h3>TCP: make it reliable</h3><p>The Transmission Control Protocol cares about data integrity. It splits the data into packets, adds a header with the <b>order of reassembly</b> and an <b>error-checking value</b>, and rebuilds the data at the destination. The TCP segment travels as the <em>payload</em> of an IP packet.</p></div>
+        </div>
+      </section>
+
+      <!-- 2. switching -->
+      <section class="block" id="switching">
+        <p class="eyebrow">2 · How does data cross the network?</p>
+        <h2 class="h2">Packet switching vs circuit switching</h2>
+        <p class="muted">
+          Circuit switching reserves one dedicated path from end to end before any data moves (the old telephone network). Packet switching, invented to replace it, chops the message into
+          <b>packets</b> that each find their own way. Send the same message both ways, then cut links and add loss.
+        </p>
+        <div class="toolbar sim-bar" role="group" aria-label="Simulation settings">
+          <fieldset class="notation" style="margin-left:0">
+            <legend>Method</legend>
+            <label><input type="radio" name="sw-mode" value="packet" checked /> Packet switching</label>
+            <label><input type="radio" name="sw-mode" value="circuit" /> Circuit switching</label>
+          </fieldset>
+          <label class="check" id="sw-tcp-wrap"><input type="checkbox" id="sw-tcp" /> Add TCP (reorder + retransmit)</label>
+          <label class="field inline">Chance a packet is lost <input id="sw-loss" type="range" min="0" max="40" step="10" value="0" /><output id="sw-loss-o">0%</output></label>
+          <label class="field inline">Other users <input id="sw-bg" type="range" min="0" max="3" step="1" value="0" /><output id="sw-bg-o">0</output></label>
+        </div>
+        <div class="toolbar sim-bar" role="group" aria-label="Message and controls">
+          <label class="field inline" style="flex:1 1 280px">Message <input id="sw-msg" type="text" value="PACKETS FIND A WAY ACROSS THE NETWORK" maxlength="60" style="flex:1" /></label>
+          <label class="field inline">Chars per packet
+            <select id="sw-chunk"><option>2</option><option selected>3</option><option>4</option><option>6</option></select></label>
+          <button class="btn btn-primary" id="sw-send" type="button">▶ Send</button>
+          <button class="btn" id="sw-pause" type="button">⏸ Pause</button>
+          <button class="btn" id="sw-tick" type="button">One tick</button>
+          <button class="btn" id="sw-reset" type="button">↺ Reset</button>
+          <label class="field inline">Speed <input id="sw-speed" type="range" min="0" max="3" step="1" value="1" /><output id="sw-speed-o">1×</output></label>
+        </div>
+        <p class="preset-desc" id="sw-hint"><b>Tip:</b> click any link while it runs to cut it (click again to repair). Numbers in grey are link delays in ticks.</p>
+        <div class="svg-card"><svg id="sw-svg" viewBox="0 0 820 380" role="img" aria-label="Network with a sender, routers and a receiver"></svg></div>
+        <div class="two">
+          <div class="card">
+            <h3 class="card-title">At the receiver</h3>
+            <div class="slots" id="sw-slots" aria-label="Packets received, by sequence number"></div>
+            <p class="appview"><span class="muted">The application sees:</span> <code id="sw-app">—</code></p>
+            <p class="muted small-text" id="sw-appnote"></p>
+            <h3 class="card-sub">What happened</h3>
+            <ul class="eventlog" id="sw-log" aria-live="polite"></ul>
+          </div>
+          <div class="card"><h3 class="card-title">Results</h3><dl class="kv2" id="sw-stats"></dl><p class="verdictline" id="sw-summary"></p></div>
+        </div>
+        <div class="idea-grid" style="margin-top:14px">
+          <div class="card"><h3>Packet switching: advantages</h3><p>Much more efficient use of physical links (nobody owns a line while it is idle). More robust: more lines of communication, a lost connection only loses some of the data, and it is easier and faster to fix.</p></div>
+          <div class="card"><h3>Packet switching: disadvantages</h3><p><b>Lost packets</b> (tiny fluctuations in power, conflicting Wi-Fi signals) and <b>wrong order</b> (packets on different routes arrive in different orders). The right protocol, TCP, fixes both.</p></div>
+        </div>
+      </section>
+
+      <!-- 3. addresses -->
+      <section class="block" id="addresses">
+        <p class="eyebrow">3 · How do we name a machine?</p>
+        <h2 class="h2">IP addresses: IPv4 vs IPv6</h2>
+        <p class="muted">An IPv4 packet header carries a 4-byte source address and a 4-byte destination address, giving 2<sup>32</sup> (about 4 billion) addresses for roughly 7.8 billion people. IPv6 uses 16-byte addresses.</p>
+        <div class="two">
+          <div class="card">
+            <h3 class="card-title">IPv4 (4 bytes = 32 bits)</h3>
+            <label class="field">Address<input id="ip4" type="text" value="203.0.113.42" spellcheck="false" /></label>
+            <div class="bytes" id="ip4-bytes"></div>
+            <p class="muted small-text" id="ip4-note"></p>
+          </div>
+          <div class="card">
+            <h3 class="card-title">IPv6 (16 bytes = 128 bits)</h3>
+            <label class="field">Address (8 groups of 16 bits)<input id="ip6" type="text" value="2001:0db8:85a3:0000:0000:8a2e:0370:7334" spellcheck="false" /></label>
+            <div class="bytes six" id="ip6-bytes"></div>
+            <p class="muted small-text" id="ip6-note"></p>
+            <button class="btn small" id="ip6-rand" type="button">🎲 Random IPv6 address</button>
+          </div>
+        </div>
+        <div class="card" style="margin-top:14px">
+          <h3 class="card-title">How many addresses?</h3>
+          <div class="addr-bars" id="addr-bars"></div>
+          <p class="narr-p" id="addr-note"></p>
+        </div>
+      </section>
+
+      <!-- 4. http -->
+      <section class="block" id="http">
+        <p class="eyebrow">4 · What do we use it for?</p>
+        <h2 class="h2">HTTP: the protocol of the web</h2>
+        <p class="muted">
+          The World Wide Web is based on the Hypertext Transfer Protocol: a simple <b>client–server</b> protocol. The client is your browser; the server is the web server.
+          Every document is addressed by a <b>Uniform Resource Locator (URL)</b>.
+        </p>
+        <label class="field" style="max-width:640px">Type a URL<input id="url-in" type="text" value="http://www.example.com/docs/index.html" spellcheck="false" /></label>
+        <div class="urlview" id="url-view" aria-live="polite"></div>
+        <p class="muted small-text" id="url-note"></p>
+
+        <h3 class="h3">A request and its response</h3>
+        <div class="toolbar" role="group" aria-label="HTTP controls">
+          <button class="btn btn-primary" id="ht-step" type="button">Next message ▶</button>
+          <button class="btn" id="ht-run" type="button">▶ Run all</button>
+          <button class="btn" id="ht-reset" type="button">↺ Reset</button>
+          <label class="field inline">The server answers with
+            <select id="ht-status"></select></label>
+        </div>
+        <div class="two">
+          <div class="svg-card"><svg id="ht-svg" viewBox="0 0 560 330" role="img" aria-label="HTTP message sequence"></svg></div>
+          <div class="side">
+            <div class="card"><h3 class="card-title" id="ht-title">Ready</h3><pre class="term http" id="ht-raw"></pre></div>
+            <div class="card"><h3 class="card-title">What the browser shows</h3><div class="browser" id="ht-browser"></div></div>
+          </div>
+        </div>
+        <p class="muted small-text">The full HTTP specification runs to well over a hundred pages. Status codes tell the client what happened: 404 Not Found, 403 Forbidden, 408 Request Timeout… and, most important (not really), 418 “I’m a teapot”.</p>
+
+        <h3 class="h3">Web portals: using HTTP to do more</h3>
+        <p class="muted">A server can act as a portal to other systems: databases, resources, payment services. All e-commerce sites are portals. The server controls the client database, payment and stock database, and generates web pages dynamically. Try a purchase:</p>
+        <div class="toolbar" role="group" aria-label="Portal controls">
+          <button class="btn btn-primary" id="po-step" type="button">Next step ▶</button>
+          <button class="btn" id="po-run" type="button">▶ Run all</button>
+          <button class="btn" id="po-reset" type="button">↺ Reset</button>
+          <label class="check"><input type="checkbox" id="po-stock" /> Item is out of stock</label>
+          <label class="check"><input type="checkbox" id="po-pay" /> Payment is declined</label>
+        </div>
+        <div class="two">
+          <div class="svg-card"><svg id="po-svg" viewBox="0 0 620 300" role="img" aria-label="Browser, portal server and back-end systems"></svg></div>
+          <div class="side">
+            <div class="card"><h3 class="card-title" id="po-title">Ready</h3><p class="narr-p" id="po-narr" aria-live="polite"></p></div>
+            <div class="card"><h3 class="card-title">Page the browser gets</h3><div class="browser" id="po-browser"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2 class="h2">Things to try</h2>
+        <ol class="try">
+          <li><b>Count the overhead.</b> Send a 3-letter message down the stack. How many bytes of headers surround it? Why is it worth it?</li>
+          <li><b>Break the checksum.</b> Tick <em>Corrupt one bit</em> and run the stack. Which layer notices, and what happens to the message?</li>
+          <li><b>Circuit vs packet.</b> Send the message both ways. Which method starts delivering sooner? Which uses more of the network’s links?</li>
+          <li><b>Out of order.</b> In packet mode with no TCP, send the message and look at what the application sees. Why do packets overtake each other?</li>
+          <li><b>Turn on TCP and add 20% loss.</b> Watch the retransmissions. How does the receiver restore the original order?</li>
+          <li><b>Cut a link mid-way.</b> Do it in packet mode, then in circuit mode. Which survives? Why?</li>
+          <li><b>Crowd the network.</b> Raise <em>Other users</em> in each mode. What does a circuit say? What do packets do?</li>
+          <li><b>Change the answer.</b> Make the server reply 404, 403 or 418. What does the browser show? Which part of the URL decided where the request went?</li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>Simplified models. Real packets are about 1,500 bytes, real checksums and sequence numbers are more involved, and real routers choose paths with routing protocols. Addresses use ranges reserved for documentation (RFC 5737, RFC 3849).</p>
+        <p><a href="./teaching.html">← Teaching</a></p>
+      </div>
+    </footer>
+
+    <script src="./protocols.js"></script>
+  </body>
+</html>
