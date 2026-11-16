@@ -3,7 +3,7 @@
 | Folder | Talk |
 |---|---|
 | `keynote-trustworthy-ai/` | Keynote, Tay Do University, 15 Dec 2026: *Trustworthy AI for Smart Systems* (28 slides) |
-| `healthcare-ai-trust/` | *Towards Trustworthy Healthcare AI* (23 slides) |
+| `healthcare-ai-trust/` | *Towards Trustworthy Healthcare AI* (34 slides) |
 | `common/` | shared preamble (Metropolis theme), bibliography (`refs.bib`, `own.bib`), illustrative-figure data |
 
 Build (needs TeX Live with Beamer, TikZ, pgfplots, biblatex/biber, Fira Sans):

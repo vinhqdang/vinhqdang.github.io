@@ -113,9 +113,10 @@
   \foreach \bn [count=\bj] in {ERM,DP-SGD,PF-LD,DP-EDL,TRACER}{\node[font=\tiny,below] at ({(\bj-1)*12.5+5.5},0) {\bn};}
 \end{tikzpicture}}
 
+\newcommand{\chaplabels}{1/Why?/tdBlue,2/How sure?/tdAmber,3/Is it true?/tdGreen,4/Attacked?/tdRed}
 % chapter progress strip (bottom-left, in the footline): \chapstrip{n} with n = 0..4
 \newcommand{\chapstrip}[1]{\begin{tikzpicture}[remember picture,overlay]
-  \foreach \ci/\cl/\cc in {1/Why?/tdBlue,2/How sure?/tdAmber,3/Is it true?/tdGreen,4/Attacked?/tdRed}{%
+  \foreach \ci/\cl/\cc in \chaplabels{%
     \ifnum\ci=#1\relax\def\cfill{\cc}\def\ctext{white}\else\def\cfill{white}\def\ctext{\cc}\fi
     \node[rounded corners=4pt,fill=\cfill,draw=\cc,text=\ctext,font=\tiny\bfseries,minimum width=13mm,minimum height=2.9mm,inner sep=0.6pt,anchor=south east]
       at ([xshift={3mm+\ci*14mm},yshift=0.6mm]current page.south west) {\cl};}
