@@ -41,7 +41,11 @@ The same four questions arise for an intrusion detection system that blocks a fl
 
 Surveys of each strand exist, and they tend to present it as a catalogue of techniques. This paper takes a different route. It tells each strand as a story, starting from the simplest solution a practitioner would try, showing why that solution failed, and following the developments that repaired the failure up to the present. The order of the four strands is itself part of the story: each question became urgent because the answer to the previous one was not enough. A perfectly faithful explanation of a wrong prediction is still a wrong prediction; a well-calibrated probability says nothing about whether a generated sentence is true; and every guarantee can be broken by an adversary who controls part of the data.
 
-The contributions of this keynote paper are threefold. First, it gives a narrative review of the four strands, with the key formulas that mark each step (Section 3), and a timeline of the milestones (Figure 1). Second, it positions the author's published work within those narratives, stating what each contribution adds and what it does not solve. Third, it identifies a pattern common to all four strands, the move from heuristics to checkable statements, and derives from it a list of open problems for smart systems (Section 4).
+
+![Figure 1. The organising idea of this paper. A single alarm raises four questions, which correspond to four strands of trustworthy AI; each strand is told as the same arc, from a simple solution to the present and to the gap that motivates the next question.](dg01.jpg){width=100%}
+
+
+The contributions of this keynote paper are threefold. First, it gives a narrative review of the four strands, with the key formulas that mark each step (Section 3), and a timeline of the milestones (Figure 2). Second, it positions the author's published work within those narratives, stating what each contribution adds and what it does not solve. Third, it identifies a pattern common to all four strands, the move from heuristics to checkable statements, and derives from it a list of open problems for smart systems (Section 4).
 
 # 2. Materials and Methods
 
@@ -49,11 +53,11 @@ This is a narrative review rather than a systematic one. Literature was selected
 
 The author's own contributions were drawn from his published and in-press papers. Their descriptions, equations and reported numbers were taken from the published versions and the accompanying source code. Work that has not yet been accepted for publication is mentioned in Section 4 only as ongoing work, without numerical claims and without being listed as a reference, in line with the guidelines of this conference.
 
-Four figures illustrate the central ideas. Figure 1 is a timeline compiled from the cited literature. Figures 2 to 4 are small simulations written for this paper in Python with NumPy; their settings are stated in the captions, and they are intended to show the shape of a phenomenon, not to benchmark methods.
+Fourteen figures illustrate the central ideas. Figures 1, 3, 4, 6, 8, 9 and 11–14 are schematic diagrams drawn for this paper. Figure 2 is a timeline compiled from the cited literature. Figures 5, 7 and 10 are small simulations written for this paper in Python with NumPy; their settings are stated in the captions, and they are intended to show the shape of a phenomenon, not to benchmark methods.
 
 # 3. Results
 
-![Figure 1. Milestones in the four strands of trustworthy AI, 1945–2024. The years 1940–2000 are compressed. Most milestones in verification and in attacks on learning systems are less than ten years old.](fig1.jpg){width=100%}
+![Figure 2. Milestones in the four strands of trustworthy AI, 1945–2024. The years 1940–2000 are compressed. Most milestones in verification and in attacks on learning systems are less than ten years old.](fig1.jpg){width=100%}
 
 ## 3.1. Why? From readable models to explanations that can be tested
 
@@ -81,6 +85,10 @@ Each step added a property its predecessor lacked: locality, completeness, then 
 
 **The crisis: explanations can be wrong, or gamed.** Two results changed how explanations are judged. Adebayo et al. showed that several popular saliency methods produce nearly the same maps for a trained network and for a network with randomised weights; such maps cannot be explaining what the model learned [@adebayo2018]. Slack et al. built classifiers that behave in a discriminatory way on real inputs while presenting innocuous LIME and SHAP explanations, because those methods query the model on perturbed inputs that an adversarial model can recognise [@slack2020]. The lesson is that an explanation is itself a claim about the model and needs a test, for example a randomisation check or a fidelity measure that removes the highlighted evidence and observes whether the prediction changes. Rudin went further and argued that for high-stakes decisions one should prefer models that are interpretable by design [@rudin2019].
 
+
+![Figure 3. (a) The sanity-check idea [@adebayo2018]: if randomising the model does not change the saliency map, the map is not explaining the model. (b) Heterophily in adversarial graphs: a bot connects mostly to humans, so averaging over neighbours hides it and a neighbourhood-based explanation misleads (schematic).](dg02.jpg){width=100%}
+
+
 **The present: explaining relational systems.** Many smart systems are graphs: sensors connected by physical proximity, devices by network flows, accounts by follower relations. Graph neural networks update the representation $h_v$ of each node from its neighbourhood $\mathcal{N}(v)$,
 
 $$h_v^{(\ell+1)}=\sigma\Big(W^{(\ell)}\cdot\operatorname{AGG}\big\{h_u^{(\ell)}:u\in\mathcal{N}(v)\cup\{v\}\big\}\Big),$$
@@ -88,6 +96,10 @@ $$h_v^{(\ell+1)}=\sigma\Big(W^{(\ell)}\cdot\operatorname{AGG}\big\{h_u^{(\ell)}:
 and GNNExplainer explains a prediction by finding a small subgraph and feature subset that maximise mutual information with the prediction [@ying2019]. Neighbourhood aggregation, however, rests on an assumption of *homophily*: that connected nodes tend to share a label. Many real graphs are heterophilous, and in adversarial settings this is deliberate. Fraudsters, bots and intruders connect to many normal nodes so that their neighbourhoods look normal, which degrades standard graph neural networks [@zhu2020]. In such graphs both the prediction and the explanation ("the neighbours look normal") mislead.
 
 **Our contribution.** XHBot addresses this setting for social bot detection [@own2026xhbotexplainableheterophily]. It combines four ideas. A spectral refinement step learns, for each edge, a label-free mismatch score $E(u,v)=\sigma\big(W[x_u\Vert x_v\Vert(x_u-x_v)^2]+b\big)$ and softly down-weights edges whose score exceeds a threshold, since edges between dissimilar nodes carry high-frequency energy in the sense of the graph Dirichlet energy $\sum_{(u,v)}(f_u-f_v)^2$. A three-channel layer combines smoothing over the refined graph, max-pooling over the raw graph, which preserves anomalous signals instead of averaging them away, and a self-identity channel, fused by per-node attention. A disentangling objective separates a node's behavioural code from its social-position code. Finally, explanations are produced at two levels, a sparse edge mask that preserves the prediction and a community-level summary, and are evaluated by fidelity, the test that the crisis above called for. In ablations, the heterophilic channel contributed most to performance. Earlier, our work on intrusion detection had used explainability both to understand detector decisions and to improve detectors by selecting features that the explanations showed to be informative [@own2020understandingdecisionmachine; @own2021improvingperformanceintrusion].
+
+
+![Figure 4. Pipeline of XHBot [@own2026xhbotexplainableheterophily]: spectral edge refinement, a three-channel heterophily-aware layer, disentangling of behaviour from social position, and two-level explanations. The raw graph is kept for the max-pooling channel.](dg03.jpg){width=100%}
+
 
 **Hand-off.** An explanation tells an operator which evidence the model used. It does not tell the operator whether this particular output is correct, or how often outputs like it are wrong. Operators of our explained intrusion detectors asked exactly that next question.
 
@@ -99,7 +111,7 @@ and GNNExplainer explains a prediction by finding a small subgraph and feature s
 
 $$\mathrm{ECE}=\sum_b\frac{|B_b|}{n}\,\big|\operatorname{acc}(B_b)-\operatorname{conf}(B_b)\big|,$$
 
-and is largely removed by temperature scaling, $\hat p=\operatorname{softmax}(z/T)$ with a single parameter $T$ fitted on validation data [@guo2017] (Figure 2a). Calibration, however, is fitted on familiar data. Networks still assign high confidence to inputs unlike anything seen in training [@nguyen2015], which motivated baselines for detecting such out-of-distribution inputs [@hendrycks2017].
+and is largely removed by temperature scaling, $\hat p=\operatorname{softmax}(z/T)$ with a single parameter $T$ fitted on validation data [@guo2017] (Figure 5a). Calibration, however, is fitted on familiar data. Networks still assign high confidence to inputs unlike anything seen in training [@nguyen2015], which motivated baselines for detecting such out-of-distribution inputs [@hendrycks2017].
 
 **Development: separating noise from ignorance.** Treating the model weights $\theta$ as uncertain yields, by the law of total variance, a decomposition of predictive uncertainty into an aleatoric part, noise inherent in the data, and an epistemic part, ignorance that more data could remove [@kendall2017]:
 
@@ -107,17 +119,21 @@ $$\operatorname{Var}[y\mid x]=\underbrace{\mathbb{E}_\theta\operatorname{Var}[y\
 
 Monte Carlo dropout [@gal2016] and deep ensembles [@lakshminarayanan2017] made the epistemic term practical. A large benchmark then showed that the quality of all these estimates degrades under distribution shift, and none of them carries a guarantee [@ovadia2019]. Our work on intrusion detection used such uncertainty measures as a routing signal: confident predictions are acted upon, uncertain ones are escalated to an analyst or a second model, which improves overall detection performance [@own2026utilizinguncertaintymeasures].
 
-![Figure 2. (a) Reliability diagram (illustrative values) of an overconfident classifier before and after temperature scaling. (b) Simulation of split conformal prediction with target coverage 0.90: heavy-tailed scores (Student t, 3 degrees of freedom), 4,000 calibration draws for each calibration size n, coverage measured on 200 fresh test points per draw. The average coverage is at least 0.90 for every n, as the theorem promises; the spread around it shrinks as n grows.](fig2.jpg){width=100%}
+![Figure 5. (a) Reliability diagram (illustrative values) of an overconfident classifier before and after temperature scaling. (b) Simulation of split conformal prediction with target coverage 0.90: heavy-tailed scores (Student t, 3 degrees of freedom), 4,000 calibration draws for each calibration size n, coverage measured on 200 fresh test points per draw. The average coverage is at least 0.90 for every n, as the theorem promises; the spread around it shrinks as n grows.](fig2.jpg){width=100%}
 
 **The guarantee: conformal prediction.** Conformal prediction replaces modelling assumptions by a single assumption about the data, exchangeability [@vovk2005]. In its split form [@papadopoulos2002], held-out calibration examples $(x_i,y_i)$, $i=1,\dots,n$, are scored by a nonconformity score such as $s_i=1-\hat p_{y_i}(x_i)$. Let $\hat q$ be the $\lceil (n+1)(1-\alpha)\rceil$-th smallest score. The prediction set for a new input is $\mathcal{C}(x)=\{y: 1-\hat p_y(x)\le\hat q\}$. If calibration and test points are exchangeable, then
 
 $$1-\alpha\ \le\ \mathbb{P}\big(Y\in\mathcal{C}(X)\big)\ \le\ 1-\alpha+\frac{1}{n+1},$$
 
-because the rank of the test score among the $n+1$ scores is uniformly distributed [@angelopoulos2023]. No assumption is made about the model. Figure 2b shows the guarantee at work and also its nature: it holds on average over calibration draws, and a single small calibration set can under-cover.
+because the rank of the test score among the $n+1$ scores is uniformly distributed [@angelopoulos2023]. No assumption is made about the model. Figure 5b shows the guarantee at work and also its nature: it holds on average over calibration draws, and a single small calibration set can under-cover.
+
+
+![Figure 6. Split conformal prediction in two steps. The threshold is a quantile of calibration scores; the prediction set keeps every label whose score falls below it. The guarantee requires only exchangeability of calibration and test data.](dg04.jpg){width=100%}
+
 
 The two decades that followed extended this guarantee in several directions. Lei et al. established distribution-free predictive inference for regression [@lei2018]. Conformalised quantile regression made intervals adapt to local noise [@romano2019], and adaptive prediction sets made classification sets grow where the classifier is unsure [@romano2020]. Weighting calibration scores by a likelihood ratio handles covariate shift [@tibshirani2019]. Adaptive conformal inference maintains long-run coverage under drift by updating the level online, $\alpha_{t+1}=\alpha_t+\gamma(\alpha-\mathrm{err}_t)$ [@gibbs2021], and Barber et al. bounded the coverage loss when exchangeability fails [@barber2023]. Our earlier work applied kernel-based nonconformity scores to botnet detection, giving set-valued outputs with a stated error rate [@own2024kernelmethodsconformal].
 
-**Monitoring over time: from Wald to betting.** A monitoring system tests the same hypothesis, "the structure is healthy", at every epoch for years. A test at level $\alpha$ repeated at every look accumulates false alarms; with enough looks, a false alarm is almost certain (Figure 3a). The classical answers are Wald's sequential probability ratio test [@wald1945], which stops when the likelihood ratio $\Lambda_t=\prod_{s\le t}p_1(X_s)/p_0(X_s)$ exceeds $1/\alpha$, and Page's cumulative sum (CUSUM) procedure for change detection [@page1954]. Both need the pre- and post-change distributions to be specified.
+**Monitoring over time: from Wald to betting.** A monitoring system tests the same hypothesis, "the structure is healthy", at every epoch for years. A test at level $\alpha$ repeated at every look accumulates false alarms; with enough looks, a false alarm is almost certain (Figure 7a). The classical answers are Wald's sequential probability ratio test [@wald1945], which stops when the likelihood ratio $\Lambda_t=\prod_{s\le t}p_1(X_s)/p_0(X_s)$ exceeds $1/\alpha$, and Page's cumulative sum (CUSUM) procedure for change detection [@page1954]. Both need the pre- and post-change distributions to be specified.
 
 The modern answer is testing by betting [@shafer2021; @ramdas2023]. A forecaster bets against the null hypothesis that observations $X_s\in[0,1]$ have mean at most $\mu_0$, choosing each bet $\lambda_s$ before seeing $X_s$. The forecaster's wealth
 
@@ -127,9 +143,9 @@ is a non-negative supermartingale under the null, and Ville's inequality gives, 
 
 $$\mathbb{P}_{H_0}\big(\exists\,t:\ W_t\ge 1/\alpha\big)\le\alpha.$$
 
-The monitor may look at the data every hour and stop whenever it likes: the false-alarm budget holds for the whole monitoring life, without a parametric model (Figure 3). Confidence sequences built on the same principle give anytime-valid estimates of means [@howard2021; @waudby2024], and e-values have become a general language for such evidence [@vovkwang2021; @grunwald2024].
+The monitor may look at the data every hour and stop whenever it likes: the false-alarm budget holds for the whole monitoring life, without a parametric model (Figure 7). Confidence sequences built on the same principle give anytime-valid estimates of means [@howard2021; @waudby2024], and e-values have become a general language for such evidence [@vovkwang2021; @grunwald2024].
 
-![Figure 3. (a) Probability of at least one false alarm on data generated under the null hypothesis, as a function of the number of looks, for a z-test at level 0.05 applied at every step and for a betting e-process (mixture of four bet sizes, alarm when wealth reaches 20); 2,000 simulated streams. (b) One wealth path: uniform observations with mean 0.5 for 300 steps, then shifted by 0.15.](fig3.jpg){width=100%}
+![Figure 7. (a) Probability of at least one false alarm on data generated under the null hypothesis, as a function of the number of looks, for a z-test at level 0.05 applied at every step and for a betting e-process (mixture of four bet sizes, alarm when wealth reaches 20); 2,000 simulated streams. (b) One wealth path: uniform observations with mean 0.5 for 300 steps, then shifted by 0.15.](fig3.jpg){width=100%}
 
 **Hand-off.** Calibrated probabilities, conformal sets and e-processes quantify how often a model errs. For a generative model that produces a sentence or a caption, the operator needs something more direct: is this particular output true?
 
@@ -141,6 +157,10 @@ $$\forall x\in\mathcal{B}_\infty(x_0,\varepsilon):\ \arg\max_k f_k(x)=y_0\ ?$$
 
 Satisfiability modulo theories (SMT) solving made this feasible for networks with rectified linear units [@katz2017], layer-by-layer search addressed safety of image classifiers [@huang2017], and bound propagation combined with branch-and-bound scaled verification considerably further [@wang2021bcrown]. These methods prove local properties of moderately sized networks; they cannot establish that a sentence produced by a language model is factually correct.
 
+
+![Figure 8. (a) Formal verification propagates an input region through the network and proves bounds on the output. (b) Selective prediction with risk control (illustrative curve): the threshold is chosen so that the error among answered inputs stays below the target, and the remaining inputs are refused.](dg05.jpg){width=100%}
+
+
 **The second answer: check outputs against evidence.** A parallel line of work checks the output instead of the network. The FEVER benchmark framed fact verification as retrieving evidence and labelling a claim as supported, refuted or lacking information [@fever2018]. The CHAIR metric measured object hallucination in image captions against annotations [@rohrbach2018]. Retrieval-augmented generation conditioned generation on retrieved passages [@lewis2020]. SelfCheckGPT detected hallucinations through inconsistency among sampled answers [@selfcheck2023], FActScore split generations into atomic facts and scored the share supported by a knowledge source [@factscore2023], and POPE probed vision-language models with yes-or-no questions about object presence [@pope2023]. A survey documents how hallucination became a research field of its own [@ji2023]. These methods detect and score unsupported content; most give no guarantee about how often an accepted output is still wrong.
 
 **The present: guarantees on what is said.** Selective prediction lets a model abstain when a confidence score falls below a threshold, trading coverage, the share of inputs answered, for risk among the answered ones [@geifman2017]. Risk control turns this trade-off into a guarantee: choose the threshold $\hat\lambda$ on calibration data so that, with high probability,
@@ -150,6 +170,10 @@ $$\mathbb{E}\big[\ell\big(Y,\mathcal{C}_{\hat\lambda}(X)\big)\big]\le\alpha$$
 for a bounded loss $\ell$ [@bates2021; @angelopoulos2024crc]. Conformal factuality applies the idea to text: sub-claims of a generated answer are removed until the remainder is factual with probability at least $1-\alpha$ [@mohri2024]. The price of such guarantees is abstention, which raises the question of how much can be answered rather than refused.
 
 **Our contribution.** CMVKG-Guard verifies a vision-language model while it generates [@own2026realtimehallucination]. For each proposed token it builds three scores: a visual score from the attention mass on the token's image region and a contrastive image-text similarity, a knowledge-graph score from the most confident path in a per-query multimodal knowledge graph, and a reasoning score from multi-hop checks. A weighted combination $\Omega(t_i)=w^\top[S_{\mathrm{vis}},S_{\mathrm{kg}},S_{\mathrm{reason}}]$ is compared with a threshold that tightens with the generation step, to stop hallucinations from compounding. Flagged tokens are replaced through a look-ahead beam search that mixes the model's likelihood with the graph's. The method wraps the generation loop without retraining. On LLaVA-1.5 it raised the F1 score on POPE from 82.1 to 91.2 and reduced the CHAIR hallucination rate from 22.0% to 3.5%, with about 12 ms of overhead per token (Table 2). The same paper reports its limitations: performance is sensitive to the base threshold, and over-correction caused by missed object detections accounts for most remaining errors. CMVKG-Guard is a detector and corrector, not a guarantee, which is why our ongoing work combines its correction step with the risk-control framework above (Section 4).
+
+
+![Figure 9. Token-level verification and correction in CMVKG-Guard [@own2026realtimehallucination]. Three verification layers score each proposed token; tokens below a step-aware threshold are replaced through a look-ahead beam search guided by the knowledge graph.](dg06.jpg){width=100%}
+
 
 **Hand-off.** All the guarantees so far assume that the data, the calibration set and the participants are honest. The final question drops that assumption.
 
@@ -167,11 +191,15 @@ $$R=\frac{\sigma}{2}\Big(\Phi^{-1}(\underline{p_A})-\Phi^{-1}(\overline{p_B})\Bi
 
 where $\underline{p_A}$ and $\overline{p_B}$ bound the probabilities of the top two classes [@cohen2019]. The arc mirrors Section 3.2: from heuristics to certificates.
 
-**Many participants: federated learning and its liars.** Federated learning trains a shared model while data stay local; the server averages client models, $w_{t+1}=\sum_k\frac{n_k}{n}w^{(k)}_{t+1}$ [@mcmahan2017]. The mean is exactly the estimator Huber warned about. Robust aggregation rules replace it: Krum selects the update closest to its neighbours [@blanchard2017], and coordinate-wise medians and trimmed means come with statistical error rates [@yin2018]. Figure 4 shows the difference in a simple simulation. Robust rules, however, do not stop a participant who implants a backdoor through updates that look statistically normal [@bagdasaryan2020]. FLTrust responded by bootstrapping trust from a small clean dataset held by the server [@cao2021fltrust].
+**Many participants: federated learning and its liars.** Federated learning trains a shared model while data stay local; the server averages client models, $w_{t+1}=\sum_k\frac{n_k}{n}w^{(k)}_{t+1}$ [@mcmahan2017]. The mean is exactly the estimator Huber warned about. Robust aggregation rules replace it: Krum selects the update closest to its neighbours [@blanchard2017], and coordinate-wise medians and trimmed means come with statistical error rates [@yin2018]. Figure 10 shows the difference in a simple simulation. Robust rules, however, do not stop a participant who implants a backdoor through updates that look statistically normal [@bagdasaryan2020]. FLTrust responded by bootstrapping trust from a small clean dataset held by the server [@cao2021fltrust].
 
-![Figure 4. Simulated aggregation error when a fraction of 100 clients send malicious updates (each coordinate set to −10) and honest updates are drawn from a normal distribution with mean 1 in 50 dimensions; average over 50 repetitions, logarithmic scale. The mean fails at the first malicious client; the coordinate-wise median degrades gracefully.](fig4.jpg){width=75%}
+![Figure 10. Simulated aggregation error when a fraction of 100 clients send malicious updates (each coordinate set to −10) and honest updates are drawn from a normal distribution with mean 1 in 50 dimensions; average over 50 repetitions, logarithmic scale. The mean fails at the first malicious client; the coordinate-wise median degrades gracefully.](fig4.jpg){width=75%}
 
 **Our contribution: FORTRESS-FL.** In next-generation networks, the participants in federated learning are operators that share a model but not data, and do not fully trust each other. FORTRESS-FL combines the historical ideas above into one protocol [@own2026fortressflbyzantine]. Operators first commit to their updates with Pedersen commitments, so no operator can adapt its update to the others'. A spectral step builds a cosine-similarity graph of updates and separates an outlying cluster using the normalised Laplacian. Each operator carries a reputation updated as an exponential moving average of how close its update is to the honest consensus. Updates are then aggregated with reputation weights, and Gaussian noise is added for differential privacy. The design targets settings with fewer than one third Byzantine operators, the bound inherited from Lamport et al. Our earlier FedFairGNN work combined federated graph learning with privacy and fairness constraints for fraud detection [@dang2026fedfairgnn].
+
+
+![Figure 11. (a) Federated learning with honest and Byzantine operators. (b) One aggregation round of FORTRESS-FL [@own2026fortressflbyzantine]: commitment, spectral filtering, reputation weighting, and differentially private aggregation.](dg07.jpg){width=100%}
+
 
 **Privacy, and proving that something was forgotten.** Differential privacy bounds what any single record can reveal: a mechanism $M$ is $(\varepsilon,\delta)$-differentially private if, for all datasets $D,D'$ differing in one record and all sets of outcomes $S$ [@dwork2006],
 
@@ -181,6 +209,10 @@ Differentially private stochastic gradient descent clips per-example gradients a
 
 **Our contribution: VOUCH.** VOUCH issues anytime-valid certificates of unlearning by combining the canaries of privacy auditing with the betting e-processes of Section 3.2 [@dang2026vouch]. The verifier creates twin canary records and flips a private coin to decide which twin is trained on, and later forgotten, while the other is never seen. After unlearning, it compares the model's score $s$ on the two twins, $Z_i=\mathbf{1}\{s(M_u,c_i^{\mathrm{in}})>s(M_u,c_i^{\mathrm{ghost}})\}$. If forgetting is exact, $Z_i$ is a fair coin *by the verifier's own randomisation*, with no shadow models and no trust in the provider. The verifier then bets that the attacker's advantage is below a tolerance $\varepsilon$, with wealth $E_t=\prod_{u\le t}\big(1+\lambda_u(p_0(u)-Z_{\pi(u)})\big)$, where the boundary $p_0(u)$ is recentred on the pairs not yet revealed so that the test remains exact under arbitrary dependence between pairs. A certificate is issued when the wealth reaches $1/\alpha$, and a mirror process revokes it if leakage is detected. In experiments, a fixed-sample test used with repeated peeking reached a type-I error of 0.35 while VOUCH remained below $\alpha$; VOUCH needed fewer queries than valid group-sequential baselines; and on standard unlearning benchmarks, models that had not been unlearned were revoked in 16 of 18 runs, while exactly retrained models were certified in all 18 runs at $\varepsilon=0.1$. The paper also states its limits: it certifies the absence of leakage detectable by a declared class of scores on the planted cohort, not the erasure of parameters, and a perplexity filter can identify the canaries.
 
+
+![Figure 12. Protocol of VOUCH [@dang2026vouch]. Paired canaries and a private coin create an exact null hypothesis under which the verifier bets; a certificate is issued or revoked when the corresponding wealth reaches 1/α.](dg08.jpg){width=100%}
+
+
 **The newest surface: language-model agents.** Language models that read documents and call tools merge the data channel and the instruction channel. Perez and Ribeiro demonstrated goal hijacking and prompt leaking with instructions such as "ignore previous instructions" [@perez2022]. Greshake et al. showed *indirect* prompt injection, in which the attack hides in a web page, email or document the agent retrieves [@greshake2023]. Zou et al. found adversarial suffixes that transfer across aligned models [@zou2023], and AgentDojo provided a benchmark of attacks and defences for tool-using agents [@debenedetti2024]. Classical input validation does not apply when any text can act as an instruction.
 
 **Our contribution: CAPS.** Component-level vulnerability scores rate each component of a deployment in isolation, whereas attacks on retrieval-augmented and agentic systems are chains, for example an injected document reaching a retriever, then an agent, then a shell. CAPS scores such chains [@own2026capscompositionalattack]. The effective exploitability of a vulnerability is reduced by each mitigation $m$ treated as an independent survival factor, $E_{\mathrm{eff}}=E_{\mathrm{base}}\prod_m\big(1-M(m)\big)$; a path $P$ of $k$ nodes ending in an asset of value $I(v_k)$ receives the score
@@ -188,6 +220,10 @@ Differentially private stochastic gradient descent clips per-example gradients a
 $$S(P)=10\,I(v_k)\,\alpha^{k-1}\prod_{i=1}^{k}P_{\mathrm{node}}(v_i),$$
 
 with a decay $\alpha<1$ per hop; and candidate mitigations are ranked by how much they lower the score of the worst path. The paper notes its main limitations: exploitability values are expert estimates, and mitigations are assumed to fail independently.
+
+
+![Figure 13. (a) Indirect prompt injection: an instruction hidden in retrieved content travels through the agent to a tool with real-world effect. (b) CAPS [@own2026capscompositionalattack] scores attack chains rather than isolated components.](dg09.jpg){width=100%}
+
 
 Table 1 summarises the four narratives, and Table 2 lists the author's contributions discussed in this section.
 
@@ -214,7 +250,11 @@ Table 1 summarises the four narratives, and Table 2 lists the author's contribut
 
 # 4. Discussion
 
-**A common pattern.** Read side by side, the four narratives share a structure (Table 1). Each began with a heuristic that had to be trusted: a readable model, a test score, a formal proof limited to small networks, an average. Each heuristic failed in a documented way. Each strand then moved towards a statement that an outsider can check: a fidelity test for an explanation, a coverage guarantee for a prediction set, a risk certificate for generated content, an audit of forgetting. The oldest ideas keep returning. Wald's sequential test of 1945 reappears as the e-process that monitors bridges and certifies unlearning; Huber's breakdown point reappears in federated aggregation; Lamport's bound on faulty participants reappears in federated protocols for telecommunications operators. Students entering the field are well served by learning these foundations alongside the newest methods.
+**A common pattern.** Read side by side, the four narratives share a structure (Table 1, Figure 14). Each began with a heuristic that had to be trusted: a readable model, a test score, a formal proof limited to small networks, an average. Each heuristic failed in a documented way. Each strand then moved towards a statement that an outsider can check: a fidelity test for an explanation, a coverage guarantee for a prediction set, a risk certificate for generated content, an audit of forgetting. The oldest ideas keep returning. Wald's sequential test of 1945 reappears as the e-process that monitors bridges and certifies unlearning; Huber's breakdown point reappears in federated aggregation; Lamport's bound on faulty participants reappears in federated protocols for telecommunications operators. Students entering the field are well served by learning these foundations alongside the newest methods.
+
+
+![Figure 14. The common pattern of the four strands: from a heuristic that must be trusted, through a period of development, to a statement that an outsider can check.](dg10.jpg){width=100%}
+
 
 **Domain structure makes guarantees useful.** Distribution-free guarantees are attractive because they assume little, but by assuming little they can say little. In our ongoing (unpublished) work on structural health monitoring, we combine the betting e-processes of Section 3.2 with the physics of vibrating structures: eigenvalue perturbation theory implies that a loss of stiffness can only lower natural frequencies, in directions given by the finite-element model, so the monitor can bet only on evidence of that shape. Similarly, in ongoing work on graph-based bot detection we derive the camouflage level at which averaging over neighbours becomes worse than ignoring the graph. In both cases, knowledge of the domain turns a generic guarantee into a sharper one.
 
