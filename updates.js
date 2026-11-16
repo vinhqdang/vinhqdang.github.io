@@ -3,6 +3,16 @@ window.siteUpdates = [
   {
     date: "November 2026",
     type: "Publication",
+    title: "Paper on green credit policy and FinTech accepted in FinTech and Sustainable Innovation",
+    summary:
+      "\"Screening Green from Grey: FinTech Infrastructure and the Threshold Effectiveness of Green Credit Policy\" has been accepted for publication in FinTech and Sustainable Innovation (Bon View Publishing). The paper asks when green credit policy actually separates green from polluting borrowers, and how the strength of a region's FinTech infrastructure shapes that effect.",
+    href: "https://ojs.bonviewpress.com/index.php/FSI",
+    cta: "About the journal",
+    featured: true
+  },
+  {
+    date: "November 2026",
+    type: "Publication",
     title: "VOUCH accepted in Machine Learning (Springer)",
     summary:
       "\"VOUCH: Anytime-Valid Certificates for Machine Unlearning via Paired-Canary Hypothesis-Betting\" is accepted in Machine Learning. It plants paired ghost canaries before training and uses betting statistics that stay valid however long an auditor watches. An interactive, in-browser explainer walks through the algorithm.",
