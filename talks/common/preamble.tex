@@ -90,7 +90,8 @@
   {\ {\color{tdBlue}$\bullet$}\ }
   {}
 \setlength{\columnsep}{6pt}
-\newcommand{\srcc}[2]{\par\vfill\begingroup\fontsize{5.2}{6.1}\selectfont\color{tdMuted}\raggedright\setlength{\parindent}{0pt}\begin{multicols}{3}\ifx\relax#1\relax\else #1\ \fi\ifx\relax#2\relax\else\scite{#2}\fi\end{multicols}\vspace{-2pt}\endgroup}
+\newlength{\srccpad}\setlength{\srccpad}{-2pt}
+\newcommand{\srcc}[2]{\par\vfill\begingroup\fontsize{4.9}{5.6}\selectfont\color{tdMuted}\setlength{\columnsep}{3mm}\raggedright\setlength{\parindent}{0pt}\begin{multicols}{3}\ifx\relax#1\relax\else #1\ \fi\ifx\relax#2\relax\else\scite{#2}\fi\end{multicols}\vspace{\srccpad}\endgroup}
 
 \tikzset{chip/.style={rounded corners=3pt,text width=64mm,align=left,inner sep=3pt,minimum height=7.5mm,anchor=north west},
   done/.style={chip,draw=#1!70!black,fill=#1!14},wip/.style={chip,draw=#1!70!black,dashed,fill=#1!3},done/.default=tdBlue,wip/.default=tdBlue}
@@ -111,3 +112,16 @@
     \node[font=\tiny,above] at (\bx+4.5,\bh) {\bv};}%
   \foreach \bn [count=\bj] in {ERM,DP-SGD,PF-LD,DP-EDL,TRACER}{\node[font=\tiny,below] at ({(\bj-1)*12.5+5.5},0) {\bn};}
 \end{tikzpicture}}
+
+% chapter progress strip (bottom-left, in the footline): \chapstrip{n} with n = 0..4
+\newcommand{\chapstrip}[1]{\begin{tikzpicture}[remember picture,overlay]
+  \foreach \ci/\cl/\cc in {1/Why?/tdBlue,2/How sure?/tdAmber,3/Is it true?/tdGreen,4/Attacked?/tdRed}{%
+    \ifnum\ci=#1\relax\def\cfill{\cc}\def\ctext{white}\else\def\cfill{white}\def\ctext{\cc}\fi
+    \node[rounded corners=4pt,fill=\cfill,draw=\cc,text=\ctext,font=\tiny\bfseries,minimum width=13mm,minimum height=2.9mm,inner sep=0.6pt,anchor=south east]
+      at ([xshift={3mm+\ci*14mm},yshift=0.6mm]current page.south west) {\cl};}
+\end{tikzpicture}}
+% formula card: \fcard{colour}{title}{formula}{note}
+\newcommand{\fcard}[4]{\begin{tikzpicture}\node[rounded corners=4pt,draw=#1!70!black,fill=#1!8,inner sep=5pt,text width=\linewidth-12pt,align=left]{{\scriptsize\bfseries\color{#1!70!black}#2}\\[1pt]{\small #3}\\[1pt]{\tiny\color{tdMuted}#4}};\end{tikzpicture}}
+
+% timeline milestone: \ms{year}{y}{colour}{label}{placement}
+\newcommand{\ms}[5]{\pgfmathsetmacro{\xx}{#1<2000 ? (#1-1940)*0.34 : 20.4+(#1-2000)*4.9}\fill[#3] (\xx,#2) circle (1.1mm); \node[font=\tiny,align=center,text width=16mm,#5] at (\xx,#2) {#4};}
