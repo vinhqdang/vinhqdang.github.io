@@ -18,3 +18,5 @@ talks/**/*.bbl-SAVE-ERROR
 talks/_bis/
 # Compiled slide PDFs are shared for review, not published until approved
 talks/**/main.pdf
+talks/**/*.docx
+!talks/**/reference.docx
