@@ -196,11 +196,9 @@ So accuracy pushed us to \bad{black boxes}, and the question became: \emph{can w
 \[\max_{G_S}\ \operatorname{MI}\big(Y,(G_S,X_S)\big)\]
 \end{column}
 \begin{column}{0.47\textwidth}
-\begin{block}{The hidden assumption: homophily}
-{\footnotesize Averaging neighbours helps only if \textbf{neighbours resemble you}. Many real graphs are \emph{heterophilous}: fraudsters, bots and intruders deliberately connect to normal nodes, so their neighbourhood looks normal \cit{zhu2020}.}
-\end{block}
-\vspace{2mm}
-{\footnotesize Then both the \bad{prediction} and the \bad{explanation} (``your neighbours look normal'') mislead. This is where our work starts.}
+{\footnotesize\textbf{Hidden assumption: homophily.} Averaging helps only if neighbours resemble you; bots and intruders connect to normal nodes on purpose \cit{zhu2020}.}
+\begin{center}\includegraphics[width=0.92\linewidth,height=0.3\textheight,keepaspectratio]{figs/heterophily.jpg}\end{center}
+{\footnotesize Prediction \emph{and} explanation mislead. Our work starts here.}
 \end{column}
 \end{columns}
 \srcc{}{kipf2017,ying2019,zhu2020}
@@ -435,6 +433,26 @@ In security this assumption fails by design. Sommer and Paxson called it the \te
 \srcc{}{vovk2005,papadopoulos2002,lei2018,angelopoulos2023}
 \end{frame}
 
+\begin{frame}{How sure? \,|\, What the guarantee does, and does not, say}
+\chapstrip{2}
+\begin{columns}[c]
+\begin{column}{0.55\textwidth}
+\includegraphics[width=\linewidth,height=0.58\textheight,keepaspectratio]{figs/sim_coverage.jpg}\par
+{\tiny Simulation: heavy-tailed scores (Student $t$, 3 d.f.), 4{,}000 calibration draws per $n$, coverage on 200 fresh test points per draw.}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\footnotesize\good{Does:} the average coverage is $\ge 0.90$ for every calibration size, with no model of the scores at all.
+
+\vspace{2mm}
+\bad{Does not:} one particular calibration set can under-cover. With $n=20$ the coverage of a single deployment spreads from about 0.7 to 1.0; with $n=1000$ it concentrates near 0.90.
+
+\vspace{2mm}
+\key{Lesson for practice:} report the calibration size with the guarantee.}
+\end{column}
+\end{columns}
+\srcc{Simulation written for this talk.}{angelopoulos2023}
+\end{frame}
+
 \begin{frame}{How sure? \,|\, How conformal grew up (2002--2023)}
 \chapstrip{2}
 \centering
@@ -479,6 +497,15 @@ In security this assumption fails by design. Sommer and Paxson called it the \te
 \end{column}
 \end{columns}
 \srcc{}{wald1945,page1954,shafer2021,ramdas2023}
+\end{frame}
+
+\begin{frame}{How sure? \,|\, Peeking, simulated}
+\chapstrip{2}
+\centering
+\includegraphics[width=0.9\linewidth,height=0.6\textheight,keepaspectratio]{figs/sim_peeking.jpg}
+
+{\footnotesize Left: a $z$-test at level 0.05 checked at every step reaches a \bad{43\% chance of a false alarm} after 1{,}000 looks; the betting e-process stays \good{below 5\%}. Right: wealth drifts down while the data are healthy and grows exponentially after a 0.15 shift.}
+\srcc{Simulation written for this talk: 2{,}000 null streams; mixture of four bet sizes; alarm at $W_t\ge20$.}{ramdas2023}
 \end{frame}
 
 \begin{frame}{How sure? \,|\, Our work: PHASE, a lifetime false-alarm budget for bridges}
@@ -696,16 +723,8 @@ for any bounded loss \cit{bates2021,angelopoulos2024crc}.
 \chapstrip{4}
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
-\begin{sfig}[0.55]
-\begin{tikzpicture}[x=1mm,y=1mm]
-  \draw[->,thick,tdMuted] (0,0) -- (78,0);
-  \foreach \xx in {8,9.5,10,10.5,11,12,9,10.8,11.5}{\fill[tdBlue!75] (\xx*3,0) circle (1.2mm);}
-  \fill[tdRed] (70,0) circle (1.6mm); \node[font=\tiny,text=tdRed,above=2mm] at (70,0) {one bad sensor};
-  \draw[tdGreen,very thick] (31.5,-5) -- (31.5,6) node[above,font=\scriptsize,text=tdGreen!70!black] {median};
-  \draw[tdRed,very thick] (40.5,-5) -- (40.5,6) node[above,font=\scriptsize,text=tdRed,xshift=4mm] {mean};
-\end{tikzpicture}
-\end{sfig}
-{\tiny\illus}
+\includegraphics[width=\linewidth,height=0.6\textheight,keepaspectratio]{figs/sim_robust.jpg}\par
+{\tiny Simulation: 100 clients, 50 dimensions; malicious clients send $-10$ in every coordinate.}
 \end{column}
 \begin{column}{0.47\textwidth}
 {\footnotesize \textbf{Robust statistics} (Huber, 1964): one arbitrary outlier can move the mean anywhere (breakdown point 0); the median tolerates up to half the data being bad (breakdown point $\tfrac12$) \cit{huber1964}.
@@ -819,6 +838,15 @@ Gaussian noise & differential privacy
 \end{column}
 \end{columns}
 \srcc{}{own2026fortressflbyzantine,lamport1982,cao2021fltrust,dwork2006}
+\end{frame}
+
+\begin{frame}{Attacked? \,|\, Our work: VOUCH, the protocol in one picture}
+\chapstrip{4}
+\centering
+\includegraphics[width=\linewidth,height=0.62\textheight,keepaspectratio]{figs/vouch_protocol.jpg}
+
+{\footnotesize Two old ideas meet: \key{canaries} from privacy auditing, and \key{betting} from sequential testing.}
+\srcc{Accepted, Machine Learning.}{dang2026vouch,steinke2023,ramdas2023}
 \end{frame}
 
 \begin{frame}{Attacked? \,|\, Our work: VOUCH, an auditable certificate of forgetting}
