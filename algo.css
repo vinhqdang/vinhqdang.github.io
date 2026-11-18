@@ -167,3 +167,37 @@ table.sb th.num { text-align: right; }
 .bp-n.hallN circle { stroke: var(--back); stroke-width: 4; fill: color-mix(in srgb, var(--back) 20%, var(--card)); }
 .bp-n.pend circle { stroke: var(--hot); stroke-width: 4.5; }
 .sb input[type=number] { font: 14px var(--sans); color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 3px 4px; }
+
+/* Network Flow III */
+table.mx { border-collapse: separate; border-spacing: 4px; font: 14px var(--sans); margin: 4px auto; }
+table.mx th { font: 600 12px var(--sans); color: var(--muted); padding: 4px 8px; text-align: center; white-space: nowrap; }
+table.mx th small.pp { display: block; font-weight: 600; font-size: 10.5px; color: var(--lvl); }
+table.mx td { text-align: center; min-width: 54px; padding: 8px 6px; border-radius: 8px; background: var(--bg); border: 1.5px solid var(--line); font-variant-numeric: tabular-nums; transition: background 0.25s, border-color 0.25s; }
+table.mx td.cell { cursor: pointer; }
+table.mx td.cell.static { cursor: default; }
+table.mx td.cell:hover:not(.static) { border-color: var(--accent); }
+table.mx td.cell:focus-visible { outline: 2px solid var(--accent); }
+table.mx td.cell.pick { background: color-mix(in srgb, var(--lvl) 26%, var(--card)); border-color: var(--lvl); font-weight: 700; }
+table.mx td.cell b { display: block; font-size: 16px; }
+table.mx td.cell small { display: block; font-size: 10.5px; color: var(--muted); }
+table.mx td.tight { border-color: color-mix(in srgb, var(--lvl) 60%, var(--line)); }
+table.mx td.m { background: color-mix(in srgb, var(--lvl) 26%, var(--card)); border-color: var(--lvl); }
+table.mx td.opt { outline: 3px solid var(--hot); outline-offset: -3px; }
+table.mx td.neg b { color: var(--cutc); }
+table.mx td.padd { background: color-mix(in srgb, var(--hot) 26%, var(--card)); border-color: var(--hot); }
+table.mx td.prem { border-style: dashed; border-color: var(--hot); background: color-mix(in srgb, var(--hot) 12%, var(--card)); }
+table.mx td.pin, table.mx th.pin { background: transparent; border-color: transparent; padding: 2px; }
+table.mx input { width: 3.6em; text-align: center; font: 14px var(--sans); color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 5px 2px; }
+.as-e { stroke: var(--line); stroke-width: 2; opacity: 0.6; transition: stroke 0.3s; }
+.as-e.tight { stroke: var(--muted); stroke-width: 2.6; opacity: 0.8; }
+.as-e.m { stroke: var(--lvl); stroke-width: 6.5; opacity: 1; }
+.as-e.add { stroke: var(--hot); stroke-width: 6; opacity: 1; }
+.as-e.rm { stroke: var(--hot); stroke-width: 6; stroke-dasharray: 7 5; opacity: 1; }
+.as-n circle { fill: var(--card); stroke: var(--ink); stroke-width: 2; transition: fill 0.3s, stroke 0.3s; }
+.as-n.matched circle { fill: color-mix(in srgb, var(--lvl) 28%, var(--card)); stroke: var(--lvl); }
+.as-n.settled circle { stroke: var(--back); stroke-width: 3.5; }
+.as-n.onpath circle { stroke: var(--hot); stroke-width: 4; }
+.as-n.cur circle { stroke: var(--hot); stroke-width: 4.5; fill: color-mix(in srgb, var(--hot) 22%, var(--card)); }
+.as-name { font: 700 14px var(--sans); fill: var(--ink); pointer-events: none; }
+.as-p { font: 600 11.5px var(--sans); fill: var(--lvl); pointer-events: none; }
+.as-d { font: 700 11.5px var(--sans); fill: var(--back); pointer-events: none; paint-order: stroke; stroke: var(--card); stroke-width: 3px; }

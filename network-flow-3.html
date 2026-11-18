@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Network Flow III: The Assignment Problem | Algorithm Design | Vinh Dang</title>
+    <meta name="description" content="Interactive animation of the assignment problem: minimum-cost perfect matching, prices and reduced costs, and the successive shortest path algorithm. For Algorithm Design (FTU)." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./fetch-execute.css" />
+    <link rel="stylesheet" href="./algo.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="./index.html">Vinh Dang</a>
+        <nav class="site-nav" aria-label="Primary">
+          <a href="./index.html#research">Research</a>
+          <a href="./publications.html">Publications</a>
+          <a href="./teaching.html" aria-current="page">Teaching</a>
+          <a href="./talks.html">Talks</a>
+          <a href="./updates.html">News</a>
+          <a href="./index.html#about">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap ad lab">
+      <p class="crumbs"><a href="./teaching.html">Teaching</a> / <a href="./algorithm-design.html">Algorithm Design</a> / Network Flow III</p>
+      <div class="page-head">
+        <p class="eyebrow">Interactive lesson · Chapter 7 · Network Flow</p>
+        <h1>Network Flow III: the assignment problem</h1>
+        <p>
+          Matching asks <i>whether</i> everyone can be paired. The <b>assignment problem</b> asks for the <i>cheapest</i> pairing. The idea that solves it is beautiful:
+          put a <b>price</b> on every node, so that finding the next best change becomes a shortest-path problem with no negative edges.
+        </p>
+        <p class="course-note">
+          For <strong>Algorithm Design</strong> (FTU, undergraduate). This page goes with the lecture slides
+          <a href="https://www.cs.princeton.edu/~wayne/kleinberg-tardos/pdf/07NetworkFlowIII.pdf" target="_blank" rel="noopener">07 Network Flow III</a> by Kevin Wayne.
+          It builds on <a href="./network-flow-2.html">Part II</a> (bipartite matching and alternating paths).
+        </p>
+        <p class="small-text muted">
+          Sections: <a href="#problem">1 The problem</a> · <a href="#prices">2 Prices change nothing</a> · <a href="#ssp">3 Successive shortest paths</a> · <a href="#summary">4 Summary</a>
+        </p>
+      </div>
+      <noscript><p class="empty">These visualisations need JavaScript.</p></noscript>
+
+      <!-- 1 problem -->
+      <section class="block" id="problem">
+        <p class="eyebrow">1 · The problem (slides 3–9)</p>
+        <h2 class="h2">Pick the cheapest assignment</h2>
+        <p class="muted">
+          Given n workers X, n jobs Y, and a cost c(x, y) for giving job y to worker x, find a perfect matching of <b>minimum total cost</b>.
+          Pick exactly one cell in every row and every column below. Can you beat every other assignment? There are n! of them.
+        </p>
+        <div class="toolbar" role="group" aria-label="Problem controls">
+          <label class="field inline">Problem <select id="as-pre"></select></label>
+          <label class="field inline" id="as-n-wrap" hidden>Size <select id="as-n"><option>3</option><option>4</option><option selected>5</option><option>6</option></select></label>
+          <button class="btn small" id="as-new" type="button" hidden>🎲 New random costs</button>
+          <label class="check"><input type="checkbox" id="as-edit" /> Edit the costs</label>
+          <button class="btn small" id="as-clear" type="button">Clear picks</button>
+          <button class="btn small" id="as-best" type="button">Show the cheapest</button>
+        </div>
+        <div class="grid3">
+          <div class="card table-scroll"><table class="mx" id="as-mx"></table></div>
+          <div class="side"><div class="card sidebox" id="as-info"></div></div>
+        </div>
+      </section>
+
+      <!-- 2 prices -->
+      <section class="block" id="prices">
+        <p class="eyebrow">2 · The key idea (slides 14–17)</p>
+        <h2 class="h2">Prices change nothing</h2>
+        <p class="muted">
+          Add a constant p(x) to every cost in row x. Every perfect matching uses exactly one cell of that row, so every matching gets p(x) more expensive: the <i>best matching does not change</i>.
+          The same holds for subtracting a constant p(y) from a column. The <b>reduced cost</b> is c<sup>p</sup>(x,y) = p(x) + c(x,y) − p(y).
+          Change the prices below: the numbers move, the optimal cells (outlined) never do. Prices are <b>compatible</b> with a matching M when c<sup>p</sup> ≥ 0 everywhere and = 0 on M:
+          then M has cost 0 under c<sup>p</sup>, and nothing can be cheaper, so M is optimal.
+        </p>
+        <div class="toolbar" role="group" aria-label="Price controls">
+          <button class="btn small" id="pr-zero" type="button">Zero prices</button>
+          <button class="btn small" id="pr-rows" type="button">Subtract row minima</button>
+          <button class="btn small btn-primary" id="pr-final" type="button">Use the prices the algorithm ends with</button>
+        </div>
+        <div class="grid3">
+          <div class="card table-scroll"><table class="mx" id="pr-mx"></table></div>
+          <div class="side"><div class="card sidebox" id="pr-info"></div></div>
+        </div>
+      </section>
+
+      <!-- 3 ssp -->
+      <section class="block" id="ssp">
+        <p class="eyebrow">3 · The algorithm (slides 12–34)</p>
+        <h2 class="h2">Successive shortest paths</h2>
+        <p class="muted">
+          Start with an empty matching and all prices 0. Repeat n times: find the <b>cheapest alternating path</b> from an unmatched x to an unmatched y, augment along it, then add each node’s distance to its price.
+          Because the prices stay compatible, every edge has a non-negative reduced cost, so plain <b>Dijkstra</b> finds the path. The table on the right shows the reduced costs c<sup>p</sup>; the small grey number is the original cost.
+          Edges with reduced cost 0 (<i>tight</i>) are free to use. It uses the problem you chose above.
+        </p>
+        <div id="ss-player"></div>
+        <div class="grid2">
+          <div class="vcard"><h3>Bipartite graph <span class="hint">p = price · d = distance from the unmatched x</span></h3><svg id="ss-svg" role="img" aria-label="Assignment graph"></svg></div>
+          <div class="vcard"><h3>Reduced costs c<sup>p</sup> <span class="hint">small grey = original c</span></h3><div class="table-scroll" style="padding:6px 8px 10px"><table class="mx" id="ss-mx"></table></div></div>
+        </div>
+        <div class="legend"><span><i style="border-color:var(--lvl)"></i>matched edge</span><span><i class="hot"></i>augmenting path (dashed = matched edge removed)</span><span><i style="border-color:var(--muted);opacity:.6"></i>tight edge, c<sup>p</sup> = 0</span></div>
+        <div class="narr" id="ss-narr" aria-live="polite"></div>
+        <div class="counters" id="ss-cnt"></div>
+      </section>
+
+      <!-- 4 summary -->
+      <section class="block" id="summary">
+        <p class="eyebrow">4 · Summary (slides 34–40)</p>
+        <h2 class="h2">What to remember</h2>
+        <ul class="try" style="list-style:disc">
+          <li><b>Invariant.</b> The algorithm always holds a matching M and prices p that are compatible with it. Each iteration keeps this true (Lemmas 1–3), and at the end M is perfect, so it is optimal.</li>
+          <li><b>Running time.</b> n iterations, each a dense Dijkstra in O(n²): <b>O(n³)</b> in total. Trying all n! assignments is hopeless for n = 20.</li>
+          <li><b>Where it comes from.</b> It is max flow again: augmenting paths in the residual network, but always the <i>cheapest</i> one. Its history includes Kuhn’s <i>Hungarian method</i> (1955), named after the Hungarian mathematicians Kőnig and Egerváry (slides 35–40).</li>
+          <li><b>Used for</b> assigning tasks to workers, matching objects between frames, scheduling, and in a more general form for kidney exchange (slides 3–9).</li>
+        </ul>
+        <h3 class="h3" style="margin:26px 0 6px;font:600 1.15rem var(--serif)">Questions to explore</h3>
+        <ol class="try">
+          <li><b>Greedy.</b> In section 1, always take the cheapest available cell row by row. Is it optimal? Use the lecture example.</li>
+          <li><b>Equal costs.</b> Make every cost 0 except a few. What does the algorithm do, and how does it relate to bipartite matching?</li>
+          <li><b>Tight edges.</b> After each iteration, which edges are tight? Why is every matched edge tight?</li>
+          <li><b>Re-matching.</b> Find an iteration whose path has a dashed (removed) edge. Why can a later worker take a job from an earlier one?</li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>The algorithm follows Kleinberg and Tardos, <i>Algorithm Design</i>, and Kevin Wayne’s lecture slides (Princeton). Animations by Vinh Dang.</p>
+        <p><a href="./algorithm-design.html">← Algorithm Design</a> · <a href="./network-flow-2.html">Part II</a></p>
+      </div>
+    </footer>
+
+    <script src="./assign.js"></script>
+    <script src="./flowalgo.js"></script>
+    <script src="./flowviz.js"></script>
+    <script src="./nf3.js"></script>
+  </body>
+</html>
