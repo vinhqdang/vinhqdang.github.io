@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Network Flow I: Max Flow and Min Cut | Algorithm Design | Vinh Dang</title>
+    <meta name="description" content="Interactive animations for network flow: flows and residual networks, Ford–Fulkerson, shortest augmenting paths, capacity scaling, Dinitz, and the max-flow min-cut theorem. For Algorithm Design (FTU)." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./fetch-execute.css" />
+    <link rel="stylesheet" href="./algo.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="./index.html">Vinh Dang</a>
+        <nav class="site-nav" aria-label="Primary">
+          <a href="./index.html#research">Research</a>
+          <a href="./publications.html">Publications</a>
+          <a href="./teaching.html" aria-current="page">Teaching</a>
+          <a href="./talks.html">Talks</a>
+          <a href="./updates.html">News</a>
+          <a href="./index.html#about">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap ad lab">
+      <p class="crumbs"><a href="./teaching.html">Teaching</a> / <a href="./algorithm-design.html">Algorithm Design</a> / Network Flow I</p>
+      <div class="page-head">
+        <p class="eyebrow">Interactive lesson · Chapter 7 · Network Flow</p>
+        <h1>Network Flow I: maximum flow and minimum cut</h1>
+        <p>
+          How much can we ship from a source <b>s</b> to a sink <b>t</b> through a network with limited capacities? Run the algorithms step by step,
+          play the algorithm yourself, and see why the biggest flow always equals the smallest cut.
+        </p>
+        <p class="course-note">
+          For <strong>Algorithm Design</strong> (FTU, undergraduate). This page goes with the lecture slides
+          <a href="https://www.cs.princeton.edu/~wayne/kleinberg-tardos/pdf/07NetworkFlowI.pdf" target="_blank" rel="noopener">07 Network Flow I</a>
+          by Kevin Wayne, which follow Kleinberg and Tardos, <i>Algorithm Design</i>. The animations are my own; slide numbers are given so you can switch between the two.
+        </p>
+        <p class="small-text muted">
+          Sections: <a href="#flow">1 What is a flow?</a> · <a href="#lab">2 Algorithm lab</a> · <a href="#play">3 You be the algorithm</a> · <a href="#cuts">4 Cuts and max-flow = min-cut</a> · <a href="#summary">5 Cheat-sheet</a>
+        </p>
+      </div>
+
+      <noscript><p class="empty">These visualisations need JavaScript.</p></noscript>
+
+      <!-- 1. flow -->
+      <section class="block" id="flow">
+        <p class="eyebrow">1 · The problem (slides 3–10)</p>
+        <h2 class="h2">What is a flow?</h2>
+        <p class="muted">
+          A <b>flow network</b> is a directed graph with a capacity <i>c(e)</i> on every edge, a source <b>s</b> and a sink <b>t</b>.
+          An <b>s–t flow</b> gives every edge a number <i>f(e)</i> such that
+          <b>(1) capacity</b>: 0 ≤ f(e) ≤ c(e), and <b>(2) conservation</b>: at every node other than s and t, flow in = flow out.
+          Its <b>value</b> is the flow leaving s. The pipe on each edge fills up in proportion to f(e)/c(e).
+        </p>
+        <div class="toolbar" role="group" aria-label="Flow checker">
+          <label class="field inline">Network <select id="fl-net"></select></label>
+          <button class="btn small" id="fl-reset" type="button">↺ Zero flow</button>
+          <button class="btn small" id="fl-max" type="button">Show a maximum flow</button>
+          <span class="small-text muted">Click an edge to add 1 unit · right-click or Shift+click to remove 1</span>
+        </div>
+        <div class="grid3">
+          <div class="vcard"><h3>Flow network <span class="hint">edge label = flow / capacity</span></h3><svg id="fl-svg" role="img" aria-label="Flow network you can edit"></svg></div>
+          <div class="side">
+            <div class="card sidebox">
+              <h4>Is it a valid flow?</h4>
+              <div class="verdict" id="fl-verdict" aria-live="polite"></div>
+              <div class="counters" id="fl-cnt"></div>
+              <p class="small-text muted" style="margin-top:10px">Node labels show <i>flow in = flow out</i>. A red edge exceeds its capacity; a red node breaks conservation.</p>
+            </div>
+            <div class="card sidebox">
+              <h4>Try this</h4>
+              <ol class="small-text" style="margin:0;padding-left:1.2em">
+                <li>Push flow along one path from s to t. Valid?</li>
+                <li>Add flow to a single edge only. What breaks?</li>
+                <li>Reach the highest value you can. How do you know you cannot go higher?</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+        <div class="legend"><span><i></i>flow in the pipe</span><span><i class="sat"></i>saturated edge (f = c)</span></div>
+      </section>
+
+      <!-- 2. lab -->
+      <section class="block" id="lab">
+        <p class="eyebrow">2 · The algorithms (slides 12–72)</p>
+        <h2 class="h2">Algorithm lab</h2>
+        <p class="muted">
+          Pick a network and an algorithm, then step through it. The left view shows the flow <i>f</i>; the right view shows the <b>residual network</b> <i>G<sub>f</sub></i>,
+          which is where every algorithm looks for its next move. A <b>backward arc</b> (dashed) lets an algorithm undo flow it pushed earlier.
+          Use the buttons, the slider, or the arrow keys. You can drag the nodes.
+        </p>
+        <div class="toolbar" role="group" aria-label="Lab controls">
+          <label class="field inline">Network <select id="lab-net"></select></label>
+          <label class="field inline">Algorithm <select id="lab-algo"></select></label>
+          <label class="field inline" id="lab-c-wrap" hidden>C = <input type="range" id="lab-c" min="1" max="100" value="8" /> <output id="lab-c-out">8</output></label>
+          <button class="btn small" id="lab-new" type="button" hidden>🎲 New random network</button>
+        </div>
+        <p class="preset-desc" id="lab-desc"></p>
+        <div id="lab-player"></div>
+        <div class="grid2">
+          <div class="vcard"><h3>Flow network G <span class="hint">drag nodes to rearrange</span></h3><svg id="lab-flow" role="img" aria-label="Flow network"></svg></div>
+          <div class="vcard"><h3>Residual network G<sub>f</sub> <span class="hint">label = residual capacity</span></h3><svg id="lab-res" role="img" aria-label="Residual network"></svg></div>
+        </div>
+        <div class="legend" aria-label="Legend">
+          <span><i class="sat"></i>saturated edge</span><span><i class="hot"></i>current path</span><span><i class="fwd"></i>residual arc, forward: c − f</span>
+          <span><i class="back"></i>backward arc: can undo f</span><span><i class="cut"></i>minimum cut</span>
+        </div>
+        <div class="narr" id="lab-narr" aria-live="polite"></div>
+        <div class="counters" id="lab-cnt"></div>
+        <div class="grid2">
+          <div class="card sidebox" id="lab-info"></div>
+          <div class="card"><h4 class="card-title">Augmentations so far <span class="stats">click a row to jump there</span></h4><div class="pathlog table-scroll"><table class="sb" id="lab-log"></table></div></div>
+        </div>
+        <h3 class="h3" style="margin:26px 0 6px;font:600 1.15rem var(--serif)">Which algorithm is fastest on this network?</h3>
+        <p class="muted small-text" style="max-width:52em">
+          All six always find the same maximum value. What differs is how many augmentations they need. Change the network above (try the exponential trap) and watch this table.
+        </p>
+        <div class="card table-scroll"><table class="sb" id="lab-score"></table></div>
+      </section>
+
+      <!-- 3. play -->
+      <section class="block" id="play">
+        <p class="eyebrow">3 · Hands on</p>
+        <h2 class="h2">You be the algorithm</h2>
+        <p class="muted">
+          Now you choose the augmenting paths. <b>Click nodes</b> in either view to build an s→t path in the residual network, one node at a time
+          (click a node already on your path to cut it back). When you reach <b>t</b>, press <i>Augment</i>. Backward arcs are allowed. Keep going until no path exists:
+          then you have a maximum flow. Can you finish in fewer augmentations than the algorithms?
+        </p>
+        <div class="toolbar" role="group" aria-label="Play controls">
+          <label class="field inline">Network <select id="pl-net"></select></label>
+          <button class="btn small btn-primary" id="pl-aug" type="button" disabled>Augment</button>
+          <button class="btn small" id="pl-undo" type="button">↶ Undo</button>
+          <button class="btn small" id="pl-clear" type="button">Clear path</button>
+          <button class="btn small" id="pl-hint" type="button">Hint: a shortest path</button>
+          <button class="btn small" id="pl-stuck" type="button">I think I am stuck</button>
+          <button class="btn small" id="pl-reset" type="button">↺ Restart</button>
+        </div>
+        <div class="grid2">
+          <div class="vcard"><h3>Flow network G</h3><svg id="pl-flow" role="img" aria-label="Flow network"></svg></div>
+          <div class="vcard"><h3>Residual network G<sub>f</sub> <span class="hint">click nodes to build a path</span></h3><svg id="pl-res" role="img" aria-label="Residual network, click nodes to build a path"></svg></div>
+        </div>
+        <div class="narr" id="pl-narr" aria-live="polite"></div>
+        <div class="counters" id="pl-cnt"></div>
+      </section>
+
+      <!-- 4. cuts -->
+      <section class="block" id="cuts">
+        <p class="eyebrow">4 · Why the algorithm stops (slides 4–6, 25–36)</p>
+        <h2 class="h2">Cuts and the max-flow min-cut theorem</h2>
+        <p class="muted">
+          An <b>s–t cut</b> (A, B) splits the nodes into a set A containing s and a set B containing t. Its <b>capacity</b> is the total capacity of edges going from A to B.
+          Every flow must squeeze through every cut, so <i>flow value ≤ capacity of any cut</i>. The surprise: some cut is exactly as small as the best flow.
+          <b>Click nodes</b> to move them between A and B, and slide the flow from nothing up to maximum.
+        </p>
+        <div class="toolbar" role="group" aria-label="Cut explorer controls">
+          <label class="field inline">Network <select id="cu-net"></select></label>
+          <label class="field inline">Flow after <input type="range" id="cu-k" min="0" max="3" value="3" /> <output id="cu-kout"></output> augmentations</label>
+          <button class="btn small" id="cu-min" type="button">Show a minimum cut</button>
+          <button class="btn small" id="cu-bfs" type="button">Cut from the residual network</button>
+          <button class="btn small" id="cu-clear" type="button">↺ A = {s}</button>
+        </div>
+        <div class="grid3">
+          <div class="vcard"><h3>Network with flow <span class="hint">shaded = A · red = edges from A to B</span></h3><svg id="cu-svg" role="img" aria-label="Cut explorer"></svg></div>
+          <div class="side">
+            <div class="card sidebox">
+              <h4>Your cut</h4>
+              <div id="cu-info"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <h4 class="card-title">All cuts of this network, smallest to largest <span class="stats" id="cu-plot-note"></span></h4>
+          <svg class="cutplot" id="cu-plot" viewBox="0 0 700 150" role="img" aria-label="Capacities of all cuts"></svg>
+        </div>
+      </section>
+
+      <!-- 5. summary -->
+      <section class="block" id="summary">
+        <p class="eyebrow">5 · Summary (slides 73–74)</p>
+        <h2 class="h2">Cheat-sheet</h2>
+        <div class="card table-scroll">
+          <table class="sb">
+            <thead><tr><th>Algorithm</th><th>Key idea</th><th class="num">Augmentations</th><th class="num">Running time</th></tr></thead>
+            <tbody>
+              <tr><td><b>Ford–Fulkerson</b> (arbitrary path)</td><td>Augment along any s→t path in G<sub>f</sub></td><td class="num">≤ val(f*) ≤ nC</td><td class="num">O(mnC)</td></tr>
+              <tr><td>Fattest path</td><td>Path with the largest bottleneck</td><td class="num">O(m log(mC))</td><td class="num">O(m² log n log(mC))</td></tr>
+              <tr><td>Capacity scaling</td><td>Only use arcs with residual ≥ Δ; halve Δ</td><td class="num">O(m log C)</td><td class="num">O(m² log C)</td></tr>
+              <tr><td>Shortest augmenting path</td><td>BFS: fewest edges</td><td class="num">≤ mn</td><td class="num">O(m²n)</td></tr>
+              <tr><td>Dinitz</td><td>Level graph + blocking flow in phases</td><td class="num">≤ mn</td><td class="num">O(mn²)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small-text muted" style="margin-top:10px">m = edges, n = nodes, C = largest capacity (integers). Ford–Fulkerson with arbitrary paths is <i>not</i> polynomial in the input size (slide 39); the other four are.</p>
+        <h3 class="h3" style="margin:26px 0 6px;font:600 1.15rem var(--serif)">Questions to explore</h3>
+        <ol class="try">
+          <li><b>Greedy vs. residual.</b> Run <i>Greedy</i> on the “Greedy trap”. Where does it get stuck? Then run Ford–Fulkerson and find the backward arc it uses.</li>
+          <li><b>2C augmentations.</b> On the exponential trap choose <i>worst-case path</i> and raise C. Then choose <i>shortest path</i>. What changes, and why does the input size not change much?</li>
+          <li><b>Δ.</b> In capacity scaling, why does the last phase (Δ = 1) always find the maximum?</li>
+          <li><b>Levels.</b> In Dinitz on “Growing path lengths”, how does the distance to t change from phase to phase? Why can it never decrease?</li>
+          <li><b>Min cut.</b> After a maximum flow, which nodes can still be reached from s in G<sub>f</sub>? Why are all edges leaving that set saturated?</li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>Algorithms and examples follow Kleinberg and Tardos, <i>Algorithm Design</i>, and Kevin Wayne’s lecture slides (Princeton). Animations by Vinh Dang.</p>
+        <p><a href="./algorithm-design.html">← Algorithm Design</a></p>
+      </div>
+    </footer>
+
+    <script src="./flowalgo.js"></script>
+    <script src="./flowviz.js"></script>
+    <script src="./nf1.js"></script>
+  </body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Algorithm Design | Teaching | Vinh Dang</title>
+    <meta name="description" content="Interactive visualisations and animations for Algorithm Design (FTU, undergraduate), following Kleinberg and Tardos. Network flow first; other chapters added over time." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./algo.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="./index.html">Vinh Dang</a>
+        <nav class="site-nav" aria-label="Primary">
+          <a href="./index.html#research">Research</a>
+          <a href="./publications.html">Publications</a>
+          <a href="./teaching.html" aria-current="page">Teaching</a>
+          <a href="./talks.html">Talks</a>
+          <a href="./updates.html">News</a>
+          <a href="./index.html#about">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap ad">
+      <p class="crumbs"><a href="./teaching.html">Teaching</a> / Algorithm Design</p>
+      <div class="page-head">
+        <p class="eyebrow">Course</p>
+        <h1>Algorithm Design</h1>
+        <p class="course-note"><strong>FTU</strong> · Undergraduate</p>
+        <p>
+          Animations and interactive visualisations for the course. The course follows Kleinberg and Tardos, <i>Algorithm Design</i>,
+          and the lecture slides by Kevin Wayne (Princeton) are excellent. These pages add what a static slide cannot: you can run the algorithm one step at a time,
+          change the input, break it, and see why it works. I am putting the most effort into the later chapters, where the ideas are hardest to see.
+        </p>
+        <p class="status-note">
+          <b>Work in progress.</b> I am building this chapter by chapter, in the order of the lectures. <b>Network Flow</b> comes first because it is the topic being taught
+          this week. The other chapters will be filled in gradually; the roadmap below shows what is ready and what is planned.
+        </p>
+        <p class="small-text muted" style="font:14px var(--sans)">
+          Book and slides:
+          <a href="https://www.cs.princeton.edu/~wayne/kleinberg-tardos/" target="_blank" rel="noopener">Kleinberg–Tardos lecture slides (Kevin Wayne, Princeton)</a>.
+        </p>
+      </div>
+
+      <section class="block" style="border-top:0;margin-top:0;padding-top:0">
+        <h2 class="h2">Roadmap</h2>
+        <ol class="roadmap">
+          <li class="rm now">
+            <span class="no">7</span>
+            <h3>Network Flow</h3>
+            <span class="tag">Ready this week</span>
+            <p>Maximum flow and minimum cut, the algorithms that compute them, and the problems that reduce to them.</p>
+            <div class="links">
+              <a href="./network-flow-1.html">Part I · Max flow and min cut →</a>
+            </div>
+            <p class="small-text" style="margin-top:6px">
+              <b>Part I</b> (ready): flows and residual networks, Ford–Fulkerson, shortest augmenting path, capacity scaling, Dinitz, min-cut and the max-flow min-cut theorem. &nbsp;
+              <b>Part II</b> (next): applications of max flow and min cut. &nbsp; <b>Part III</b> (next): the assignment problem.
+            </p>
+          </li>
+          <li class="rm"><span class="no">1</span><h3>Stable Matching</h3><span class="tag">Planned</span><p>Gale–Shapley, step by step, with proposals and engagements.</p></li>
+          <li class="rm"><span class="no">2</span><h3>Basics of Algorithm Analysis</h3><span class="tag">Planned</span><p>Growth rates, running time, priority queues.</p></li>
+          <li class="rm"><span class="no">3</span><h3>Graphs</h3><span class="tag">Planned</span><p>BFS, DFS, connected components, bipartite graphs, DAGs.</p></li>
+          <li class="rm"><span class="no">4</span><h3>Greedy Algorithms</h3><span class="tag">Planned</span><p>Interval scheduling, shortest paths, minimum spanning trees, clustering, Huffman codes.</p></li>
+          <li class="rm"><span class="no">5</span><h3>Divide and Conquer</h3><span class="tag">Planned</span><p>Mergesort, counting inversions, closest pair, fast multiplication.</p></li>
+          <li class="rm"><span class="no">6</span><h3>Dynamic Programming</h3><span class="tag">Planned</span><p>Weighted interval scheduling, knapsack, sequence alignment, shortest paths with negative edges.</p></li>
+          <li class="rm"><span class="no">8</span><h3>NP and Computational Intractability</h3><span class="tag">Planned</span><p>Polynomial-time reductions, NP-completeness.</p></li>
+          <li class="rm"><span class="no">9–13</span><h3>Further topics</h3><span class="tag">Planned</span><p>PSPACE, extending tractability, approximation algorithms, local search, randomized algorithms.</p></li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>Course structure follows Kleinberg and Tardos, <i>Algorithm Design</i>. Animations by Vinh Dang.</p>
+        <p><a href="./teaching.html">← Teaching</a></p>
+      </div>
+    </footer>
+  </body>
+</html>
