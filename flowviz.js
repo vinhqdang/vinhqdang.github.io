@@ -133,15 +133,17 @@
         var frac = e.c >= FA.INF ? (f[k] > 0 ? 1 : 0) : Math.min(1, f[k] / e.c);
         o.fill.setAttribute("stroke-dasharray", (L * frac) + " " + (L * 2));
         o.head.setAttribute("points", headPoints(x2 + d[0] * 3, y2 + d[1] * 3, d[0], d[1]));
-        var mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+        var lp = e.lp === undefined ? 0.5 : e.lp, mx = x1 + (x2 - x1) * lp, my = y1 + (y2 - y1) * lp;
         var label = st.edgeLabel ? st.edgeLabel(k) : f[k] + "/" + cap(e.c);
         o.txt.textContent = label; o.txt.setAttribute("x", mx); o.txt.setAttribute("y", my + 4);
-        var w = Math.max(24, label.length * 7.4 + 8);
-        o.lbg.setAttribute("x", mx - w / 2); o.lbg.setAttribute("y", my - 9); o.lbg.setAttribute("width", w); o.lbg.setAttribute("height", 18);
+        var w = label === "" ? 0 : Math.max(24, label.length * 7.4 + 8);
+        o.lbg.setAttribute("x", mx - w / 2); o.lbg.setAttribute("y", my - 9); o.lbg.setAttribute("width", w); o.lbg.setAttribute("height", label === "" ? 0 : 18);
         o.title.textContent = nmEdge(net, k) + ": flow " + f[k] + " of capacity " + cap(e.c);
-        var over = f[k] > e.c, sat = f[k] === e.c && e.c < FA.INF;
-        var cls = { sat: sat, over: over, hot: pathE[k], flash: flashE[k], cut: cutE[k], empty: f[k] === 0 };
+        var over = f[k] > e.c, sat = f[k] === e.c && e.c < FA.INF && e.c > 0;
+        var cls = { sat: sat, over: over, hot: pathE[k], flash: flashE[k], cut: cutE[k], empty: f[k] === 0, removed: st.removed && st.removed[k], bad: st.badE && st.badE[k] };
         setCls(o.g, cls);
+        var col = st.edgeColor && st.edgeColor[k] ? st.edgeColor[k] : "";
+        o.fill.style.stroke = col; o.head.style.fill = col;
         if (self.opts.onEdgeClick) o.g.classList.add("clickable");
       });
     } else {

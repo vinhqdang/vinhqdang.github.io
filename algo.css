@@ -141,3 +141,29 @@ table.sb tr.cur td { background: var(--accent-soft); }
 .nv .nv-badge { paint-order: stroke; stroke: var(--card); stroke-width: 4px; stroke-linejoin: round; }
 .nv .nv-e.cut .nv-track { stroke-width: 13; stroke: color-mix(in srgb, var(--cutc) 62%, var(--card)); }
 table.sb th.num { text-align: right; }
+
+.nv .nv-e.removed { opacity: 0.4; }
+.nv .nv-e.removed .nv-track { stroke-dasharray: 5 6; stroke: var(--cutc); }
+.nv .nv-e.removed .nv-fill { stroke-dasharray: 0 999 !important; }
+.nv .nv-e.bad .nv-track { stroke: var(--cutc); }
+.nv .nv-e.bad .nv-lbg { stroke: var(--cutc); }
+
+/* Network Flow II */
+.seg-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+@media (max-width: 820px) { .seg-row { grid-template-columns: 1fr; } }
+.seg-row .vcard svg { min-width: 0; max-width: 270px; margin: 6px auto 8px; }
+.px-t { font: 600 11px var(--sans); pointer-events: none; }
+.px-b { stroke: var(--hot); stroke-width: 3.5; stroke-linecap: round; }
+.bp-e line:first-child { stroke: var(--line); stroke-width: 3; transition: stroke 0.3s; }
+.bp-e.m line:first-child { stroke: var(--lvl); stroke-width: 6; }
+.bp-e.add line:first-child { stroke: var(--hot); stroke-width: 5.5; }
+.bp-e.rm line:first-child { stroke: var(--hot); stroke-width: 5.5; stroke-dasharray: 7 5; }
+.bp-hit { stroke: transparent; stroke-width: 16; cursor: pointer; }
+.bp-n { cursor: pointer; }
+.bp-n circle { fill: var(--card); stroke: var(--ink); stroke-width: 2; transition: fill 0.3s; }
+.bp-n text { font: 700 14px var(--sans); fill: var(--ink); pointer-events: none; }
+.bp-n.matched circle { fill: color-mix(in srgb, var(--lvl) 28%, var(--card)); stroke: var(--lvl); }
+.bp-n.hallS circle { stroke: var(--hot); stroke-width: 4; fill: color-mix(in srgb, var(--hot) 20%, var(--card)); }
+.bp-n.hallN circle { stroke: var(--back); stroke-width: 4; fill: color-mix(in srgb, var(--back) 20%, var(--card)); }
+.bp-n.pend circle { stroke: var(--hot); stroke-width: 4.5; }
+.sb input[type=number] { font: 14px var(--sans); color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 3px 4px; }

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Network Flow II: Applications | Algorithm Design | Vinh Dang</title>
+    <meta name="description" content="Interactive animations for reductions to max flow and min cut: bipartite matching and Hall's theorem, edge-disjoint paths and Menger's theorem, project selection, image segmentation, baseball elimination, circulation with demands. For Algorithm Design (FTU)." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./fetch-execute.css" />
+    <link rel="stylesheet" href="./algo.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="./index.html">Vinh Dang</a>
+        <nav class="site-nav" aria-label="Primary">
+          <a href="./index.html#research">Research</a>
+          <a href="./publications.html">Publications</a>
+          <a href="./teaching.html" aria-current="page">Teaching</a>
+          <a href="./talks.html">Talks</a>
+          <a href="./updates.html">News</a>
+          <a href="./index.html#about">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap ad lab">
+      <p class="crumbs"><a href="./teaching.html">Teaching</a> / <a href="./algorithm-design.html">Algorithm Design</a> / Network Flow II</p>
+      <div class="page-head">
+        <p class="eyebrow">Interactive lesson · Chapter 7 · Network Flow</p>
+        <h1>Network Flow II: applications</h1>
+        <p>
+          Max flow and min cut are powerful because so many different problems <b>reduce</b> to them: build the right network, run the algorithm, read the answer off the flow or the cut.
+          Here are six reductions to play with. Each one shows the network that the problem becomes.
+        </p>
+        <p class="course-note">
+          For <strong>Algorithm Design</strong> (FTU, undergraduate). This page goes with the lecture slides
+          <a href="https://www.cs.princeton.edu/~wayne/kleinberg-tardos/pdf/07NetworkFlowII.pdf" target="_blank" rel="noopener">07 Network Flow II</a> by Kevin Wayne.
+          It uses the algorithms from <a href="./network-flow-1.html">Part I</a>.
+        </p>
+        <p class="small-text muted">
+          Sections: <a href="#match">1 Bipartite matching</a> · <a href="#paths">2 Edge-disjoint paths</a> · <a href="#closure">3 Project selection</a> · <a href="#segment">4 Image segmentation</a> · <a href="#baseball">5 Baseball elimination</a> · <a href="#circ">6 Circulation</a> · <a href="#recipe">7 The recipe</a>
+        </p>
+      </div>
+      <noscript><p class="empty">These visualisations need JavaScript.</p></noscript>
+
+      <!-- 1 matching -->
+      <section class="block" id="match">
+        <p class="eyebrow">1 · Matching (slides 6–21)</p>
+        <h2 class="h2">Bipartite matching and Hall’s theorem</h2>
+        <p class="muted">
+          A <b>matching</b> pairs up nodes of L with nodes of R so that nobody is used twice. To find a largest one, add a source s joined to every node of L and a sink t joined from every node of R,
+          give <b>every edge capacity 1</b>, and compute a max flow. A flow of value k is exactly a matching with k edges. An augmenting path in the residual network is an <b>alternating path</b>:
+          it adds new edges and removes (⇠) some matched ones. If the matching cannot be perfect, the min cut hands you a set S ⊆ L with fewer neighbours than members: <b>Hall’s theorem</b>.
+        </p>
+        <div class="toolbar" role="group" aria-label="Matching controls">
+          <label class="field inline">Graph <select id="mt-net"></select></label>
+          <label class="field inline">Algorithm <select id="mt-algo"><option value="bfs">Augmenting paths (shortest first)</option><option value="dinitz">Dinitz (phases)</option></select></label>
+          <button class="btn small" id="mt-clear" type="button">Clear all edges</button>
+          <span class="small-text muted">Edit: click a left node, then a right node to add or remove an edge · click an edge to remove it</span>
+        </div>
+        <p class="preset-desc" id="mt-desc"></p>
+        <div id="mt-player"></div>
+        <div class="grid2">
+          <div class="vcard"><h3>Bipartite graph G <span class="hint">green = matched · orange = current path</span></h3><svg id="mt-bip" role="img" aria-label="Bipartite graph"></svg></div>
+          <div class="vcard"><h3>Flow network G′ <span class="hint">all capacities 1</span></h3><svg id="mt-flow" role="img" aria-label="Flow network for matching"></svg></div>
+        </div>
+        <div class="narr" id="mt-narr" aria-live="polite"></div>
+        <div class="counters" id="mt-cnt"></div>
+      </section>
+
+      <!-- 2 paths -->
+      <section class="block" id="paths">
+        <p class="eyebrow">2 · Connectivity (slides 23–38)</p>
+        <h2 class="h2">Edge-disjoint paths and Menger’s theorem</h2>
+        <p class="muted">
+          How many routes from s to t share no edge? Give every edge capacity 1: <b>the max-flow value is exactly the number of edge-disjoint s→t paths</b>.
+          <b>Menger’s theorem</b> says this equals the fewest edges whose removal disconnects t from s: the min cut. Switch to <i>Break it yourself</i> and try to cut s off from t with as few edges as possible.
+        </p>
+        <div class="toolbar" role="group" aria-label="Edge-disjoint paths controls">
+          <label class="field inline">Network <select id="ep-net"></select></label>
+          <fieldset class="notation" style="margin-left:0"><legend>Show</legend>
+            <label><input type="radio" name="ep-mode" value="paths" checked /> Disjoint paths</label>
+            <label><input type="radio" name="ep-mode" value="break" /> Break it yourself</label>
+          </fieldset>
+          <button class="btn small" id="ep-min" type="button" hidden>Show a minimum set</button>
+          <button class="btn small" id="ep-reset" type="button" hidden>↺ Restore all edges</button>
+        </div>
+        <div class="grid3">
+          <div class="vcard"><h3>Network <span class="hint" id="ep-hint"></span></h3><svg id="ep-svg" role="img" aria-label="Network for edge-disjoint paths"></svg></div>
+          <div class="side"><div class="card sidebox" id="ep-info"></div></div>
+        </div>
+      </section>
+
+      <!-- 3 closure -->
+      <section class="block" id="closure">
+        <p class="eyebrow">3 · Min cut as optimisation (slides 64–68)</p>
+        <h2 class="h2">Project selection</h2>
+        <p class="muted">
+          Each project has a profit (+) or a cost (−), and some projects <b>require</b> others first. Choose a set of projects that is closed under the prerequisites and has the largest total profit.
+          The reduction: source → profitable project (capacity = profit), costly project → sink (capacity = cost), and an <b>infinite</b> edge from a project to each of its prerequisites.
+          A set A of chosen projects is legal exactly when no infinite edge leaves A, and then <i>profit = (sum of all profits) − cap(A, B)</i>. So the best selection is a minimum cut.
+        </p>
+        <div class="toolbar" role="group" aria-label="Project selection controls">
+          <label class="field inline">Example <select id="pj-net"></select></label>
+          <button class="btn small btn-primary" id="pj-solve" type="button">Solve with max flow</button>
+          <button class="btn small" id="pj-clear" type="button">↺ Choose nothing</button>
+          <span class="small-text muted">Click a project to select or deselect it</span>
+        </div>
+        <div class="grid3">
+          <div class="vcard"><h3>Network <span class="hint">shaded = chosen · edge label = capacity (or flow / capacity after solving)</span></h3><svg id="pj-svg" role="img" aria-label="Project selection network"></svg></div>
+          <div class="side"><div class="card sidebox" id="pj-info"></div></div>
+        </div>
+      </section>
+
+      <!-- 4 segmentation -->
+      <section class="block" id="segment">
+        <p class="eyebrow">4 · Min cut in pictures (slides 57–62)</p>
+        <h2 class="h2">Image segmentation</h2>
+        <p class="muted">
+          Label every pixel <b>foreground</b> or <b>background</b>. Pixel i prefers the foreground by a<sub>i</sub> and the background by b<sub>i</sub>; neighbouring pixels that get different labels pay a penalty <i>p</i>.
+          Maximise (foreground likelihoods) + (background likelihoods) − p·(number of label changes between neighbours). This is a minimum cut:
+          s→i with capacity a<sub>i</sub>, i→t with capacity b<sub>i</sub>, and capacity p both ways between neighbours. Deciding pixel by pixel ignores the neighbours; the cut does not.
+        </p>
+        <div class="toolbar" role="group" aria-label="Segmentation controls">
+          <label class="field inline">Smoothness penalty p <input type="range" id="sg-p" min="0" max="8" value="3" /> <output id="sg-pout">3</output></label>
+          <label class="field inline">Noise <input type="range" id="sg-noise" min="0" max="10" value="5" /> <output id="sg-nout">5</output></label>
+          <button class="btn small" id="sg-new" type="button">🎲 New noise</button>
+        </div>
+        <div class="seg-row">
+          <div class="vcard"><h3>Image <span class="hint">brightness = a<sub>i</sub> (foreground likelihood)</span></h3><svg id="sg-img" role="img" aria-label="Noisy image"></svg></div>
+          <div class="vcard"><h3>Pixel by pixel <span class="hint">foreground if a<sub>i</sub> &gt; b<sub>i</sub></span></h3><svg id="sg-px" role="img" aria-label="Pixel-by-pixel labelling"></svg></div>
+          <div class="vcard"><h3>Minimum cut <span class="hint">uses the neighbours</span></h3><svg id="sg-cut" role="img" aria-label="Min-cut labelling"></svg></div>
+        </div>
+        <div class="card table-scroll" style="margin-top:12px"><table class="sb" id="sg-tab"></table></div>
+      </section>
+
+      <!-- 5 baseball -->
+      <section class="block" id="baseball">
+        <p class="eyebrow">5 · A surprising reduction (slides 70–79)</p>
+        <h2 class="h2">Baseball elimination</h2>
+        <p class="muted">
+          Can team z still finish with the most wins, if it wins all its remaining games? The other games have to be divided so that nobody ends above w<sub>z</sub> + r<sub>z</sub>.
+          Network: s → each <b>game</b> node (capacity = games left), game → both <b>team</b> nodes (∞), team x → t (capacity w<sub>z</sub> + r<sub>z</sub> − w<sub>x</sub>, the wins x may still collect).
+          Team z is <b>not</b> eliminated exactly when the max flow saturates all edges out of s. You can edit the standings.
+        </p>
+        <div class="toolbar" role="group" aria-label="Baseball controls">
+          <label class="field inline">Team to test <select id="bb-team"></select></label>
+          <button class="btn small" id="bb-reset" type="button">↺ Lecture data</button>
+        </div>
+        <div class="grid3">
+          <div class="card table-scroll"><table class="sb" id="bb-tab"></table></div>
+          <div class="side"><div class="card sidebox" id="bb-info"></div></div>
+        </div>
+        <div id="bb-player"></div>
+        <div class="vcard" style="margin-top:12px"><h3>Flow network for the chosen team <span class="hint">edge label = flow / capacity</span></h3><svg id="bb-svg" role="img" aria-label="Baseball elimination network"></svg></div>
+        <div class="narr" id="bb-narr" aria-live="polite"></div>
+      </section>
+
+      <!-- 6 circulation -->
+      <section class="block" id="circ">
+        <p class="eyebrow">6 · Supplies and demands (slides 41–47)</p>
+        <h2 class="h2">Circulation with supplies and demands</h2>
+        <p class="muted">
+          Some nodes <b>supply</b> goods, others <b>demand</b> them, edges have capacities, and flow must be conserved elsewhere. Is there a feasible way to ship everything?
+          Add a super-source S with an edge to every supply node and a super-sink T from every demand node. Feasible exactly when the max flow saturates all of these new edges.
+          Lower the capacity of the bottleneck edge e→d and watch it become infeasible.
+        </p>
+        <div class="toolbar" role="group" aria-label="Circulation controls">
+          <label class="field inline">Capacity of e → d <input type="range" id="ci-cap" min="1" max="4" value="3" /> <output id="ci-out">3</output></label>
+        </div>
+        <div id="ci-player"></div>
+        <div class="vcard"><h3>Network with super-source S and super-sink T <span class="hint">node labels: supply (−) or demand (+)</span></h3><svg id="ci-svg" role="img" aria-label="Circulation with demands"></svg></div>
+        <div class="narr" id="ci-narr" aria-live="polite"></div>
+      </section>
+
+      <!-- 7 recipe -->
+      <section class="block" id="recipe">
+        <p class="eyebrow">7 · Summary</p>
+        <h2 class="h2">The recipe</h2>
+        <div class="card table-scroll">
+          <table class="sb">
+            <thead><tr><th>Problem</th><th>Network</th><th>Read the answer from</th></tr></thead>
+            <tbody>
+              <tr><td>Bipartite matching</td><td>s→L (1), L→R (1), R→t (1)</td><td>Edges of L→R with flow 1. Min cut gives Hall’s violator.</td></tr>
+              <tr><td>Edge-disjoint paths</td><td>All capacities 1</td><td>Decompose the flow into paths. Min cut = Menger’s edge set.</td></tr>
+              <tr><td>Project selection</td><td>s→profit, cost→t, prerequisites ∞</td><td>Source side of a min cut. Profit = Σ profits − cut.</td></tr>
+              <tr><td>Image segmentation</td><td>s→a<sub>i</sub>, i→t b<sub>i</sub>, neighbours p both ways</td><td>Source side of a min cut = foreground.</td></tr>
+              <tr><td>Baseball elimination</td><td>s→games, games→teams (∞), teams→t</td><td>Saturated? If not, the cut names the teams that eliminate z.</td></tr>
+              <tr><td>Circulation with demands</td><td>Super-source and super-sink</td><td>Saturated? Then a feasible circulation exists.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small-text muted" style="margin-top:10px">Not yet animated here: survey design and airline scheduling (slides 49–55), edge-disjoint paths in undirected graphs (slides 32–38), and circulation with lower bounds (slides 46–47). They use the same recipe.</p>
+        <h3 class="h3" style="margin:26px 0 6px;font:600 1.15rem var(--serif)">Questions to explore</h3>
+        <ol class="try">
+          <li><b>Alternating paths.</b> In the first matching example, which augmentation uses ⇠ arcs? Which matched edges does it undo?</li>
+          <li><b>Hall.</b> Remove one edge from a perfect matching example until it breaks. What is the violating set S, and why is it exactly the nodes reachable from s?</li>
+          <li><b>Menger.</b> Can you disconnect s from t with fewer edges than the number of disjoint paths? Why not?</li>
+          <li><b>Greedy fails.</b> In the open-pit mine, dig the single most valuable block. Is that the best plan?</li>
+          <li><b>Penalty.</b> Slide the smoothness penalty from 0 to 8. At p = 0 the min cut equals the pixel-by-pixel labelling. Why?</li>
+          <li><b>Elimination.</b> Change Atlanta’s wins. Which teams are eliminated, and which set R of teams proves it?</li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>Reductions follow Kleinberg and Tardos, <i>Algorithm Design</i>, and Kevin Wayne’s lecture slides (Princeton). Animations by Vinh Dang.</p>
+        <p><a href="./algorithm-design.html">← Algorithm Design</a> · <a href="./network-flow-1.html">Part I</a></p>
+      </div>
+    </footer>
+
+    <script src="./flowalgo.js"></script>
+    <script src="./flowapps.js"></script>
+    <script src="./flowviz.js"></script>
+    <script src="./nf2.js"></script>
+  </body>
+</html>
