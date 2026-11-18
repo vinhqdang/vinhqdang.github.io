@@ -26,6 +26,17 @@ window.sitePublications = [
   },
   {
     year: "2026",
+    title: "Fuzzy-conformal graph neural networks with distribution-free coverage guarantees for cybersecurity anomaly detection",
+    authors: "Quang-Vinh Dang",
+    venue: "International Journal of Machine Learning and Cybernetics",
+    type: "Journal Article",
+    href: "https://doi.org/10.1007/s13042-026-03371-3",
+    wos: "SCIE",
+    scopus: "74th percentile",
+    scimago: "Q2"
+  },
+  {
+    year: "2026",
     title: "Numerical Analysis of Nonlinear Differential Equations Using Iterative Approximation Methods",
     authors: "N. Rajeshwaran, Quang-Vinh Dang, Praveen Srinivasan, M. Manjula, Deepthi Chamkur V",
     venue: "Acta Innovations",

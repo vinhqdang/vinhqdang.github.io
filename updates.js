@@ -3,6 +3,16 @@ window.siteUpdates = [
   {
     date: "November 2026",
     type: "Publication",
+    title: "New paper in the International Journal of Machine Learning and Cybernetics: fuzzy-conformal graph neural networks",
+    summary:
+      "\"Fuzzy-conformal graph neural networks with distribution-free coverage guarantees for cybersecurity anomaly detection\" is now published in the International Journal of Machine Learning and Cybernetics (Springer). It joins fuzzy rule-based message passing with a community-wise conformal calibration, so that each alert comes with a set of candidate attack classes, a coverage guarantee conditional on the region of the network, and readable IF-THEN rules. It is evaluated on seven public cybersecurity benchmarks. The journal is SCIE-indexed, SCImago Q2, and at the 74th Scopus percentile.",
+    href: "https://doi.org/10.1007/s13042-026-03371-3",
+    cta: "Read the paper",
+    featured: true
+  },
+  {
+    date: "November 2026",
+    type: "Publication",
     title: "Paper on green credit policy and FinTech accepted in FinTech and Sustainable Innovation",
     summary:
       "\"Screening Green from Grey: FinTech Infrastructure and the Threshold Effectiveness of Green Credit Policy\" has been accepted for publication in FinTech and Sustainable Innovation (Bon View Publishing). The paper asks when green credit policy actually separates green from polluting borrowers, and how the strength of a region's FinTech infrastructure shapes that effect.",
