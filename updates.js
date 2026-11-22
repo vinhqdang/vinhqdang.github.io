@@ -23,6 +23,16 @@ window.siteUpdates = [
   {
     date: "November 2026",
     type: "Publication",
+    title: "New paper at FDSE 2026 on object hallucination in vision-language models, with two first-year students",
+    summary:
+      "\"Unraveling Object Hallucination in Vision-Language Models: From Scene Complexity to Visual Grounding\" (with Phuong Lan Nguyen and Hoang Viet Vu, who were first-year undergraduates when they did this work) appears in the FDSE 2026 proceedings (Springer CCIS). Do cluttered scenes make a vision-language model invent objects? On LLaVA-1.5-7B and MS COCO, we find the link between visual complexity and hallucination is weak and even changes direction with the complexity measure, and removing image content helps only when the removal is small. What predicts hallucination best is how well each mentioned object is grounded in the image: a lightweight detector reaches a ROC-AUC of 0.85 mostly from grounding features.",
+    href: "https://doi.org/10.1007/978-981-92-8107-7_7",
+    cta: "Read the paper",
+    featured: true
+  },
+  {
+    date: "November 2026",
+    type: "Publication",
     title: "New paper in the International Journal of Machine Learning and Cybernetics: fuzzy-conformal graph neural networks",
     summary:
       "\"Fuzzy-conformal graph neural networks with distribution-free coverage guarantees for cybersecurity anomaly detection\" is now published in the International Journal of Machine Learning and Cybernetics (Springer). It joins fuzzy rule-based message passing with a community-wise conformal calibration, so that each alert comes with a set of candidate attack classes, a coverage guarantee conditional on the region of the network, and readable IF-THEN rules. It is evaluated on seven public cybersecurity benchmarks. The journal is SCIE-indexed, SCImago Q2, and at the 74th Scopus percentile.",
