@@ -3,6 +3,16 @@ window.siteUpdates = [
   {
     date: "November 2026",
     type: "Publication",
+    title: "New paper at ICONIP 2026 on local LLMs for log anomaly detection",
+    summary:
+      "\"Local LLM-Guided Counterfactual Augmentation for Low-Label Log Anomaly Detection\" (led by Dat Le, with Anh Vu Le, Sutharshan Rajasegarar, Thanh Thi Nguyen, Minh Ngoc Dinh, Maia Angelova, Wei Luo, Thach Ngo and me) appears in the proceedings of ICONIP 2026 (Springer CCIS, CORE rank B). A local language model is used only offline, to rewrite training log windows into label-changing variants such as a failure becoming a recovery; the deployed detector stays a light TF-IDF classifier with no LLM calls. On a fixed HDFS split this helped in the low-label setting for one generator configuration, while the gains were smaller elsewhere and BGL and Thunderbird were already near ceiling. The paper presents this as feasibility evidence, not a scaling claim.",
+    href: "https://doi.org/10.1007/978-981-92-8230-2_34",
+    cta: "Read the paper",
+    featured: true
+  },
+  {
+    date: "November 2026",
+    type: "Publication",
     title: "New paper in Technological Sustainability on AI for environmental governance",
     summary:
       "\"From compliance to resilience: a functional framework for AI-enabled environmental governance\" is out in Technological Sustainability (Emerald). The paper asks what really counts as AI in corporate environmental governance, and why so much of it only automates compliance reporting. It proposes a four-layer framework (sensing, decision, institutional, equity) and argues that buying sensing tools without building the decision and institutional layers yields compliance, not resilience, especially for SMEs in middle-income economies. The journal is at the 80th Scopus percentile (Q1) and SCImago Q2.",

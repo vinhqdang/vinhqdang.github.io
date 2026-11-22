@@ -3,6 +3,18 @@
 window.sitePublications = [
   {
     year: "2027",
+    title: "Local LLM-Guided Counterfactual Augmentation for Low-Label Log Anomaly Detection",
+    authors: "Dat Le, Anh Vu Le, Sutharshan Rajasegarar, Thanh Thi Nguyen, Quang-Vinh Dang, Minh Ngoc Dinh, Maia Angelova, Wei Luo, Thach Ngo",
+    venue: "Neural Information Processing (ICONIP 2026), Communications in Computer and Information Science, vol. 3197",
+    type: "Conference Paper",
+    href: "https://doi.org/10.1007/978-981-92-8230-2_34",
+    core: "B",
+    wos: "Not confirmed",
+    scopus: "Not confirmed",
+    scimago: "N/A"
+  },
+  {
+    year: "2027",
     title: "Context-gated exponentiated gradient for online forecast combination",
     authors: "Quang-Vinh Dang",
     venue: "Operations Research Letters",

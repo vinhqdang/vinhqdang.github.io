@@ -31,6 +31,7 @@
     else if (/^indexed/i.test(sc)) out.push('<span class="badge">Scopus indexed</span>');
     const sj = (p.scimago || "").match(/^Q[1-4]/);
     if (sj) out.push(`<span class="badge${sj[0] === "Q1" ? " good" : ""}">SJR ${esc(p.scimago)}</span>`);
+    if (p.core) out.push(`<span class="badge neutral" title="CORE conference ranking">CORE ${esc(p.core)}</span>`);
     return out.length ? `<div class="badges">${out.join("")}</div>` : "";
   };
 
