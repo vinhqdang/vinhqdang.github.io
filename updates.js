@@ -3,6 +3,16 @@ window.siteUpdates = [
   {
     date: "November 2026",
     type: "Publication",
+    title: "New paper in Technological Sustainability on AI for environmental governance",
+    summary:
+      "\"From compliance to resilience: a functional framework for AI-enabled environmental governance\" is out in Technological Sustainability (Emerald). The paper asks what really counts as AI in corporate environmental governance, and why so much of it only automates compliance reporting. It proposes a four-layer framework (sensing, decision, institutional, equity) and argues that buying sensing tools without building the decision and institutional layers yields compliance, not resilience, especially for SMEs in middle-income economies. The journal is at the 80th Scopus percentile (Q1) and SCImago Q2.",
+    href: "https://doi.org/10.1108/TECHS-08-2026-0184",
+    cta: "Read the paper",
+    featured: true
+  },
+  {
+    date: "November 2026",
+    type: "Publication",
     title: "New paper in the International Journal of Machine Learning and Cybernetics: fuzzy-conformal graph neural networks",
     summary:
       "\"Fuzzy-conformal graph neural networks with distribution-free coverage guarantees for cybersecurity anomaly detection\" is now published in the International Journal of Machine Learning and Cybernetics (Springer). It joins fuzzy rule-based message passing with a community-wise conformal calibration, so that each alert comes with a set of candidate attack classes, a coverage guarantee conditional on the region of the network, and readable IF-THEN rules. It is evaluated on seven public cybersecurity benchmarks. The journal is SCIE-indexed, SCImago Q2, and at the 74th Scopus percentile.",

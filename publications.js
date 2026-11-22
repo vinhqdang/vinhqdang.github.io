@@ -26,6 +26,17 @@ window.sitePublications = [
   },
   {
     year: "2026",
+    title: "From compliance to resilience: a functional framework for AI-enabled environmental governance",
+    authors: "Quang-Vinh Dang",
+    venue: "Technological Sustainability",
+    type: "Journal Article",
+    href: "https://doi.org/10.1108/TECHS-08-2026-0184",
+    wos: "Not confirmed",
+    scopus: "80th percentile",
+    scimago: "Q2"
+  },
+  {
+    year: "2026",
     title: "Fuzzy-conformal graph neural networks with distribution-free coverage guarantees for cybersecurity anomaly detection",
     authors: "Quang-Vinh Dang",
     venue: "International Journal of Machine Learning and Cybernetics",
