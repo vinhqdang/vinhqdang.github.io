@@ -3,15 +3,15 @@
 \apcfooter{Searching}
 \apctitle{Searching}{Linear search, binary search, and why sorted data is powerful}
 
-% one row of the 16-element array used in the binary search trace:  y, lo, hi, mid
-\newcommand{\arrayrow}[4]{%
-  \foreach \v [count=\i from 0] in {3,8,12,15,19,23,27,31,36,42,47,53,58,64,71,79}{%
-    \ifnum\i<#2 \def\fc{tdLine!55}\else\ifnum\i>#3 \def\fc{tdLine!55}\else\def\fc{white}\fi\fi
-    \ifnum\i=#4 \def\fc{tdAmber!45}\fi
-    \node[cell,fill=\fc] at (\i*0.76,#1) {\scriptsize\v};}%
-  \node[font=\tiny,text=tdBlue] at (#2*0.76,#1-0.55) {lo};
-  \node[font=\tiny,text=tdBlue] at (#3*0.76,#1-0.55) {hi};
-  \node[font=\tiny\bfseries,text=tdAmber!70!black] at (#4*0.76,#1+0.55) {mid};}
+% ---- drawing helpers; the figures are generated from real traces by searching.py (snippets/tk_*.out)
+\tikzset{mcell/.style={cell,minimum width=5.6mm,minimum height=5.6mm,font=\scriptsize\ttfamily}}
+% \cellsx{style}{step}{x0}{y}{value/colour,...}
+\newcommand{\cellsx}[5]{\foreach \v/\c [count=\i from 0] in {#5}{\node[#1,fill=\c] at (#3+\i*#2,#4) {\v};}}
+\newcommand{\rl}[3]{\node[font=\scriptsize,anchor=east,text=tdMuted] at (#1,#2) {#3};}
+\newcommand{\rn}[4]{\node[font=\scriptsize,anchor=west,text=#4] at (#1,#2) {#3};}
+% \ptr{x}{y}{text}{direction: -1 below, +1 above}{colour}
+\newcommand{\ptr}[5]{\node[font=\tiny\bfseries,text=#5] at (#1,#2+0.5*#4) {#3};}
+\newcommand{\legsq}[2]{\tikz[baseline=-0.5ex]\node[draw=tdInk!60,fill=#1,minimum size=2.6mm,inner sep=0]{};\;#2}
 
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
@@ -37,7 +37,8 @@ a program \key{searches}. Because it happens billions of times a day, \emph{how}
 \item explain \emph{why} binary search needs sorted data;
 \item count the steps each one takes;
 \item use \texttt{bisect} instead of writing your own;
-\item choose the right search for a problem.
+\item search \textbf{on the answer} (square root, shipping);
+\item solve rotated-array, peak and two-pointer problems.
 \end{itemize}}
 \end{block}
 \end{column}
@@ -115,24 +116,23 @@ Best strategy: always guess the \textbf{middle}. Each answer throws away half of
 \end{frame}
 
 \begin{frame}{Binary search on a sorted array: target = 47}
-\begin{sfig}[0.62]
+\begin{sfig}[0.66]
 \begin{tikzpicture}
-  \arrayrow{0}{0}{15}{7}
-  \arrayrow{-1.7}{8}{15}{11}
-  \arrayrow{-3.4}{8}{10}{9}
-  \arrayrow{-5.1}{10}{10}{10}
-  \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.5,0) {step 1};
-  \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.5,-1.7) {step 2};
-  \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.5,-3.4) {step 3};
-  \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.5,-5.1) {step 4};
-  \node[font=\tiny,anchor=west,text=tdMuted] at (11.9,0) {$31<47$: go right};
-  \node[font=\tiny,anchor=west,text=tdMuted] at (11.9,-1.7) {$53>47$: go left};
-  \node[font=\tiny,anchor=west,text=tdMuted] at (11.9,-3.4) {$42<47$: go right};
-  \node[font=\tiny,anchor=west,text=tdGreen!70!black] at (11.9,-5.1) {$47=47$: found!};
+  \input{snippets/tk_found.out}
 \end{tikzpicture}
 \end{sfig}
 \vspace{1mm}
-{\small 16 items, only \textbf{4} comparisons. Grey cells are never looked at again: the window \texttt{[lo, hi]} shrinks by about half each time.}
+{\small 16 items, only \textbf{4} comparisons. Grey cells are never looked at again: the window \texttt{[lo, hi]} shrinks by about half each time. (Drawn from the real trace of the code on the next slide.)}
+\end{frame}
+
+\begin{frame}{When the target is missing: target = 20}
+\begin{sfig}[0.68]
+\begin{tikzpicture}
+  \input{snippets/tk_missing.out}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small The window keeps shrinking: after 4 steps \texttt{lo = 5} is larger than \texttt{hi = 4}, the window is \textbf{empty}, so 20 is not in the list. Even a failed search costs only about $\log_2 n$ comparisons.}
 \end{frame}
 
 \begin{frame}{Binary search in Python}
@@ -143,7 +143,7 @@ Best strategy: always guess the \textbf{middle}. Each answer throws away half of
 \pyout{binary_demo}
 \end{column}
 \begin{column}{0.44\textwidth}
-{\small Running an instrumented copy (\texttt{binary\_trace} in the course file) on the array from the previous slide:}
+{\small Running an instrumented copy (\texttt{binary\_trace} in the course file) on the array from the previous slides:}
 \vspace{1mm}
 \pyout{trace_demo}
 \vspace{2mm}
@@ -265,6 +265,252 @@ Need insertion point, counts, ranges & \texttt{bisect\_left}, \texttt{bisect\_ri
 {\small $O(\cdot)$ is Big-O notation: a way to say how the cost \emph{grows} with $n$. We make it precise in the Big-O lecture.}
 \end{frame}
 
+% ===================== worked problems =====================
+\begin{frame}{Problem 1: first and last occurrence}
+\begin{sfig}[0.62]
+\begin{tikzpicture}
+  \input{snippets/tk_lower.out}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small List \texttt{[1,2,2,2,2,3,5,5,8]}, target 2. Plain binary search may stop at \emph{any} of the four 2s. \texttt{lower\_bound} never stops early: the window is \emph{half-open} (blue line = \texttt{lo}, red line = \texttt{hi}, the cell at \texttt{hi} is outside) and the loop ends when they meet at the first index with value $\ge$ target.}
+\end{frame}
+
+\begin{frame}{First and last occurrence: code}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\pycode{lower}
+\vspace{1mm}
+\pycode{first_last}
+\end{column}
+\begin{column}{0.42\textwidth}
+\pyout{firstlast_demo}
+\vspace{2mm}
+{\small
+\textbf{Two shapes of binary search.}
+\begin{itemize}\setlength\itemsep{2pt}
+\item Closed window \texttt{[lo, hi]}, \texttt{while lo <= hi}, \texttt{hi = mid - 1}: look for \emph{one exact} match.
+\item Half-open \texttt{[lo, hi)}, \texttt{while lo < hi}, \texttt{hi = mid}: look for a \emph{boundary}.
+\end{itemize}
+The last occurrence is ``where the next larger value starts'', minus one. \texttt{bisect\_left} and \texttt{bisect\_right} do the same (last line).}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Binary search on the answer}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\begin{sfig}[0.3]
+\begin{tikzpicture}
+  \cellsx{cell}{0.8}{0}{0}{F/tdRed!22,F/tdRed!22,F/tdRed!22,F/tdRed!22,F/tdRed!22,T/tdGreen!30,T/tdGreen!30,T/tdGreen!30,T/tdGreen!30,T/tdGreen!30}
+  \foreach \i in {0,...,9}{\node[font=\tiny,text=tdMuted] at (\i*0.8,-0.6) {\i};}
+  \draw[->,thick,tdAmber] (5*0.8,0.95) -- (5*0.8,0.5); \node[font=\scriptsize,text=tdAmber!70!black] at (5*0.8,1.2) {first true};
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+{\small
+Sometimes there is \textbf{no array} to search, only a yes/no question about a number $x$ that is \emph{monotone}: false for small $x$, true from some point on.
+
+\vspace{2mm}
+\key{Recipe}
+\begin{enumerate}\setlength\itemsep{2pt}
+\item Write \texttt{ok(x)}: ``is $x$ big enough?''
+\item Choose \texttt{[lo, hi]} that surely contains the answer, with \texttt{ok(hi)} true.
+\item \texttt{first\_true} finds the boundary with $O(\log(\text{range}))$ calls to \texttt{ok}.
+\end{enumerate}}
+\end{column}
+\begin{column}{0.5\textwidth}
+\pycode{first_true}
+\vspace{2mm}
+{\small
+This is the half-open pattern again: \texttt{hi = mid}, because \texttt{mid} itself may be the answer.
+
+\vspace{2mm}
+The next slides use it for a square root and for a scheduling problem.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Example: integer square root}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\begin{sfig}[0.78]
+\begin{tikzpicture}
+  \input{snippets/tk_isqrt.out}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small $n=50$: the question is ``is $r^2>50$?''. Red dot: yes, the answer is to the left; green: no, to the right. The dashed line is $\sqrt{50}+1\approx 8.07$, where the answer flips.}
+\end{column}
+\begin{column}{0.44\textwidth}
+\pycode{isqrt}
+\vspace{2mm}
+\pyout{isqrt_demo}
+\vspace{1mm}
+{\small
+Largest $r$ with $r^2\le n$ equals (first $r$ with $r^2>n$) $-1$. Even for $n\approx10^{12}$ only about 40 squarings are needed, with no floating-point error.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Example: ship packages within $D$ days}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\pycode{ship}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small Weights $1,2,\dots,10$ are shipped \emph{in this order}; the ship carries up to \texttt{cap} per day. Smallest \texttt{cap} that finishes in 5 days?}
+\vspace{1mm}
+\pyout{ship_demo}
+\vspace{1mm}
+{\small
+\texttt{days\_needed} is a greedy $O(n)$ scan. More capacity never needs \emph{more} days: the test is monotone in \texttt{cap}.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Why it works: days needed against capacity}
+\begin{columns}[T]
+\begin{column}{0.58\textwidth}
+\begin{sfig}[0.8]
+\begin{tikzpicture}
+\begin{axis}[width=10.5cm,height=6.4cm,xlabel={capacity},ylabel={days needed},axis lines=left,const plot,ymin=0,ymax=8,xmin=8,xmax=56,ytick={1,...,7},legend pos=north east,legend style={font=\scriptsize},tick label style={font=\scriptsize},label style={font=\small}]
+  \addplot[tdBlue,very thick] table[x=cap,y=days]{snippets/ship_data.out};
+  \addplot[tdRed,dashed,no markers,domain=8:56,samples=2] {5};
+  \addplot[only marks,mark=*,mark size=3pt,tdAmber] coordinates {(15,5)};
+  \legend{days needed,limit: 5 days,answer: 15}
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.4\textwidth}
+{\small
+The measured curve from \texttt{days\_needed} is a \textbf{staircase that only goes down}. That is exactly the monotone shape binary search needs: ``too slow'' for small capacities, ``fast enough'' from 15 on.
+
+\vspace{2mm}
+The search in the previous slide tried capacities 32, 21, 15, 12, 14: five \texttt{days\_needed} calls instead of scanning all 46 candidates.
+
+\vspace{2mm}
+\emph{Same pattern, other problems:} the smallest speed to eat all bananas in $H$ hours, the largest minimum distance between $k$ cows in stalls, the smallest time for $m$ workers to finish a job.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Problem 3: search in a rotated sorted array}
+\begin{columns}[T]
+\begin{column}{0.66\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+  \input{snippets/tk_rotated.out}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small Array \texttt{[15,18,22,27,3,5,9,12]}: a sorted list rotated by 4. Target 9. Blue = the half we know is sorted.}
+\end{column}
+\begin{column}{0.32\textwidth}
+{\small
+The list is not sorted, but \textbf{at least one half of any window is sorted}. At each step:
+\begin{enumerate}\setlength\itemsep{2pt}
+\item find the sorted half: if \texttt{a[lo] <= a[mid]} it is the left one;
+\item test whether the target lies inside that half's range;
+\item if yes, keep that half; else keep the other.
+\end{enumerate}
+Still $O(\log n)$.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Rotated array: code}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\pycode{rotated}
+\end{column}
+\begin{column}{0.42\textwidth}
+\pyout{rotated_demo}
+\vspace{2mm}
+{\small
+Compare with \texttt{binary\_search}: only the \emph{decision} is more careful. The chained comparison \texttt{a[lo] <= target < a[mid]} says ``target is inside the sorted left half'' in one line.
+
+\vspace{2mm}
+The last line tests the function on every rotation of every list of size 1 to 11 against the slow \texttt{list.index}: always test tricky index code like this.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Problem 4: find a peak element}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+  \input{snippets/tk_peak.out}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small A \textbf{peak} is an item not smaller than its neighbours. The list is \emph{not} sorted, yet binary search works: compare \texttt{a[mid]} with \texttt{a[mid+1]}. If the list goes \textbf{uphill} to the right, a peak must exist on the right (the list cannot climb forever); otherwise a peak exists at \texttt{mid} or to its left.}
+\end{frame}
+
+\begin{frame}{Peak element: code}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\pycode{peak}
+\vspace{2mm}
+\pyout{peak_demo}
+\end{column}
+\begin{column}{0.44\textwidth}
+{\small
+\textbf{Why correct?} Invariant: \emph{a peak lies in} \texttt{[lo, hi]}. If \texttt{a[mid] < a[mid+1]}, then \texttt{mid} is not a peak, and following the climb must reach one (or the end of the list, which counts as a peak).
+
+\vspace{2mm}
+This is another \emph{half-open style} loop: \texttt{hi = mid}, never \texttt{hi = mid - 1}, because \texttt{mid} itself may be the peak.
+
+\vspace{2mm}
+Binary search needs less than sortedness: it needs a question whose answer \textbf{tells you which half to discard}.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Problem 5: two numbers that add up to a target (two pointers)}
+\begin{columns}[T]
+\begin{column}{0.64\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+  \input{snippets/tk_twosum.out}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.34\textwidth}
+{\small
+Sorted list \texttt{[1,3,4,6,8,11,15]}, target 14. Checking all pairs is $O(n^2)$.
+
+\vspace{2mm}
+\textbf{Two pointers:} \texttt{i} at the smallest, \texttt{j} at the largest. If the sum is too small, only a larger left number can help: move \texttt{i} right. If too big, move \texttt{j} left. Every step throws away one item, so $O(n)$.
+
+\vspace{2mm}
+Same ``discard what cannot work'' idea as binary search, with a different kind of discard.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Two pointers: code}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\pycode{twosum}
+\vspace{1mm}
+\pycode{describe}
+\end{column}
+\begin{column}{0.42\textwidth}
+\pyout{twosum_demo}
+\vspace{2mm}
+{\small
+\texttt{describe} uses \texttt{match}: the pattern \texttt{(i, j)} unpacks a pair, \texttt{None} means ``nothing found''.
+
+\vspace{2mm}
+Why is it safe to discard? If \texttt{a[i] + a[j] < target}, then \texttt{a[i]} plus anything $\le$ \texttt{a[j]} is smaller still, so \texttt{a[i]} cannot be in any answer with the current or a smaller \texttt{j}.
+
+\vspace{2mm}
+A \texttt{set} gives $O(n)$ even for unsorted input.}
+\end{column}
+\end{columns}
+\end{frame}
+
 \begin{frame}{Recap and practice}
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
@@ -274,8 +520,9 @@ Need insertion point, counts, ranges & \texttt{bisect\_left}, \texttt{bisect\_ri
 \item \key{Linear search}: any list, $n$ steps in the worst case.
 \item \key{Binary search}: sorted list, about $\log_2 n$ steps, because every comparison halves the window.
 \item The \textbf{invariant} (``the target is in \texttt{[lo, hi]}'') is how you get the loop right.
-\item Use \texttt{bisect} in real code.
-\item Sorting has a cost: it pays off when you search often.
+\item Use \texttt{bisect} in real code; \texttt{lower\_bound} finds boundaries.
+\item \key{Search on the answer}: any monotone yes/no question can be halved.
+\item Binary search only needs a test that says which half to discard (rotated array, peak).
 \end{enumerate}}
 \end{block}
 \end{column}
@@ -283,13 +530,27 @@ Need insertion point, counts, ranges & \texttt{bisect\_left}, \texttt{bisect\_ri
 \begin{block}{Practice}
 {\small
 \begin{enumerate}\setlength\itemsep{3pt}
-\item Modify \texttt{binary\_search} to return the index of the \emph{first} occurrence when there are duplicates. (Hint: do not stop at the first match.)
 \item Trace \texttt{binary\_search} by hand on \texttt{[2,4,6,8,10,12]} for target \texttt{5}. What are \texttt{lo, hi, mid} at each step?
 \item How many comparisons does binary search need for one billion items? Check with \texttt{n.bit\_length()}.
 \item Use \texttt{bisect} to find how many scores in a list are below 50.
+\item Use \texttt{first\_true} to find $\lceil\sqrt n\rceil$ without \texttt{math}.
+\item Run \texttt{search\_rotated} by hand for target 3 on \texttt{[15,18,22,27,3,5,9,12]}.
 \end{enumerate}}
 \end{block}
 \end{column}
 \end{columns}
+\end{frame}
+
+\begin{frame}{Challenge problems}
+\begin{enumerate}\setlength\itemsep{3pt}\small
+\item \textbf{Smallest eating speed}: Koko has piles \texttt{[3,6,7,11]} and $H=8$ hours. Each hour she eats up to $k$ bananas from one pile. Find the smallest $k$. (Search on the answer.)
+\item \textbf{Find the minimum} of a rotated sorted array without duplicates in $O(\log n)$.
+\item \textbf{Rotated array with duplicates}: what goes wrong when \texttt{a[lo] == a[mid] == a[hi]}? What is the worst case now?
+\item \textbf{Median of two sorted arrays} in $O(\log(\min(m,n)))$ (hard: binary search on a partition).
+\item \textbf{Aggressive cows}: place $k$ cows in sorted stalls to maximise the \emph{smallest} distance between any two cows.
+\item \textbf{Three sum}: all triples in a sorted list that add up to 0. Combine a loop with two pointers: $O(n^2)$.
+\item \textbf{Closest pair}: in a sorted list find two items whose sum is \emph{closest} to a target.
+\item \textbf{Square root with decimals}: use binary search on real numbers to get $\sqrt 2$ to 8 digits. When do you stop?
+\end{enumerate}
 \end{frame}
 \end{document}

@@ -3,12 +3,18 @@
 \apcfooter{Sorting}
 \apctitle{Sorting}{From simple $O(n^2)$ methods to divide and conquer}
 
-% a row of six cells: \suffixrow{y}{list}{k} colours the last k cells; \prefixrow colours the first k
-\newcommand{\suffixrow}[3]{\foreach \v [count=\i from 0] in {#2}{\ifnum\i<\numexpr6-#3\relax\def\fc{white}\else\def\fc{tdGreen!24}\fi
-  \node[cell,fill=\fc] at (\i*0.8,#1) {\v};}}
-\newcommand{\prefixrow}[3]{\foreach \v [count=\i from 0] in {#2}{\ifnum\i<#3\relax\def\fc{tdGreen!24}\else\def\fc{white}\fi
-  \node[cell,fill=\fc] at (\i*0.8,#1) {\v};}}
-\newcommand{\mnode}[3]{\node[rounded corners=2pt,draw=tdInk!60,fill=#3,inner sep=2.5pt,font=\scriptsize\ttfamily] at (#1) {#2};}
+% ---- drawing helpers; the figures are generated from real traces by sorting.py (snippets/tk_*.out)
+\tikzset{mcell/.style={cell,minimum width=5.6mm,minimum height=5.6mm,font=\scriptsize\ttfamily},
+  wcell/.style={cell,minimum width=12mm,minimum height=9mm,align=center,font=\scriptsize\sffamily}}
+% \cellsx{style}{step}{x0}{y}{value/colour,...}
+\newcommand{\cellsx}[5]{\foreach \v/\c [count=\i from 0] in {#5}{\node[#1,fill=\c] at (#3+\i*#2,#4) {\v};}}
+\newcommand{\rl}[3]{\node[font=\scriptsize,anchor=east,text=tdMuted] at (#1,#2) {#3};}
+\newcommand{\rn}[4]{\node[font=\scriptsize,anchor=west,text=#4] at (#1,#2) {#3};}
+\newcommand{\mt}[4]{\node[rounded corners=2pt,draw=tdInk!60,fill=#4,inner sep=2.5pt,font=\scriptsize\ttfamily] at (#1,#2) {#3};}
+\newcommand{\ptr}[3]{\node[font=\tiny\bfseries,text=tdBlue] at (#1,#2-0.5) {#3};}
+% \interval{y}{lo}{hi}{pivot}{unit}: a window of indices with the pivot marked
+\newcommand{\interval}[5]{\fill[tdBlue!15] (#2*#5-0.4,#1-0.15) rectangle (#3*#5+0.4,#1+0.15);\fill[tdAmber] (#4*#5,#1) circle (0.12);}
+\newcommand{\legsq}[2]{\tikz[baseline=-0.5ex]\node[draw=tdInk!60,fill=#1,minimum size=2.6mm,inner sep=0]{};\;#2}
 
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
@@ -33,9 +39,10 @@ Sorting is one of the most studied problems in computer science, and a perfect p
 \begin{itemize}\setlength\itemsep{2pt}
 \item trace \textbf{bubble}, \textbf{insertion}, \textbf{merge} and \textbf{quick} sort;
 \item explain why two are $O(n^2)$ and two are $O(n\log n)$;
-\item see the difference in \textbf{real timings};
+\item see the difference in \textbf{real timings} and \textbf{comparison counts};
 \item use \texttt{sorted} and \texttt{key=} in practice;
-\item say what \textbf{stable} means and why it matters.
+\item say what \textbf{stable} means and why it matters;
+\item solve classic problems: \textbf{inversions}, \textbf{k-th largest}, \textbf{merge k lists}, \textbf{Dutch flag}, \textbf{top-k}.
 \end{itemize}}
 \end{block}
 \end{column}
@@ -44,18 +51,15 @@ Sorting is one of the most studied problems in computer science, and a perfect p
 
 \begin{frame}{Bubble sort: swap neighbours that are out of order}
 \begin{columns}[T]
-\begin{column}{0.5\textwidth}
+\begin{column}{0.42\textwidth}
 \begin{sfig}[0.62]
 \begin{tikzpicture}
-  \suffixrow{0}{5,2,9,1,7,3}{0}   \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.6,0) {start};
-  \suffixrow{-1.2}{2,5,1,7,3,9}{1} \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.6,-1.2) {pass 1};
-  \suffixrow{-2.4}{2,1,5,3,7,9}{2} \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.6,-2.4) {pass 2};
-  \suffixrow{-3.6}{1,2,3,5,7,9}{3} \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.6,-3.6) {pass 3};
+  \input{snippets/tk_bubble.out}
 \end{tikzpicture}
 \end{sfig}
-{\small Each pass \textbf{bubbles} the largest remaining item to the end (green = in its final place). After pass 4 nothing moves, so we can stop.}
+{\small Each pass \textbf{bubbles} the largest remaining item to the end (green = in its final place). The last pass finds nothing to swap, so we can stop.}
 \end{column}
-\begin{column}{0.48\textwidth}
+\begin{column}{0.56\textwidth}
 \pycode{bubble}
 \vspace{2mm}
 \pyout{bubble_trace}
@@ -63,20 +67,42 @@ Sorting is one of the most studied problems in computer science, and a perfect p
 \end{columns}
 \end{frame}
 
+\begin{frame}{Inside one pass of bubble sort}
+\begin{columns}[T]
+\begin{column}{0.64\textwidth}
+\begin{sfig}[0.86]
+\begin{tikzpicture}
+  \input{snippets/tk_bpass.out}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.34\textwidth}
+{\small
+Pass 1 on \texttt{[5, 2, 9, 1, 7, 3]}: five neighbour comparisons.
+
+\vspace{2mm}
+\legsq{tdRed!25}{compared and swapped}\\[2pt]
+\legsq{tdAmber!45}{compared, already in order}\\[2pt]
+\legsq{tdGreen!24}{final place}
+
+\vspace{2mm}
+Notice that \textbf{9} is carried along until it meets something bigger; it never meets one, so it ends at the far right.
+
+\vspace{2mm}
+Pass 2 does the same on the first five cells, and so on: $5+4+3+2+1$ comparisons in total.}
+\end{column}
+\end{columns}
+\end{frame}
+
 \begin{frame}{Insertion sort: how you sort a hand of cards}
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
-\begin{sfig}[0.62]
+\begin{sfig}[0.7]
 \begin{tikzpicture}
-  \prefixrow{0}{5,2,9,1,7,3}{1}    \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.6,0) {start};
-  \prefixrow{-1.2}{2,5,9,1,7,3}{2} \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.6,-1.2) {insert 2};
-  \prefixrow{-2.4}{2,5,9,1,7,3}{3} \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.6,-2.4) {insert 9};
-  \prefixrow{-3.6}{1,2,5,9,7,3}{4} \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.6,-3.6) {insert 1};
-  \prefixrow{-4.8}{1,2,5,7,9,3}{5} \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.6,-4.8) {insert 7};
-  \prefixrow{-6.0}{1,2,3,5,7,9}{6} \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.6,-6.0) {insert 3};
+  \input{snippets/tk_insert.out}
 \end{tikzpicture}
 \end{sfig}
-{\small Green prefix = already sorted. Take the next item and slide it left until it fits.}
+{\small Green prefix = already sorted. Take the next item (amber) and slide it left until it fits.}
 \end{column}
 \begin{column}{0.48\textwidth}
 \pycode{insertion}
@@ -123,32 +149,68 @@ $n$ & about $n^2/2$ steps\\\midrule
 \end{columns}
 \end{frame}
 
-\begin{frame}{Merge sort: split in half, sort each half, merge}
-\begin{sfig}[0.6]
-\begin{tikzpicture}[x=1mm,y=1mm]
-  \node[font=\small\bfseries] at (28,31) {1. split until single items};
-  \mnode{28,26}{38 27 43 3 9 82 10 5}{white}
-  \mnode{14,19}{38 27 43 3}{white}   \mnode{42,19}{9 82 10 5}{white}
-  \mnode{7,12}{38 27}{white} \mnode{21,12}{43 3}{white} \mnode{35,12}{9 82}{white} \mnode{49,12}{10 5}{white}
-  \draw[arr] (28,24) -- (14,21); \draw[arr] (28,24) -- (42,21);
-  \draw[arr] (14,17) -- (7,14); \draw[arr] (14,17) -- (21,14); \draw[arr] (42,17) -- (35,14); \draw[arr] (42,17) -- (49,14);
-  \begin{scope}[xshift=82mm]
-  \node[font=\small\bfseries] at (28,31) {2. merge sorted halves};
-  \mnode{7,26}{27 38}{tdGreen!15} \mnode{21,26}{3 43}{tdGreen!15} \mnode{35,26}{9 82}{tdGreen!15} \mnode{49,26}{5 10}{tdGreen!15}
-  \mnode{14,19}{3 27 38 43}{tdGreen!15} \mnode{42,19}{5 9 10 82}{tdGreen!15}
-  \mnode{28,12}{3 5 9 10 27 38 43 82}{tdGreen!30}
-  \draw[arr] (7,24) -- (14,21); \draw[arr] (21,24) -- (14,21); \draw[arr] (35,24) -- (42,21); \draw[arr] (49,24) -- (42,21);
-  \draw[arr] (14,17) -- (28,14); \draw[arr] (42,17) -- (28,14);
-  \end{scope}
+\begin{frame}{Counting comparisons for real}
+\begin{columns}[T]
+\begin{column}{0.4\textwidth}
+{\small We wrap each number in a class whose comparison operators \textbf{count how often they are called}, then run the very same four functions:}
+\vspace{1mm}
+\pyout{cmp_demo}
+\vspace{2mm}
+{\small Bubble sort does \emph{exactly} $n(n-1)/2$ comparisons (79\,800 for $n=400$). Merge sort stays close to $n\log_2 n$.}
+\end{column}
+\begin{column}{0.56\textwidth}
+\begin{sfig}[0.78]
+\begin{tikzpicture}
+\begin{axis}[width=10cm,height=6.6cm,xmode=log,ymode=log,xlabel={list size $n$},ylabel={comparison operations},axis lines=left,legend pos=north west,legend style={font=\scriptsize},tick label style={font=\scriptsize},label style={font=\small}]
+  \addplot[tdRed,very thick,mark=*,mark size=1.4pt] table[x=n,y=bubble]{snippets/cmp_data.out};
+  \addplot[tdAmber,very thick,mark=triangle*,mark size=1.6pt] table[x=n,y=insertion]{snippets/cmp_data.out};
+  \addplot[tdPurple,very thick,mark=diamond*,mark size=1.6pt] table[x=n,y=quick]{snippets/cmp_data.out};
+  \addplot[tdBlue,very thick,mark=square*,mark size=1.4pt] table[x=n,y=merge]{snippets/cmp_data.out};
+  \addplot[tdInk,dashed,thick] table[x=n,y=nlogn]{snippets/cmp_data.out};
+  \legend{bubble,insertion,quick,merge,$n\log_2 n$}
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+{\tiny Random lists, measured by running the code. Both axes are logarithmic: a steeper line means faster growth.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Merge sort, part 1: split until single items}
+\begin{sfig}[0.72]
+\begin{tikzpicture}
+  \input{snippets/tk_msplit.out}
 \end{tikzpicture}
 \end{sfig}
 \vspace{1mm}
-{\small Eight items need $\log_2 8=3$ levels of splitting. At every level the merging touches each item once, so the total work is about $n\log_2 n$.}
+{\small Eight items need $\log_2 8=3$ levels of splitting. A list of one item is already sorted: that is the \key{base case} of the recursion.}
+\end{frame}
+
+\begin{frame}{Merge sort, part 2: merge sorted runs back together}
+\begin{sfig}[0.72]
+\begin{tikzpicture}
+  \input{snippets/tk_mmerge.out}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small At every level the merging touches each item once, so a level costs about $n$. With $\log_2 n$ levels the total is about $n\log_2 n$.}
+\end{frame}
+
+\begin{frame}{Merging two sorted runs, step by step}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+  \input{snippets/tk_mstep.out}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small Compare the \textbf{fronts} (amber) of the two runs, copy the smaller one (green) to the output and advance that run; grey cells are used up. When one run is empty, copy the rest of the other. Each item is copied once, so merging $n$ items costs $O(n)$.}
 \end{frame}
 
 \begin{frame}{Merge sort in Python}
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
+\pycode{merge_sort}
+\vspace{1mm}
 \pycode{merge}
 \end{column}
 \begin{column}{0.46\textwidth}
@@ -172,9 +234,11 @@ The \texttt{<=} (not \texttt{<}) in \texttt{merge} keeps equal items in their or
 \begin{column}{0.5\textwidth}
 \begin{sfig}[0.55]
 \begin{tikzpicture}[x=1mm,y=1mm]
-  \mnode{30,34}{7 2 9 4 5 1 8 6}{white}
+  \node[rounded corners=2pt,draw=tdInk!60,fill=white,inner sep=2.5pt,font=\scriptsize\ttfamily] at (30,34) {7 2 9 4 5 1 8 6};
   \node[font=\scriptsize,text=tdMuted] at (60,34) {pivot = 5 (middle)};
-  \mnode{8,20}{2 4 1}{tdBlue!15} \mnode{30,20}{5}{tdAmber!35} \mnode{52,20}{7 9 8 6}{tdRed!12}
+  \node[rounded corners=2pt,draw=tdInk!60,fill=tdBlue!15,inner sep=2.5pt,font=\scriptsize\ttfamily] at (8,20) {2 4 1};
+  \node[rounded corners=2pt,draw=tdInk!60,fill=tdAmber!35,inner sep=2.5pt,font=\scriptsize\ttfamily] at (30,20) {5};
+  \node[rounded corners=2pt,draw=tdInk!60,fill=tdRed!12,inner sep=2.5pt,font=\scriptsize\ttfamily] at (52,20) {7 9 8 6};
   \draw[arr] (26,32) -- (10,22); \draw[arr] (30,32) -- (30,22); \draw[arr] (34,32) -- (50,22);
   \node[font=\tiny,text=tdBlue] at (8,14) {less than 5}; \node[font=\tiny,text=tdAmber!70!black] at (30,14) {equal: done};
   \node[font=\tiny,text=tdRed] at (52,14) {greater than 5};
@@ -188,6 +252,49 @@ The \texttt{<=} (not \texttt{<}) in \texttt{merge} keeps equal items in their or
 \vspace{2mm}
 {\small
 \textbf{Average} $O(n\log n)$. \textbf{Worst case} $O(n^2)$: a bad pivot (e.g.\ always the smallest) splits off just one item. Choosing the \emph{middle} (or a random) item makes that rare.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Quick sort: the whole recursion tree}
+\begin{columns}[T]
+\begin{column}{0.7\textwidth}
+\begin{sfig}[0.86]
+\begin{tikzpicture}
+  \input{snippets/tk_qtree.out}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.28\textwidth}
+{\small
+Each box is one call to \texttt{quick\_sort}; the \textbf{pivot} is amber. Boxes hang \emph{left} (smaller) or \emph{right} (larger) of their parent.
+
+\vspace{2mm}
+Read the pivots from left to right: $1,2,4,5,6,7,8,9$. Because every pivot ends in its final place, the tree is also the sorted order.
+
+\vspace{2mm}
+Balanced splits give a shallow tree ($\log n$ levels). A bad pivot gives a tall, thin tree: $O(n^2)$.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Partitioning in place (Lomuto scheme)}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.88]
+\begin{tikzpicture}
+  \input{snippets/tk_part.out}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.48\textwidth}
+\pycode{partition}
+\vspace{1mm}
+{\small
+\legsq{tdBlue!18}{$\le$ pivot}\quad \legsq{tdRed!25}{$>$ pivot}\quad \legsq{tdAmber!60}{pivot}
+
+\vspace{1mm}
+No extra lists: one scan, swapping small items to the front. Memory $O(1)$, but the sort is no longer stable.}
 \end{column}
 \end{columns}
 \end{frame}
@@ -216,6 +323,29 @@ Doubling $n$: bubble and insertion get about \textbf{4$\times$ slower}; merge an
 \end{axis}
 \end{tikzpicture}
 \end{sfig}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The fast sorts at larger $n$ (linear axes)}
+\begin{columns}[T]
+\begin{column}{0.58\textwidth}
+\begin{sfig}[0.8]
+\begin{tikzpicture}
+\begin{axis}[width=10.5cm,height=6.6cm,xlabel={list size $n$},ylabel={time (ms)},axis lines=left,legend pos=north west,legend style={font=\scriptsize},tick label style={font=\scriptsize},label style={font=\small},scaled x ticks=false,xtick={20000,40000,60000,80000,100000},xticklabel style={/pgf/number format/fixed,/pgf/number format/1000 sep={\,}}]
+  \addplot[tdBlue,very thick,mark=square*,mark size=1.4pt] table[x=n,y=merge]{snippets/big_data.out};
+  \addplot[tdPurple,very thick,mark=diamond*,mark size=1.6pt] table[x=n,y=quick]{snippets/big_data.out};
+  \addplot[tdGreen,very thick,mark=o,mark size=1.4pt] table[x=n,y=builtin]{snippets/big_data.out};
+  \legend{our merge sort,our quick sort,\texttt{sorted()}}
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.4\textwidth}
+\pyout{big_data}
+\vspace{2mm}
+{\small
+Both of our sorts grow almost \textbf{linearly} on this range (the extra $\log n$ factor is gentle). Yet \texttt{sorted()}, written in C, is about \textbf{8--10$\times$ faster}: the \emph{algorithm} is the same idea, the \emph{implementation} matters.}
 \end{column}
 \end{columns}
 \end{frame}
@@ -249,8 +379,8 @@ Use \texttt{key=} for what to compare and \texttt{reverse=True} for descending o
 
 \begin{frame}{Choosing a sorting algorithm}
 \renewcommand{\arraystretch}{1.3}
-\footnotesize
-\begin{tabular}{@{}>{\raggedright\bfseries}p{25mm}>{\raggedright}p{26mm}>{\raggedright}p{30mm}>{\centering}p{13mm}>{\raggedright\arraybackslash}p{44mm}@{}}
+\footnotesize\setlength\tabcolsep{4pt}
+\begin{tabular}{@{}>{\raggedright\bfseries}p{23mm}>{\raggedright}p{26mm}>{\raggedright}p{30mm}>{\centering}p{13mm}>{\raggedright\arraybackslash}p{42mm}@{}}
 \toprule
 Algorithm & Best case & Average / worst & Stable? & Notes\\
 \midrule
@@ -266,6 +396,254 @@ Timsort (Python) & $O(n)$ & $O(n\log n)$ & yes & adapts to existing order\\
 {\small A known limit: any sort that works by comparing items needs $\Omega(n\log n)$ comparisons in the worst case, so merge sort is optimal in that sense.}
 \end{frame}
 
+% ===================== worked problems =====================
+\begin{frame}{Problem 1: count the inversions}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\small
+An \key{inversion} is a pair of positions $i<j$ with $a[i]>a[j]$: two items in the wrong order. The number of inversions measures \emph{how unsorted} a list is (0 = sorted, $n(n-1)/2$ = reversed).
+
+\vspace{2mm}
+Checking all pairs is $O(n^2)$. \textbf{Idea:} piggy-back on merge sort. While merging, when we take an item from the \emph{right} run, it is smaller than \textbf{every item still waiting} in the left run, so it forms that many inversions at once.}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{sfig}[0.45]
+\begin{tikzpicture}
+  \input{snippets/tk_inv.out}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small
+On \texttt{[2, 4, 1, 3, 5]} the red arcs join the three inverted pairs: $(2,1)$, $(4,1)$, $(4,3)$.
+
+\vspace{2mm}
+Merging \texttt{[2,4]} with \texttt{[1,3,5]}: taking 1 costs 2 (both 2 and 4 wait), taking 3 costs 1 (only 4 waits). Total 3.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Inversions: solution in $O(n\log n)$}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\pycode{inversions}
+\end{column}
+\begin{column}{0.41\textwidth}
+\pyout{inversions_demo}
+\vspace{2mm}
+{\small
+\texttt{count\_inversions} returns the sorted list \emph{and} the count, so the parent can merge and add the cross-count at once. The line \texttt{cross += len(left) - i} is the only change to merge sort.
+
+\vspace{2mm}
+Reversed input of 1000 items gives $1000\cdot999/2=499\,500$, as predicted. The last line checks the fast answer against a brute-force double loop.
+
+\vspace{2mm}
+Cost $O(n\log n)$ instead of $O(n^2)$.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Problem 2: the $k$-th largest item}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\small
+Find the 3rd best score in a list \emph{without sorting everything}.}
+\vspace{1mm}
+\begin{block}{Way 1: a min-heap of size $k$}
+{\small Keep the $k$ best so far in a heap; the \textbf{root} is the smallest of them. A new item beats the root? Replace it. Cost $O(n\log k)$, memory $O(k)$, works on a stream.}
+\end{block}
+\vspace{1mm}
+\pycode{kth}
+\end{column}
+\begin{column}{0.46\textwidth}
+\pyout{kth_demo}
+\vspace{2mm}
+{\small
+Line 1: our function for $k=3$ and $k=1$. Line 2: the library \texttt{heapq.nlargest}. Line 3: the slow way (sort, then index) agrees.
+
+\vspace{2mm}
+\textbf{Way 2: quickselect} (next slide) partitions like quick sort, but follows only \emph{one} side, so the work is about $n+n/2+n/4+\dots=2n$: $O(n)$ on average.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Quickselect: partition, then keep only one side}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\pycode{quickselect}
+\end{column}
+\begin{column}{0.5\textwidth}
+\pyout{qselect_demo}
+\vspace{1mm}
+\begin{sfig}[0.42]
+\begin{tikzpicture}
+  \foreach \i/\v in {0/7,1/2,2/9,3/4,4/5,5/1,6/8,7/6,8/3}{\node[font=\tiny,text=tdMuted] at (\i*0.8,0.5) {\i};}
+  \input{snippets/tk_qsel.out}
+  \node[font=\tiny,text=tdMuted,anchor=west] at (7.2,-2.4) {blue: window, amber: pivot};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small The median is the item at sorted index 4. If the pivot lands \emph{left} of index 4 we continue right; if it lands right we continue left; if it lands on 4 we are done.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Problem 3: sort by several keys, and why stability helps}
+\begin{columns}[T]
+\begin{column}{0.64\textwidth}
+\begin{sfig}[0.82]
+\begin{tikzpicture}
+  \input{snippets/tk_stab.out}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.34\textwidth}
+{\small
+Order students by \textbf{group}, then by \textbf{grade} (best first), then by \textbf{name}.
+
+\vspace{2mm}
+\textbf{Trick:} because \texttt{sorted} is stable, sort by the \emph{least} important key first and the most important last. Each pass keeps the order the previous pass created among equal keys.
+
+\vspace{2mm}
+Blue = group A, amber = group B. After step 3, equal groups are still ordered by grade, and equal grades by name.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Multi-key sort in code}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\pycode{multikey}
+\end{column}
+\begin{column}{0.4\textwidth}
+\pyout{multikey_demo}
+\vspace{2mm}
+{\small
+\textbf{One call:} the key is a \emph{tuple}; Python compares tuples element by element. To sort one part downwards, negate it (\texttt{-s.grade}). This works for numbers only; for strings use the multi-pass trick.
+
+\vspace{2mm}
+\textbf{Three passes} give the same result (last line \texttt{True}) and also work with \texttt{reverse=True} on any key.
+
+\vspace{2mm}
+\texttt{@dataclass(frozen=True, slots=True)} gives a light, read-only record.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Problem 4: merge $k$ sorted lists}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\begin{sfig}[0.6]
+\begin{tikzpicture}
+  \input{snippets/tk_kway.out}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small Three sorted lists (colours) merged into one. The next output is always the \textbf{smallest front item} of some list.}
+\end{column}
+\begin{column}{0.4\textwidth}
+{\small
+Scanning all $k$ fronts for every output costs $O(k)$ per item. A \textbf{min-heap} holds exactly one front per list and gives the smallest in $O(\log k)$:
+
+\vspace{2mm}
+\begin{enumerate}\setlength\itemsep{2pt}
+\item push \texttt{(first item, list number, index)} of each list;
+\item pop the smallest; append it to the output;
+\item push the next item of the \emph{same} list.
+\end{enumerate}
+\vspace{1mm}
+Total: $O(N\log k)$ for $N$ items. This is the heart of \textbf{external sorting} (files too big for memory) and of \texttt{heapq.merge}.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Merging $k$ lists with a heap: code}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\pycode{mergek}
+\end{column}
+\begin{column}{0.42\textwidth}
+\pyout{mergek_demo}
+\vspace{2mm}
+{\small
+The heap stores \textbf{tuples}, compared left to right. Putting the list number second breaks ties without ever comparing lists.
+
+\vspace{2mm}
+Line 2 compares with the library's \texttt{heapq.merge}. The last line shows that empty lists are fine.
+
+\vspace{2mm}
+\emph{Challenge:} what changes if the inputs are \textbf{generators} that you cannot index?}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Problem 5: the Dutch national flag (sort colours)}
+\begin{columns}[T]
+\begin{column}{0.62\textwidth}
+\begin{sfig}[0.86]
+\begin{tikzpicture}
+  \input{snippets/tk_dutch.out}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.36\textwidth}
+{\small
+A list contains only $0,1,2$ (red, white, blue). Sort it in \textbf{one pass} and $O(1)$ extra memory.
+
+\vspace{2mm}
+Keep three zones: \texttt{[0:lo]} all 0, \texttt{[lo:mid]} all 1, \texttt{[hi+1:]} all 2. The cells \texttt{[mid:hi+1]} are unknown. Look at \texttt{a[mid]}:
+\begin{itemize}\setlength\itemsep{1pt}
+\item 0: swap to the front zone;
+\item 1: already right, move on;
+\item 2: swap to the back zone (do \emph{not} advance \texttt{mid}: the swapped-in item is new).
+\end{itemize}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Sort colours in Python 3.14}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\pycode{dutch}
+\end{column}
+\begin{column}{0.42\textwidth}
+\pyout{dutch_demo}
+\vspace{2mm}
+{\small
+\texttt{match a[mid]} reads like a table of the three cases, clearer than a chain of \texttt{if}/\texttt{elif}.
+
+\vspace{2mm}
+Each step either advances \texttt{mid} or shrinks the unknown zone from the right, so the loop runs at most $n$ times: $O(n)$ time, $O(1)$ memory. \texttt{sorted} would be $O(n\log n)$.
+
+\vspace{2mm}
+The same idea (three-way partition) fixes quick sort's slowness on many equal keys.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Problem 6: top-$k$ most frequent words}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\pycode{topk}
+\vspace{2mm}
+\pyout{topk_demo}
+\vspace{2mm}
+{\small
+\texttt{Counter} counts in $O(n)$. The sort key is a tuple: count \emph{descending} (negated), then the word \emph{ascending}, so ties are broken deterministically. For huge vocabularies replace the full sort by \texttt{heapq.nsmallest(k, \dots, key=\dots)}: $O(n\log k)$.}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+\begin{axis}[xbar,width=7.5cm,height=5.2cm,symbolic y coords={or,not,do,is,be,to},ytick=data,xmin=0,xmax=4.6,bar width=9pt,
+  nodes near coords,nodes near coords align={horizontal},axis lines=left,xlabel={count},tick label style={font=\small\ttfamily},label style={font=\small}]
+  \addplot[fill=tdBlue!60,draw=tdBlue] table[x=count,y=word]{snippets/topk_data.out};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+{\tiny The sentence ``to be or not to be that is the question to be is to do'', counted by the code on the left.}
+\end{column}
+\end{columns}
+\end{frame}
+
 \begin{frame}{Recap and practice}
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
@@ -275,7 +653,8 @@ Timsort (Python) & $O(n)$ & $O(n\log n)$ & yes & adapts to existing order\\
 \item \key{Bubble} and \key{insertion} sort compare and swap neighbours: $O(n^2)$.
 \item \key{Merge} and \key{quick} sort use \textbf{divide and conquer}: $O(n\log n)$.
 \item The gap is huge: ${\sim}100\times$ at $n=4000$, and growing with $n$.
-\item A \textbf{stable} sort keeps equal items in their original order.
+\item A \textbf{stable} sort keeps equal items in their original order: sort by the least important key first.
+\item Partition and merge are \textbf{building blocks}: inversions, quickselect, $k$-way merge, Dutch flag.
 \item In practice call \texttt{sorted(items, key=...)}.
 \end{enumerate}}
 \end{block}
@@ -293,5 +672,18 @@ Timsort (Python) & $O(n)$ & $O(n\log n)$ & yes & adapts to existing order\\
 \end{block}
 \end{column}
 \end{columns}
+\end{frame}
+
+\begin{frame}{Challenge problems}
+\begin{enumerate}\setlength\itemsep{2pt}\small
+\item \textbf{Sort an almost sorted list}: every item is at most $k$ places from its final position. Sort it in $O(n\log k)$ with a heap of size $k+1$.
+\item \textbf{Merge intervals}: given \texttt{[(1,3),(8,10),(2,6),(15,18)]} return the union \texttt{[(1,6),(8,10),(15,18)]}. (Sort by start first.)
+\item \textbf{Largest number}: arrange \texttt{[3, 30, 34, 5, 9]} so that their concatenation is largest (\texttt{9534330}). Which \emph{key} compares two items correctly? (\texttt{functools.cmp\_to\_key})
+\item \textbf{Median of a stream}: after each new number report the median, using two heaps (a max-heap for the lower half, a min-heap for the upper half).
+\item \textbf{Three-way quick sort}: use Dutch-flag partitioning in \texttt{quick\_sort}. Count comparisons on a list with only 5 distinct values.
+\item \textbf{Counting sort}: sort $10^6$ integers in $0..99$ in $O(n)$. Why does this not contradict $\Omega(n\log n)$?
+\item \textbf{Minimum swaps}: the fewest swaps of any two items needed to sort a permutation of $0..n-1$ (hint: cycles).
+\item \textbf{Merge sort, bottom up}: write an iterative version that merges runs of size 1, 2, 4, \dots without recursion.
+\end{enumerate}
 \end{frame}
 \end{document}
