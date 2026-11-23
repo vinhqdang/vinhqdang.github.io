@@ -1,10 +1,11 @@
 \documentclass[aspectratio=169,10pt]{beamer}
 \input{../../common/preamble}
 \apcfooter{Graphs}
-\apctitle{Graphs}{Modelling connections: BFS, DFS and shortest paths}
+\apctitle{Graphs}{Modelling connections: BFS, DFS, shortest paths and classic problems}
 
 \tikzset{gn/.style={rounded corners=3pt,draw=tdInk!70,minimum width=11mm,minimum height=6.5mm,inner sep=2pt,font=\scriptsize\bfseries,fill=white},
-         wl/.style={midway,fill=tdPaper,inner sep=1pt,font=\tiny\bfseries,text=tdMuted}}
+         wl/.style={midway,fill=tdPaper,inner sep=1pt,font=\tiny\bfseries,text=tdMuted},
+         de/.style={->,draw=tdInk!65,thick,shorten >=1pt}}
 \newcommand{\gA}{white}\newcommand{\gB}{white}\newcommand{\gC}{white}\newcommand{\gD}{white}\newcommand{\gE}{white}\newcommand{\gF}{white}
 % campus graph; #1 = 1 shows the walking minutes on the edges
 \newcommand{\campus}[1]{%
@@ -19,8 +20,22 @@
   \fi
   \node[gn,fill=\gA] (gate) at (pg) {Gate}; \node[gn,fill=\gB] (lib) at (pl) {Lib}; \node[gn,fill=\gC] (cafe) at (pc) {Cafe};
   \node[gn,fill=\gD] (lab) at (pb) {Lab}; \node[gn,fill=\gE] (dorm) at (pd) {Dorm}; \node[gn,fill=\gF] (gym) at (py) {Gym};}
-\newcommand{\badge}[3]{\node[pill=#3,inner sep=2pt,font=\tiny\bfseries] at ($(#1)+(0.5,0.42)$) {#2};}
+\newcommand{\badge}[3]{\node[circle,fill=#3,text=white,minimum size=4.2mm,inner sep=0pt,font=\scriptsize\bfseries] at ($(#1)+(0.55,0.45)$) {#2};}
 
+% step-by-step panels (the .out files are written by graphs.py)
+\newcommand{\gcols}[6]{\gdef\gA{#1}\gdef\gB{#2}\gdef\gC{#3}\gdef\gD{#4}\gdef\gE{#5}\gdef\gF{#6}}
+\newcommand{\gpanel}[4]{\begin{minipage}[t]{0.485\textwidth}\centering
+  \begin{adjustbox}{max width=0.8\linewidth}\begin{tikzpicture}[scale=0.85,transform shape]\campus{#1}#4\end{tikzpicture}\end{adjustbox}\\[1pt]
+  {\footnotesize\textbf{#2}}\\{\scriptsize\ttfamily #3}\end{minipage}\gcols{white}{white}{white}{white}{white}{white}}
+\newcommand{\gbox}[1]{\tikz[baseline=-0.6ex]\node[gn,fill=#1,minimum width=5mm,minimum height=3.5mm]{};}
+\newcommand{\glegend}{\begin{minipage}[t]{0.485\textwidth}\scriptsize
+  \textbf{Colour key}\\[2pt]
+  \gbox{white}\ not seen yet \quad \gbox{tdAmber!40}\ waiting\\[2pt]
+  \gbox{tdRed!35}\ being processed now \quad \gbox{tdBlue!22}\ finished\end{minipage}}
+
+% sized listings: \pycodes{\fontsize{7}{8.4}}{name}  (the style's own basicstyle would override a plain size switch)
+\newcommand{\pycodes}[2]{\lstinputlisting[style=py,basicstyle=\ttfamily#1\selectfont\color{tdInk}]{snippets/#2.py}}
+\newcommand{\pyouts}[2]{\lstinputlisting[style=out,basicstyle=\ttfamily#1\selectfont\color{tdInk}]{snippets/#2.out}}
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
 
@@ -43,10 +58,10 @@ Lists and trees are special cases of graphs.}
 {\small
 \begin{itemize}\setlength\itemsep{2pt}
 \item represent a graph with a dictionary (adjacency list) or a matrix;
-\item explore it with \textbf{BFS} and \textbf{DFS};
+\item explore it with \textbf{BFS} and \textbf{DFS}, step by step;
 \item find the \textbf{fewest-hops} route and the \textbf{cheapest} route (Dijkstra);
-\item find \textbf{connected components};
-\item say what each costs: $O(V+E)$, $O((V+E)\log V)$.
+\item find \textbf{components}, \textbf{cycles} and a \textbf{topological order};
+\item solve classic problems: islands, mazes, word ladders, bipartite check, spanning trees.
 \end{itemize}}
 \end{block}
 \end{column}
@@ -55,16 +70,16 @@ Lists and trees are special cases of graphs.}
 
 \begin{frame}{Our running example: a small campus}
 \begin{columns}[T]
-\begin{column}{0.6\textwidth}
-\begin{sfig}[0.6]
+\begin{column}{0.58\textwidth}
+\begin{sfig}[0.55]
 \begin{tikzpicture}
   \campus{0}
 \end{tikzpicture}
 \end{sfig}
 \end{column}
-\begin{column}{0.38\textwidth}
-{\small
-\begin{description}\setlength\itemsep{2pt}
+\begin{column}{0.4\textwidth}
+{\footnotesize
+\begin{description}\setlength\itemsep{1pt}
 \item[vertex / node] a place: Gate, Lib, \ldots
 \item[edge] a footpath between two places.
 \item[neighbours] nodes joined by an edge: Lib's neighbours are Gate, Lab, Dorm.
@@ -75,8 +90,36 @@ Lists and trees are special cases of graphs.}
 \end{description}}
 \end{column}
 \end{columns}
-\vspace{1mm}
-{\small This graph is \textbf{undirected} (paths work both ways) and, later, \textbf{weighted} (each path takes some minutes). One-way streets would make it \textbf{directed}.}
+{\small This graph is \textbf{undirected} (paths work both ways) and, later, \textbf{weighted} (each path takes some minutes).}
+\end{frame}
+
+\begin{frame}{Kinds of graph}
+\begin{sfig}[0.5]
+\begin{tikzpicture}
+  \begin{scope}
+  \node[font=\bfseries] at (1.5,1.3) {undirected};
+  \node[tn] (a) at (0,0) {A}; \node[tn] (b) at (2,0.6) {B}; \node[tn] (c) at (3,-0.7) {C}; \node[tn] (d) at (0.8,-1.4) {D};
+  \foreach \p/\q in {a/b,b/c,a/d,c/d,b/d}{\draw[tdInk!65,thick] (\p) -- (\q);}
+  \end{scope}
+  \begin{scope}[xshift=5.2cm]
+  \node[font=\bfseries] at (1.5,1.3) {directed};
+  \node[tn] (a) at (0,0) {A}; \node[tn] (b) at (2,0.6) {B}; \node[tn] (c) at (3,-0.7) {C}; \node[tn] (d) at (0.8,-1.4) {D};
+  \foreach \p/\q in {a/b,b/c,d/a,c/d,d/b}{\draw[de] (\p) -- (\q);}
+  \end{scope}
+  \begin{scope}[xshift=10.4cm]
+  \node[font=\bfseries] at (1.5,1.3) {weighted};
+  \node[tn] (a) at (0,0) {A}; \node[tn] (b) at (2,0.6) {B}; \node[tn] (c) at (3,-0.7) {C}; \node[tn] (d) at (0.8,-1.4) {D};
+  \draw[tdInk!65,thick] (a) -- node[wl] {4} (b); \draw[tdInk!65,thick] (b) -- node[wl] {1} (c); \draw[tdInk!65,thick] (a) -- node[wl] {7} (d);
+  \draw[tdInk!65,thick] (c) -- node[wl] {2} (d); \draw[tdInk!65,thick] (b) -- node[wl,pos=0.65] {5} (d);
+  \end{scope}
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+\begin{columns}[T]
+\begin{column}{0.32\textwidth}{\small \textbf{Undirected}: an edge works both ways. Friendship, footpaths.}\end{column}
+\begin{column}{0.32\textwidth}{\small \textbf{Directed}: an edge has a direction. Follows on a social network, one-way streets, ``course A is needed for B''.}\end{column}
+\begin{column}{0.32\textwidth}{\small \textbf{Weighted}: each edge has a number (minutes, kilometres, cost). Shortest path then means smallest total weight.}\end{column}
+\end{columns}
 \end{frame}
 
 \begin{frame}{Two ways to store a graph}
@@ -100,7 +143,7 @@ Lists and trees are special cases of graphs.}
 
 \begin{frame}{Which representation?}
 \renewcommand{\arraystretch}{1.35}\small
-\begin{tabular}{@{}>{\raggedright\bfseries}p{50mm}>{\raggedright}p{45mm}>{\raggedright\arraybackslash}p{45mm}@{}}
+\begin{tabular}{@{}>{\raggedright\bfseries}p{46mm}>{\raggedright}p{42mm}>{\raggedright\arraybackslash}p{42mm}@{}}
 \toprule
  & Adjacency list & Adjacency matrix\\\midrule
 Memory & $O(V+E)$ & $O(V^2)$\\
@@ -145,9 +188,8 @@ To do this we keep a \textbf{queue} (first in, first out): neighbours are added 
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
 \pycode{bfs}
-\vspace{2mm}
 {\small
-\texttt{parent} does two jobs: it remembers which nodes we have already seen (so none is queued twice), and it records \emph{how we got there}.}
+\texttt{parent} does two jobs: it remembers which nodes we have seen (so none is queued twice), and records \emph{how we got there}.}
 \end{column}
 \begin{column}{0.47\textwidth}
 \pycode{path}
@@ -155,7 +197,43 @@ To do this we keep a \textbf{queue} (first in, first out): neighbours are added 
 \pyout{bfs_demo}
 \vspace{2mm}
 {\small
-Following \texttt{parent} backwards from Gym gives the route. Every node enters the queue once and every edge is looked at once: $O(V+E)$.}
+Following \texttt{parent} back from Gym gives the route. Each node is queued once and each edge examined once: $O(V+E)$.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{BFS step by step (1/2)}
+\input{snippets/bfs_p1.out}
+\end{frame}
+
+\begin{frame}{BFS step by step (2/2)}
+\input{snippets/bfs_p2.out}
+\end{frame}
+
+\begin{frame}{BFS layers and the shortest path in an unweighted graph}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\begin{sfig}[0.55]
+\begin{tikzpicture}
+  \renewcommand{\gA}{tdAmber!40}\renewcommand{\gB}{tdBlue!22}\renewcommand{\gC}{tdBlue!22}\renewcommand{\gD}{tdGreen!24}\renewcommand{\gE}{tdGreen!24}\renewcommand{\gF}{tdPurple!22}
+  \campus{0}
+  \foreach \u/\v in {pg/pl,pl/pb,pb/py}{\draw[very thick,tdRed!80,opacity=0.8] (\u) -- (\v);}
+  \campus{0}
+  \foreach \u/\v/\t in {pl/pg/Gate,pc/pg/Gate,pb/pl/Lib,pd/pl/Lib,py/pb/Lab}{\draw[->,tdMuted,dashed,bend right=18] (\u) to (\v);}
+  \node[font=\tiny,text=tdRed!80!black,anchor=north] at (4.1,-2.4) {path found: Gate, Lib, Lab, Gym};
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize dashed arrows: each node points to its \texttt{parent}.}
+\end{column}
+\begin{column}{0.43\textwidth}
+{\small
+BFS finishes layer $k$ before it starts layer $k+1$, so the layer number is the \textbf{hop distance} from the source.
+
+\vspace{2mm}
+To get the route, start at the target and follow \texttt{parent} back to the source, then reverse the list (\texttt{path\_to}).
+
+\vspace{2mm}
+\textbf{Not unique}: Gate--Cafe--Dorm--Gym also has 3 hops. BFS reports the one it met first. When edges have costs, hops are the wrong measure (see Dijkstra below).}
 \end{column}
 \end{columns}
 \end{frame}
@@ -184,6 +262,72 @@ Recursion \emph{is} the stack: each call remembers where to continue. Also $O(V+
 \end{columns}
 \end{frame}
 
+\begin{frame}{DFS step by step (1/2): discovery times}
+\input{snippets/dfs_p1.out}
+\end{frame}
+
+\begin{frame}{DFS step by step (2/2): backtracking and finish times}
+\input{snippets/dfs_p2.out}
+\end{frame}
+
+\begin{frame}{DFS discovery and finish order}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\pycode{dfs_times}
+\end{column}
+\begin{column}{0.48\textwidth}
+\pyout{dfs_times_demo}
+\vspace{1mm}
+{\footnotesize
+A clock ticks at every \textbf{discovery} and every \textbf{finish}. The two numbers of a node form an interval, and the intervals are \textbf{nested}: Gate $[1,12]$ contains Lib $[2,11]$, which contains Lab $[3,10]$, and so on.
+
+\vspace{1mm}
+If $v$ is discovered while $u$ is still open, then $v$ finishes first: that is the recursion stack.
+
+\vspace{1mm}
+Why care? The \textbf{reverse finish order} of a DFS on a DAG is a topological order.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Queue versus stack: one loop, two behaviours}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+{\small \textbf{BFS}: the to-do list is a \textbf{queue} (front first):}
+\pyout{bfs_trace_demo}
+\vspace{2mm}
+{\small Nodes are served in the order they were discovered: the whole layer of distance 1 before any node at distance 2.}
+\end{column}
+\begin{column}{0.48\textwidth}
+{\small \textbf{DFS}: the to-do list is a \textbf{stack} (the open calls):}
+\pyout{dfs_trace_demo}
+\vspace{2mm}
+{\small The newest node is always continued first; older nodes wait at the bottom until everything above them has finished.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{DFS without recursion: an explicit stack}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\pycode{dfs_iter}
+\end{column}
+\begin{column}{0.48\textwidth}
+{\small
+Replace the call stack by a \texttt{list}. Pushing the neighbours \textbf{reversed} makes the first neighbour the first to come out, so we get the \emph{same} order as the recursive version (see the output of the DFS slide: \texttt{iterative} line).
+
+\vspace{2mm}
+\texttt{if u in seen: continue} is needed because a node can be pushed several times before it is popped.
+
+\vspace{2mm}
+\textbf{Why bother?} Python limits recursion to about 1\,000 calls. A DFS on a graph with a long path (a maze with a million cells) would crash recursively, but works with a list.
+
+\vspace{2mm}
+\textbf{Swap the \texttt{list} for a \texttt{deque} and \texttt{pop()} for \texttt{popleft()}} and the same loop becomes BFS.}
+\end{column}
+\end{columns}
+\end{frame}
+
 \begin{frame}{Connected components: separate islands}
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
@@ -208,9 +352,112 @@ Uses: ``are these two accounts connected?'', finding islands in an image, checki
 \end{columns}
 \end{frame}
 
+\begin{frame}{Cycle detection in a directed graph: three colours}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.5]
+\begin{tikzpicture}
+  \node[gn,fill=tdBlue!22] (a) at (0,0) {A}; \node[gn,fill=tdRed!25] (b) at (2.2,0) {B}; \node[gn,fill=tdRed!25] (c) at (4.4,0) {C};
+  \node[gn,fill=tdRed!25] (d) at (6.6,0) {D}; \node[gn,fill=white] (e) at (8.8,0) {E};
+  \foreach \p/\q in {a/b,b/c,c/d,d/e}{\draw[de] (\p) -- (\q);}
+  \draw[de,tdRed!80!black,very thick] (d) to[bend right=55] (b);
+  \node[font=\scriptsize,text=tdRed!80!black] at (4.4,-1.35) {back edge $D\to B$: B is still \emph{open}};
+\end{tikzpicture}
+\end{sfig}
+{\small
+During a DFS every node is in one of three states:
+\begin{itemize}\setlength\itemsep{1pt}
+\item \textbf{white}: not seen yet;
+\item \textbf{grey}: on the current path (the call is still open);
+\item \textbf{black}: finished.
+\end{itemize}}
+\end{column}
+\begin{column}{0.46\textwidth}
+{\small
+An edge to a \textbf{grey} node closes a loop: you came from that node, and now you can reach it again. That is a \key{cycle}.
+
+\vspace{2mm}
+An edge to a \textbf{black} node is harmless: that part of the graph is finished and never led back.
+
+\vspace{2mm}
+\textbf{Why it matters}: if tasks depend on each other in a cycle (\texttt{B} needs \texttt{C}, \texttt{C} needs \texttt{D}, \texttt{D} needs \texttt{B}), nothing can ever start. Build tools, spreadsheets and package managers all check for cycles.
+
+\vspace{2mm}
+Same $O(V+E)$ cost as DFS.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Cycle detection in Python}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\pycodes{\fontsize{8}{9.6}}{cycle}
+\end{column}
+\begin{column}{0.38\textwidth}
+\pyout{cycle_demo}
+\vspace{2mm}
+{\small
+\texttt{path} holds the grey nodes in order. When an edge leads back to a node on the path, the slice \texttt{path[path.index(v):]} is the cycle itself.
+
+\vspace{2mm}
+\texttt{:=} (the walrus operator) assigns and tests in one line.
+
+\vspace{2mm}
+Remove the edge \texttt{D}$\to$\texttt{B} and the function returns \texttt{None}.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Topological sort: an order that respects dependencies}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\begin{sfig}[0.55]
+\begin{tikzpicture}
+  \node[gn,fill=tdBlue!22] (m) at (0,0.8) {Maths}; \node[gn,fill=tdBlue!22] (p) at (0,-1.1) {Prog};
+  \node[gn,fill=tdGreen!24] (d) at (2.8,-0.4) {DS}; \node[gn,fill=tdGreen!24] (w) at (2.8,-2.2) {Web};
+  \node[gn,fill=tdAmber!35] (a) at (5.6,0.6) {Algo}; \node[gn,fill=tdAmber!35] (b) at (5.6,-1.4) {DB};
+  \node[gn,fill=tdPurple!25] (i) at (8.4,-0.4) {AI};
+  \foreach \u/\v in {m/a,p/d,p/w,d/a,d/b,a/i,b/i}{\draw[de] (\u) -- (\v);}
+  \node[font=\tiny,text=tdBlue] at (0,1.5) {round 1}; \node[font=\tiny,text=tdGreen!70!black] at (2.8,0.3) {round 2};
+  \node[font=\tiny,text=tdAmber!70!black] at (5.6,1.3) {round 3}; \node[font=\tiny,text=tdPurple] at (8.4,0.3) {round 4};
+\end{tikzpicture}
+\end{sfig}
+{\small An arrow $X\to Y$ means ``take $X$ before $Y$''. Colours: the round in which Kahn's algorithm frees each course.}
+\end{column}
+\begin{column}{0.38\textwidth}
+{\small
+\textbf{Kahn's algorithm}
+\begin{enumerate}\setlength\itemsep{2pt}
+\item Count the \textbf{in-degree} of each node: how many prerequisites it still waits for.
+\item Put every node with in-degree 0 in a queue.
+\item Take one out, add it to the order, and lower the in-degree of its successors. Any that reach 0 join the queue.
+\item If the order is shorter than the graph, there was a \bad{cycle}.
+\end{enumerate}
+Cost: $O(V+E)$.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Topological sort in Python}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\pycode{kahn}
+\end{column}
+\begin{column}{0.48\textwidth}
+\pyout{topo_demo}
+\vspace{2mm}
+{\small
+\texttt{Prog} frees \texttt{DS} and \texttt{Web}; \texttt{DS} frees \texttt{Algo} (\texttt{Maths} is already done) and \texttt{DB}.
+
+\vspace{1mm}
+Many valid orders exist; this is the first the queue produces. Making \texttt{AI} a prerequisite of \texttt{Maths} creates a cycle: the function returns \texttt{None}.}
+\end{column}
+\end{columns}
+\end{frame}
+
 \begin{frame}{Fewest hops is not the same as quickest}
 \begin{columns}[T]
-\begin{column}{0.54\textwidth}
+\begin{column}{0.47\textwidth}
 \begin{sfig}[0.52]
 \begin{tikzpicture}
   \campus{1}
@@ -223,10 +470,10 @@ Uses: ``are these two accounts connected?'', finding islands in an image, checki
 Both routes from Gate to Gym have \textbf{3 edges}, so BFS cannot tell them apart. It returned Gate--Lib--Lab--Gym:
 \textcolor{tdRed}{\textbf{red}} $4+5+6=\textbf{15}$ min, but \textcolor{tdGreen!70!black}{\textbf{green}} takes $2+3+2=\textbf{7}$ min.}
 \end{column}
-\begin{column}{0.43\textwidth}
+\begin{column}{0.5\textwidth}
 {\small The weighted graph in Python: a dict of dicts (neighbour $\to$ minutes to walk).}
 \vspace{1mm}
-\pycode[\fontsize{7.8}{9.4}\selectfont]{weighted}
+\pycodes{\fontsize{7.4}{9}}{weighted}
 \vspace{2mm}
 {\small
 When edges have different costs we need an algorithm that adds up the \emph{weights}: \key{Dijkstra's algorithm}.}
@@ -236,22 +483,6 @@ When edges have different costs we need an algorithm that adds up the \emph{weig
 
 \begin{frame}{Dijkstra's algorithm: settle the closest node first}
 \begin{columns}[T]
-\begin{column}{0.46\textwidth}
-\begin{sfig}[0.5]
-\begin{tikzpicture}
-  \renewcommand{\gA}{tdAmber!40}\renewcommand{\gB}{tdBlue!15}\renewcommand{\gC}{tdBlue!15}\renewcommand{\gD}{tdBlue!15}\renewcommand{\gE}{tdBlue!15}\renewcommand{\gF}{tdBlue!15}
-  \campus{1}
-  \node[font=\tiny\bfseries,text=tdGreen!70!black,anchor=south] at (0,0.45) {0};
-  \node[font=\tiny\bfseries,text=tdGreen!70!black,anchor=south] at (2.6,1.95) {4};  \node[font=\tiny\bfseries,text=tdGreen!70!black,anchor=north] at (2.6,-1.95) {2};
-  \node[font=\tiny\bfseries,text=tdGreen!70!black,anchor=south] at (5.6,1.95) {9};  \node[font=\tiny\bfseries,text=tdGreen!70!black,anchor=north] at (5.6,-1.95) {5};
-  \node[font=\tiny\bfseries,text=tdGreen!70!black,anchor=south] at (8.2,0.45) {7};
-\end{tikzpicture}
-\end{sfig}
-{\small Green numbers = final shortest time from Gate.}
-\vspace{2mm}
-
-\pyout{dijkstra_trace}
-\end{column}
 \begin{column}{0.5\textwidth}
 {\small
 \begin{enumerate}\setlength\itemsep{3pt}
@@ -261,77 +492,378 @@ When edges have different costs we need an algorithm that adds up the \emph{weig
 \item Repeat until everything is settled.
 \end{enumerate}
 \vspace{1mm}
-A \textbf{heap} (priority queue, last lecture!) gives ``the closest node'' in $O(\log n)$. Why is it correct? All weights are $\ge 0$, so a longer walk can never become shorter.
+A \textbf{heap} (priority queue) gives ``the closest node'' in $O(\log n)$. Why is it correct? All weights are $\ge 0$, so a longer walk can never become shorter.
 
 \vspace{1mm}
 \textbf{Negative weights} break this argument: use Bellman--Ford.}
 \end{column}
+\begin{column}{0.46\textwidth}
+{\small The order in which the real code settles the nodes:}
+\pyout{dijkstra_trace}
+\vspace{2mm}
+{\small Distances never decrease: 0, 2, 4, 5, 7, 9. The next two slides draw each step.}
+\end{column}
 \end{columns}
+\end{frame}
+
+\begin{frame}{Dijkstra step by step (1/2)}
+\input{snippets/dij_p1.out}
+\end{frame}
+
+\begin{frame}{Dijkstra step by step (2/2)}
+\input{snippets/dij_p2.out}
+\end{frame}
+
+\begin{frame}{Dijkstra: the distance table}
+\begin{center}
+\small\input{snippets/dij_table.out}
+\end{center}
+\vspace{2mm}
+{\small
+Bold numbers are final (settled). Read down a column to see a distance improve: \texttt{Dorm} is first estimated at 5 (via Cafe) and never changes; \texttt{Lib}'s route to \texttt{Dorm} (4+6=10) is worse, so the update is rejected. \texttt{Lab} gets 9 via Lib; the later offer 7+6=13 from Gym is rejected too.}
 \end{frame}
 
 \begin{frame}{Dijkstra in Python}
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
-\pycode{dijkstra}
+\pycodes{\fontsize{7.2}{8.6}}{dijkstra}
 \end{column}
 \begin{column}{0.47\textwidth}
 \pyout{dijkstra_demo}
 \vspace{2mm}
 {\small
-\texttt{dist[v]} is the best time found so far to reach \texttt{v}; \texttt{parent} lets us rebuild the route, exactly as in BFS.
+\texttt{dist[v]} is the best time found so far to reach \texttt{v}; \texttt{parent} rebuilds the route, as in BFS.
 
 \vspace{2mm}
-\texttt{if d > dist[u]: continue} skips \emph{stale} heap entries: a node may be pushed several times with different distances, and only the smallest one matters.
+\texttt{if d > dist[u]: continue} skips \emph{stale} heap entries: a node may be pushed several times, and only the smallest distance matters.
 
 \vspace{2mm}
-Cost: each edge may push once, each push or pop is $O(\log)$: $O((V+E)\log V)$.}
+Cost: each edge may push once, each push or pop is $O(\log n)$: $O((V+E)\log V)$.}
 \end{column}
 \end{columns}
 \end{frame}
 
+\begin{frame}{Problem 1: number of islands}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\begin{sfig}[0.6]
+\begin{tikzpicture}
+  \input{snippets/islands_tikz.out}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+\pyout{islands_demo}
+\end{column}
+\begin{column}{0.5\textwidth}
+{\small
+\textbf{Problem.} A grid of \texttt{1} (land) and \texttt{0} (water). Count the islands: groups of land cells joined \textbf{up, down, left or right}.
+
+\vspace{2mm}
+\textbf{Idea.} The grid is a graph: each cell is a node, and neighbouring land cells are joined by an edge. An island is a \textbf{connected component}. Scan the grid; at each unlabelled land cell, start a DFS that gives every cell it reaches the same label.
+
+\vspace{2mm}
+Diagonal cells do not count: in the picture the single cells of islands 4 and 5 touch only diagonally.
+
+\vspace{2mm}
+Cost: every cell is labelled once, so $O(\text{rows}\times\text{cols})$.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Problem 1: number of islands, solution}
+\pycode{grid4}
+\vspace{2mm}
+{\small
+\texttt{grid\_neighbours} is a \textbf{generator}: it yields the (up to four) cells next to \texttt{(r, c)} that lie inside the grid. The graph is never stored: neighbours are computed on demand.
+
+\vspace{2mm}
+In \texttt{islands}, \texttt{label} maps each land cell to its island number and doubles as the ``seen'' set. Counting the distinct labels gives the answer: 5 islands, with sizes 4, 2, 3, 5 and 2 (output on the previous slide).}
+\framebreak
+\pycode{islands}
+\end{frame}
+
+\begin{frame}{Problem 2: shortest path in a maze}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.55]
+\begin{tikzpicture}
+  \input{snippets/maze_tikz.out}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+\pyout{maze_demo}
+\end{column}
+\begin{column}{0.46\textwidth}
+{\small
+\textbf{Problem.} \texttt{S} is the start, \texttt{E} the exit, \texttt{\#} a wall. Find the \textbf{fewest steps} from \texttt{S} to \texttt{E}, moving up, down, left or right.
+
+\vspace{2mm}
+\textbf{Idea.} Every free cell is a node; all steps cost 1. That is exactly the \textbf{unweighted shortest path}: use \key{BFS}.
+
+\vspace{2mm}
+The numbers in the picture are the BFS distances from \texttt{S}: the search spreads as a ripple, and the first time it reaches \texttt{E} the path (yellow) is shortest. BFS stops there, so cells beyond it are not numbered.
+
+\vspace{2mm}
+\textbf{Why not DFS?} It would find \emph{a} path, but usually not the shortest one.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Problem 2: maze solution}
+\pycode{maze_bfs}
+\vspace{2mm}
+{\small
+Same BFS as before, with cells instead of names. \texttt{parent} records where each cell was reached from; the loop stops as soon as the goal is dequeued.}
+\framebreak
+\pycode{maze}
+\vspace{2mm}
+{\small
+\texttt{solve\_maze} finds \texttt{S} and \texttt{E}, runs the BFS and then walks the \texttt{parent} chain back from the goal, exactly like \texttt{path\_to}. If the goal was never reached the maze has no solution and the function returns \texttt{None}.}
+\end{frame}
+
+\begin{frame}{Problem 3: word ladder}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\begin{sfig}[0.5]
+\begin{tikzpicture}
+  \node[gn,fill=tdAmber!40] (hit) at (0,0) {hit}; \node[gn,fill=tdBlue!22] (hot) at (2,0) {hot};
+  \node[gn,fill=tdBlue!22] (dot) at (4,1) {dot}; \node[gn] (lot) at (4,-1) {lot};
+  \node[gn,fill=tdBlue!22] (dog) at (6,1) {dog}; \node[gn] (log) at (6,-1) {log};
+  \node[gn,fill=tdGreen!30] (cog) at (8,0) {cog};
+  \foreach \u/\v in {hit/hot,hot/dot,hot/lot,dot/dog,dot/lot,lot/log,dog/log,dog/cog,log/cog}{\draw[tdInk!55] (\u) -- (\v);}
+  \foreach \u/\v in {hit/hot,hot/dot,dot/dog,dog/cog}{\draw[very thick,tdRed!80,opacity=0.8] (\u) -- (\v);}
+  \node[font=\tiny,text=tdMuted,anchor=north] at (4,-1.5) {words differ in exactly one letter $\Rightarrow$ edge};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+\pyout{ladder_demo}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small
+\textbf{Problem.} Change \texttt{hit} into \texttt{cog}, one letter at a time, and every intermediate word must be in the dictionary. What is the shortest sequence?
+
+\vspace{2mm}
+\textbf{Idea.} Words are nodes; two words are joined if they differ in one letter. The graph is too big to build, but BFS only needs ``the neighbours of $w$''.
+
+\vspace{2mm}
+\textbf{Trick}: bucket the words by \emph{pattern}. \texttt{hot}, \texttt{dot} and \texttt{lot} all fit \texttt{*ot}, so they are neighbours. Then each word has few patterns (one per letter) instead of comparing with every other word.
+
+\vspace{2mm}
+\texttt{hit}$\to$\texttt{cat} is impossible: \texttt{cat} is not in the dictionary.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Problem 3: word ladder, solution}
+\pycode{patterns}
+\vspace{2mm}
+{\small
+\texttt{patterns("hot")} gives \texttt{["*ot", "h*t", "ho*"]}: the word with one letter replaced by a star. Two words are neighbours exactly when they share a pattern.
+
+\vspace{2mm}
+In \texttt{ladder}, \textbf{step 1} builds the \texttt{buckets} dict: pattern $\to$ words. \textbf{Step 2} is plain BFS; the neighbours of \texttt{w} are the words in the buckets of its patterns. When the goal is reached, \texttt{path\_to} (from the BFS slides) rebuilds the ladder.
+
+\vspace{2mm}
+\textbf{Cost}: with $n$ words of length $L$ there are $nL$ patterns, each built in $O(L)$: about $O(nL^2)$ in all.}
+\framebreak
+\pycodes{\fontsize{8}{9.4}}{ladder}
+\end{frame}
+
+\begin{frame}{Problem 4: is the graph bipartite? (two-colouring)}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\begin{sfig}[0.5]
+\begin{tikzpicture}
+  \node[font=\bfseries\small] at (0,2.2) {6-cycle: yes};
+  \foreach \n/\ang/\col in {a/90/tdBlue!30,b/30/tdAmber!45,c/-30/tdBlue!30,d/-90/tdAmber!45,e/-150/tdBlue!30,f/150/tdAmber!45}{\node[tn,fill=\col] (\n) at (\ang:1.5cm) {\n};}
+  \foreach \u/\v in {a/b,b/c,c/d,d/e,e/f,f/a}{\draw[tdInk!60] (\u) -- (\v);}
+  \begin{scope}[xshift=6.5cm]
+  \node[font=\bfseries\small] at (0.3,2.2) {triangle: no};
+  \node[tn,fill=tdBlue!30] (x) at (-1,0.6) {a}; \node[tn,fill=tdAmber!45] (y) at (1,0.6) {b}; \node[tn,fill=tdRed!35] (z) at (0,-1) {c}; \node[tn] (w) at (2,-1) {d};
+  \draw[tdInk!60] (x) -- (y); \draw[tdRed!80!black,very thick] (y) -- (z); \draw[tdRed!80!black,very thick] (z) -- (x); \draw[tdInk!60] (z) -- (w);
+  \node[font=\tiny,text=tdRed!80!black,anchor=north] at (0.5,-1.5) {c touches both colours};
+  \end{scope}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+\pyout{bipartite_demo}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small
+\textbf{Problem.} Can the nodes be split into two groups so that every edge joins \emph{different} groups? (Teams with no friends inside a team, jobs that clash with each other\ldots)
+
+\vspace{2mm}
+\textbf{Idea.} Colour the start node 0. BFS: give each new neighbour the \textbf{opposite} colour. If we ever meet an edge whose two ends have the \textbf{same} colour, the answer is no.
+
+\vspace{2mm}
+\textbf{Fact}: a graph is bipartite exactly when it has \textbf{no odd cycle}. The triangle has 3 edges, so it fails.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Problem 4: two-colouring, solution}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\pycodes{\fontsize{8}{9.6}}{bipartite}
+\end{column}
+\begin{column}{0.44\textwidth}
+{\small
+The outer \texttt{for} restarts from every unvisited node, so \textbf{disconnected} graphs are handled too.
+
+\vspace{2mm}
+\texttt{colour} doubles as the visited set. \texttt{1 - colour[u]} flips 0 and 1.
+
+\vspace{2mm}
+\texttt{elif colour[v] == colour[u]}: an edge inside one group. We return \texttt{None} at once.
+
+\vspace{2mm}
+Cost: BFS, so $O(V+E)$. Output: see the previous slide.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Problem 5: minimum spanning tree (Kruskal)}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\begin{sfig}[0.5]
+\begin{tikzpicture}
+  \campus{1}
+  \foreach \u/\v in {pg/pc,pd/py,pc/pd,pg/pl,pl/pb}{\draw[very thick,tdGreen!80!black] (\u) -- (\v);}
+  \campus{1}
+  \node[font=\tiny,text=tdGreen!70!black,anchor=north] at (4.1,-2.2) {total = 2+2+3+4+5 = 16};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+\pyouts{\fontsize{7.6}{9}}{kruskal_demo}
+\end{column}
+\begin{column}{0.44\textwidth}
+{\small
+\textbf{Problem.} Connect all places with the \textbf{cheapest set of paths} (a \emph{spanning tree}: connected, no cycle). Used for cables, pipes, road repair.
+
+\vspace{2mm}
+\textbf{Kruskal's idea}: sort the edges by weight; take an edge \textbf{unless it would close a cycle}.
+
+\vspace{2mm}
+Cycle test: keep a \textbf{union-find} structure. Every node points to a ``leader'' of its group; an edge joins two groups only if the leaders differ.
+
+\vspace{2mm}
+Lib--Dorm (6) and Lab--Gym (6) are rejected: their ends are already connected.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Problem 5: Kruskal and union-find, solution}
+\pycode{union_find}
+\vspace{2mm}
+{\small
+\texttt{find} follows parent links to the group leader. \textbf{Path halving} (\texttt{parent[x] = parent[parent[x]]}) shortens the chain each time, so later finds are almost $O(1)$.}
+\framebreak
+\pycode{kruskal}
+\vspace{2mm}
+{\small
+Edges are \texttt{(weight, u, v)} tuples, so \texttt{sorted} orders them by weight. Sorting dominates: $O(E\log E)$. Output: previous slide.}
+\end{frame}
+
+\begin{frame}{Problem 6: Dijkstra on a road network}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\begin{sfig}[0.55]
+\begin{tikzpicture}[gn/.append style={minimum width=12mm}]
+  \node[gn,fill=tdAmber!40] (ha) at (0,0) {Hanoi}; \node[gn] (hp) at (1.7,1.5) {HaiPhong}; \node[gn,fill=tdGreen!25] (nb) at (1.7,-1.5) {NinhBinh};
+  \node[gn,fill=tdGreen!25] (vi) at (3.9,0) {Vinh}; \node[gn,fill=tdGreen!25] (hu) at (5.7,1.4) {Hue}; \node[gn] (dn) at (5.7,-1.4) {DaNang};
+  \node[gn,fill=tdGreen!25] (nt) at (7.9,0.7) {NhaTrang}; \node[gn,fill=tdGreen!25] (sg) at (9.8,-0.7) {Saigon};
+  \begin{scope}[on background layer]\foreach \u/\v/\w in {ha/hp/2,ha/nb/2,ha/vi/6,nb/vi/3,hp/vi/6,vi/hu/6,vi/dn/9,hu/dn/2,hu/nt/9,dn/nt/8,dn/sg/16,nt/sg/7}{\draw[tdInk!50] (\u) -- node[wl,font=\scriptsize\bfseries] {\w} (\v);}
+  \foreach \u/\v in {ha/nb,nb/vi,vi/hu,hu/nt,nt/sg}{\draw[very thick,tdGreen!80!black] (\u) -- (\v);}\end{scope}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+\pyouts{\fontsize{6.9}{8.4}}{network_demo}
+\end{column}
+\begin{column}{0.38\textwidth}
+{\small
+\textbf{Problem.} Travel times (hours) between 8 cities. How long from Hanoi to every other city, and by which route?
+
+\vspace{2mm}
+\textbf{Solution.} The \texttt{dijkstra} function from earlier works unchanged. Only the data is new: \texttt{undirected} turns a list of roads into a graph with both directions.
+
+\vspace{2mm}
+Green: the best route to Saigon, 27 hours. Direct roads can lose: Hanoi--Vinh takes 6 h, but Hanoi--Ninh Binh--Vinh takes $2+3=5$ h.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Problem 6: building the network}
+\pycode{undirected}
+\vspace{2mm}
+{\small
+\texttt{undirected} stores each road twice: \texttt{g[u][v]} and \texttt{g[v][u]}. \texttt{setdefault(u, \{\})} creates the inner dict the first time a city is seen. Then \texttt{dijkstra(highways, "Hanoi")} returns \texttt{dist} and \texttt{parent}, and \texttt{path\_to(parent, city)} rebuilds each route (the output on the previous slide).}
+\framebreak
+\pycode{network}
+\vspace{2mm}
+{\small
+Each tuple is \texttt{(city, city, hours)}. Real map services do the same on graphs with hundreds of millions of roads, adding tricks such as A* and precomputed shortcuts.}
+\end{frame}
+
 \begin{frame}{Which graph algorithm?}
-\renewcommand{\arraystretch}{1.32}\footnotesize
-\begin{tabular}{@{}>{\raggedright\bfseries}p{26mm}>{\raggedright}p{50mm}>{\raggedright}p{30mm}>{\raggedright\arraybackslash}p{36mm}@{}}
+\renewcommand{\arraystretch}{1.3}\footnotesize
+\begin{tabular}{@{}>{\raggedright\bfseries}p{24mm}>{\raggedright}p{44mm}>{\raggedright}p{26mm}>{\raggedright\arraybackslash}p{28mm}@{}}
 \toprule
 Algorithm & Use it to \ldots & Cost & Data structure\\\midrule
-BFS & fewest-edge path, layers, ``how far?'' & $O(V+E)$ & queue (\texttt{deque})\\
-DFS & reachability, components, cycles, mazes & $O(V+E)$ & recursion / stack\\
+BFS & fewest-edge path, layers, grids and mazes, bipartite check & $O(V+E)$ & queue (\texttt{deque})\\
+DFS & reachability, components, cycles, islands & $O(V+E)$ & recursion / stack\\
+Topological sort & order tasks with dependencies, detect cycles & $O(V+E)$ & queue + in-degrees\\
 Dijkstra & cheapest path, weights $\ge 0$ & $O((V+E)\log V)$ & heap (\texttt{heapq})\\
 Bellman--Ford & cheapest path with negative weights & $O(V\cdot E)$ & arrays\\
+Kruskal & minimum spanning tree & $O(E\log E)$ & sort + union-find\\
 A* & cheapest path to \emph{one} target, using a guess of the remaining distance & often much faster than Dijkstra & heap\\
 \bottomrule
 \end{tabular}
-\vspace{4mm}
+\vspace{3mm}
 
-{\small Navigation apps run Dijkstra-like searches over road graphs with hundreds of millions of edges, with many extra tricks to answer in milliseconds.}
+{\small \textbf{Recognising the problem is half the work}: ``fewest steps'' $\to$ BFS, ``can I reach it / how many groups'' $\to$ DFS, ``cheapest with costs'' $\to$ Dijkstra, ``what must come first'' $\to$ topological sort.}
 \end{frame}
 
 \begin{frame}{Recap and practice}
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
 \begin{block}{Take-aways}
-{\small
-\begin{enumerate}\setlength\itemsep{3pt}
+{\footnotesize
+\begin{enumerate}\setlength\itemsep{2pt}
 \item A graph is nodes plus edges; store it as an \key{adjacency list} (a dict of lists).
-\item \key{BFS} explores in layers with a queue and finds the fewest-hop path.
-\item \key{DFS} dives deep with recursion; use it for reachability and components.
-\item With edge costs, use \key{Dijkstra}: settle the closest node first, using a heap.
+\item \key{BFS} (queue) explores in layers and finds the fewest-hop path; \key{DFS} (stack or recursion) dives deep.
+\item DFS gives discovery/finish times, components, cycles and, in reverse, a topological order.
+\item Grids and word puzzles are graphs in disguise: \key{model first}, then pick BFS or DFS.
+\item With edge costs use \key{Dijkstra} (heap); for the cheapest connection of everything use \key{Kruskal}.
 \item BFS and DFS cost $O(V+E)$; Dijkstra $O((V+E)\log V)$.
 \end{enumerate}}
 \end{block}
 \end{column}
 \begin{column}{0.48\textwidth}
 \begin{block}{Practice}
-{\small
-\begin{enumerate}\setlength\itemsep{3pt}
+{\footnotesize
+\begin{enumerate}\setlength\itemsep{2pt}
 \item Add a node \texttt{Pool} connected to \texttt{Gym}. What changes in the BFS output?
 \item Write \texttt{has\_path(graph, a, b)} using BFS or DFS.
 \item Make Dijkstra return the distance to \emph{one} target and stop early.
 \item Does Dijkstra still work if you change one road to 0 minutes? To $-1$? Why?
-\item Course prerequisites form a directed graph. Write a function that lists a valid order to take the courses (topological sort).
+\item Draw the BFS queue by hand for a 3$\times$3 grid started at a corner.
+\item Add the edge \texttt{D}$\to$\texttt{A} to the cycle example. What cycle is reported?
 \end{enumerate}}
 \end{block}
 \end{column}
 \end{columns}
+\end{frame}
+
+\begin{frame}{Challenge problems}
+\small
+\begin{enumerate}\setlength\itemsep{3pt}
+\item \textbf{Max island area}: return the size of the largest island. Then count islands when \emph{diagonal} neighbours also connect.
+\item \textbf{Rotting oranges}: in a grid, every minute each rotten orange (2) rots its fresh (1) neighbours. How many minutes until none is fresh, or $-1$ if impossible? (Multi-source BFS.)
+\item \textbf{Course schedule II}: return the order of courses, or an empty list if the prerequisites contain a cycle. How many \emph{semesters} do you need if you can take any number of courses per semester?
+\item \textbf{Clone a graph} given as an adjacency dict, without sharing any list with the original.
+\item \textbf{Shortest path with at most $k$ stops}: adapt BFS or Bellman--Ford so that a route may use at most $k$ edges.
+\item \textbf{Is it a tree?} A graph with $n$ nodes is a tree if it is connected and has exactly $n-1$ edges. Implement it, and explain why both conditions are needed.
+\item \textbf{Dijkstra vs BFS}: if every edge weight is 1, does Dijkstra return the same distances as BFS? Test with random graphs.
+\end{enumerate}
 \end{frame}
 \end{document}

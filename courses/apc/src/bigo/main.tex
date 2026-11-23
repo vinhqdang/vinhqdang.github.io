@@ -3,6 +3,14 @@
 \apcfooter{Big-O and complexity}
 \apctitle{Big-O and complexity}{How the cost of an algorithm grows with the size of its input}
 
+\pgfplotsset{apc/.style={axis lines=left,tick label style={font=\scriptsize},label style={font=\small},
+  legend style={font=\scriptsize,draw=none,fill=none},every axis plot/.append style={thick},xlabel={input size $n$}}}
+\tikzset{fn/.style={circle,draw=tdInk!70,fill=white,minimum size=5.2mm,inner sep=0,font=\tiny\bfseries}}
+
+\newcommand{\gal}[2]{\begin{minipage}[t]{0.322\textwidth}{\footnotesize\textbf{#1}}\vspace{1pt}\par\pycodes{\fontsize{7.6}{9}}{#2}\end{minipage}}
+% sized listings: \pycodes{\fontsize{7}{8.4}}{name}  (the style's own basicstyle would override a plain size switch)
+\newcommand{\pycodes}[2]{\lstinputlisting[style=py,basicstyle=\ttfamily#1\selectfont\color{tdInk}]{snippets/#2.py}}
+\newcommand{\pyouts}[2]{\lstinputlisting[style=out,basicstyle=\ttfamily#1\selectfont\color{tdInk}]{snippets/#2.out}}
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
 
@@ -28,8 +36,8 @@ So computer scientists ask a different question: \key{how does the number of ste
 \item count the steps of a loop or a function;
 \item recognise $O(1)$, $O(\log n)$, $O(n)$, $O(n\log n)$, $O(n^2)$ and $O(2^n)$;
 \item simplify an expression to its Big-O form;
-\item read the complexity off a piece of code;
-\item see why the difference matters, with real timings.
+\item analyse tricky loops, recursion and Python built-ins;
+\item check your analysis with \textbf{real measurements}.
 \end{itemize}}
 \end{block}
 \end{column}
@@ -77,9 +85,32 @@ For large $n$ the $n^2$ term dominates, so this is \key{quadratic time}, $O(n^2)
 \end{columns}
 \end{frame}
 
+\begin{frame}{Seeing the nested loops: one square per inner step}
+\begin{sfig}[0.5]
+\begin{tikzpicture}
+  \foreach \i in {0,...,7}{\foreach \j in {0,...,7}{\draw[draw=tdInk!30,fill=tdBlue!40] (\j*0.45,-\i*0.45) rectangle +(0.45,-0.45);}}
+  \node[font=\footnotesize\bfseries,anchor=south] at (1.8,0.1) {\texttt{range(n)}};
+  \node[font=\footnotesize,anchor=north] at (1.8,-3.65) {$8\times8=64$ steps: $n^2$};
+  \begin{scope}[xshift=5.6cm]
+  \foreach \i in {0,...,7}{\foreach \j in {0,...,7}{\ifnum\j<\i \def\c{tdAmber!55}\else\def\c{white}\fi \draw[draw=tdInk!30,fill=\c] (\j*0.45,-\i*0.45) rectangle +(0.45,-0.45);}}
+  \node[font=\footnotesize\bfseries,anchor=south] at (1.8,0.1) {\texttt{range(i)}};
+  \node[font=\footnotesize,anchor=north] at (1.8,-3.65) {$0+1+\dots+7=28$: $\frac{n(n-1)}{2}$};
+  \end{scope}
+  \begin{scope}[xshift=11.2cm]
+  \foreach \i in {0,...,7}{\foreach \j in {0,...,7}{\draw[draw=tdInk!30,fill=white] (\j*0.45,-\i*0.45) rectangle +(0.45,-0.45);}}
+  \foreach \i in {0,...,7}{\foreach \j in {1,2,4}{\draw[draw=tdInk!30,fill=tdGreen!45] (\j*0.45,-\i*0.45) rectangle +(0.45,-0.45);}}
+  \node[font=\footnotesize\bfseries,anchor=south] at (1.8,0.1) {\texttt{j *= 2}};
+  \node[font=\footnotesize,anchor=north] at (1.8,-3.65) {$8\times3=24$: $n\log_2 n$};
+  \end{scope}
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+{\small Each row is one value of \texttt{i}, each coloured square one run of the inner body (columns are the values of \texttt{j}). \textbf{Area $=$ steps}. A full square is $n^2$; the triangle (\texttt{j} below \texttt{i}) is half of it, still $O(n^2)$; an inner loop that doubles \texttt{j} touches only $\log_2 n$ squares per row, so the total is $O(n\log n)$.}
+\end{frame}
+
 \begin{frame}{Logarithmic time: halving}
 \begin{columns}[T]
-\begin{column}{0.46\textwidth}
+\begin{column}{0.42\textwidth}
 \pycode{logarithmic}
 \vspace{2mm}
 {\small
@@ -88,8 +119,8 @@ For large $n$ the $n^2$ term dominates, so this is \key{quadratic time}, $O(n^2)
 \vspace{2mm}
 \key{Logarithmic time}, $O(\log n)$: a million items need ${\sim}20$ steps, a billion only ${\sim}30$. Binary search is the classic example; so is walking down a balanced tree.}
 \end{column}
-\begin{column}{0.5\textwidth}
-\pyout{steps}
+\begin{column}{0.54\textwidth}
+\pyouts{\fontsize{7.2}{8.6}}{steps}
 \vspace{2mm}
 {\small Compare the columns for $n=100\,000$: $\log_2 n$ is \textbf{16}, $n$ is 100\,000, $n\log_2 n$ is 1.6 million, and $n^2$ is \textbf{ten billion}.}
 \end{column}
@@ -130,6 +161,39 @@ $O(2^n)$ & exponential & all subsets\\
 \end{tikzpicture}
 \end{sfig}
 {\tiny curves rescaled to fit one picture: only the \emph{shape} matters.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Real operation counts on log--log axes}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\begin{sfig}[0.8]
+\begin{tikzpicture}
+\begin{axis}[apc,width=9.6cm,height=6.6cm,xmode=log,ymode=log,log basis x=2,ylabel={counted steps},legend pos=north west,legend columns=1,ymin=0.8,ymax=2000000]
+  \addplot[tdGreen,mark=*,mark size=1.4pt] table[x=n,y=one]{snippets/counts_loglog.out};
+  \addplot[tdBlue!70!tdGreen,mark=*,mark size=1.4pt] table[x=n,y=logn]{snippets/counts_loglog.out};
+  \addplot[tdBlue,mark=*,mark size=1.4pt] table[x=n,y=linear]{snippets/counts_loglog.out};
+  \addplot[tdPurple,mark=*,mark size=1.4pt] table[x=n,y=nlogn]{snippets/counts_loglog.out};
+  \addplot[tdRed,mark=*,mark size=1.4pt] table[x=n,y=quad]{snippets/counts_loglog.out};
+  \legend{$O(1)$,$O(\log n)$,$O(n)$,$O(n\log n)$,$O(n^2)$}
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.38\textwidth}
+{\small
+Each dot is a step count measured by running the functions \texttt{halvings}, \texttt{mystery\_d} and \texttt{mystery\_c} for $n=4,8,\dots,1024$.
+
+\vspace{2mm}
+On \textbf{log--log} paper a power law $n^k$ becomes a \textbf{straight line of slope $k$}:
+\begin{itemize}\setlength\itemsep{2pt}
+\item $O(1)$: flat;
+\item $O(n)$: slope 1;
+\item $O(n^2)$: slope 2, twice as steep;
+\item $O(n\log n)$: just above the line for $n$.
+\end{itemize}
+Reading the \textbf{slope} of a measured curve is the quickest way to guess the complexity.}
 \end{column}
 \end{columns}
 \end{frame}
@@ -204,6 +268,37 @@ $2^n+n^{10}$ & $O(2^n)$\\
 \end{columns}
 \end{frame}
 
+\begin{frame}{Gallery: which complexity is this snippet?}
+\gal{A}{g1}\hfill\gal{B}{g2}\hfill\gal{C}{g3}
+
+\vspace{1mm}
+\gal{D}{g4}\hfill\gal{E}{g5}\hfill\gal{F}{g6}
+
+\vspace{1mm}
+{\footnotesize Each function returns how often \texttt{steps += 1} ran. Decide the Big-O of each before you turn the page.}
+\end{frame}
+
+\begin{frame}{Gallery: answers}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\pyout{gallery_demo}
+\vspace{2mm}
+{\small The last column is \textbf{steps(128) / steps(64)}, the effect of doubling $n$: about 1 means constant or logarithmic, 2 means linear or $n\log n$, 4 quadratic, 8 cubic.}
+\end{column}
+\begin{column}{0.48\textwidth}
+{\footnotesize
+\begin{description}\setlength\itemsep{2pt}
+\item[A] a loop, but of fixed size 10: $O(1)$.
+\item[B] $0+1+\dots+(n-1)=\frac{n(n-1)}{2}$: $O(n^2)$.
+\item[C] $n$ is divided by 3 each round: $\log_3 n$ rounds, $O(\log n)$ (the base does not matter).
+\item[D] $n$ rows, each with $\log_2 n$ doublings: $O(n\log n)$.
+\item[E] the inner loop runs $1+2+4+\dots<2n$ times in total: $O(n)$, \emph{not} $n\log n$.
+\item[F] three nested loops over $n$: $O(n^3)$.
+\end{description}}
+\end{column}
+\end{columns}
+\end{frame}
+
 \begin{frame}{Exponential time: when the recursion repeats itself}
 \begin{columns}[T]
 \begin{column}{0.46\textwidth}
@@ -224,7 +319,120 @@ $2^n+n^{10}$ & $O(2^n)$\\
 {\tiny A straight line on a log axis means exponential growth.}
 \vspace{2mm}
 
-\pyout{growth}
+\pyouts{\fontsize{7.2}{8.6}}{growth}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Recursion tree 1: why naive Fibonacci explodes}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\begin{sfig}[0.78]
+\begin{tikzpicture}[level distance=10mm,every node/.style={fn,minimum size=6.5mm,font=\scriptsize\bfseries},edge from parent/.style={draw=tdInk!50},
+    level 1/.style={sibling distance=34mm},level 2/.style={sibling distance=17mm},level 3/.style={sibling distance=9mm},level 4/.style={sibling distance=8mm}]
+\node{5}
+  child{node{4}
+    child{node[fill=tdRed!30]{3} child{node[fill=tdAmber!45]{2} child{node{1}} child{node{0}}} child{node{1}}}
+    child{node[fill=tdAmber!45]{2} child{node{1}} child{node{0}}}}
+  child{node[fill=tdRed!30]{3}
+    child{node[fill=tdAmber!45]{2} child{node{1}} child{node{0}}}
+    child{node{1}}};
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize \texttt{fib(5)}: 15 calls for 6 different values. \textcolor{tdRed}{\textbf{fib(3)}} is computed twice, \textcolor{tdAmber!80!black}{\textbf{fib(2)}} three times.}
+\end{column}
+\begin{column}{0.38\textwidth}
+{\small
+The tree has \textbf{two children per node} and depth $n$: about $2^n$ calls (more exactly $1.6^n$).
+
+\vspace{1mm}
+The same sub-problem is solved \textbf{again and again}. The cure is to \emph{remember} answers: \textbf{memoisation}.}
+\vspace{1mm}
+\pycodes{\fontsize{7.4}{8.8}}{fib_cache}
+\vspace{1mm}
+{\small With the cache \texttt{fib(30)} makes only \textbf{31} real calls instead of 2\,692\,537: $O(n)$ time.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Recursion tree 2: merge sort and $T(n)=2T(n/2)+n$}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+  \foreach \k/\lab/\last in {0/{$n$}/0,1/{$n/2$}/1,2/{$n/4$}/3,3/{$n/8$}/7}{%
+    \pgfmathsetmacro{\w}{8/2^\k}
+    \foreach \b in {0,...,\last}{\draw[fill=tdBlue!15,draw=tdInk!60] (\b*\w+0.03,-\k*1.1) rectangle (\b*\w+\w-0.03,-\k*1.1-0.8); \node[font=\footnotesize] at (\b*\w+\w/2,-\k*1.1-0.4) {\lab};}
+    \node[font=\footnotesize\bfseries,anchor=west,text=tdGreen!60!black] at (8.3,-\k*1.1-0.4) {$\approx n$};}
+  \draw[decorate,decoration={brace,amplitude=4pt,mirror},tdRed] (-0.2,0) -- node[left,font=\footnotesize,text=tdRed,xshift=-2pt,align=center] {$\log_2 n$\\levels} (-0.2,-3.9);
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize Each box is one call, sized by its input. Every level has total input $n$, so merging it costs $\approx n$ (green).}
+\end{column}
+\begin{column}{0.38\textwidth}
+{\small
+Merge sort sorts two halves (\texttt{2T(n/2)}) and merges them ($\approx n$ steps):
+\[T(n)=2\,T(n/2)+n.\]
+\textbf{Level by level:} level $k$ has $2^k$ pieces of size $n/2^k$: every level costs $n$. There are $\log_2 n$ levels:
+\[T(n)=n\log_2 n = O(n\log n).\]
+Next: the real comparisons counted by the code.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Merge sort: counting comparisons}
+\pycode{ms_merge}
+\vspace{2mm}
+{\small \texttt{stats[0]} counts one comparison per loop round. The last line appends what is left over, without comparisons. Each merge does at most $n$ comparisons.}
+\framebreak
+\pycode{ms_sort}
+\vspace{2mm}
+\pyout{recursion_demo}
+\vspace{2mm}
+{\small Counts for random data stay a little below $n\log_2 n$. The last line shows why counting calls is useful: naive \texttt{fib(30)} makes 2.7 million.}
+\end{frame}
+
+\begin{frame}{Recurrences: a cheat sheet}
+\renewcommand{\arraystretch}{1.4}\small
+\begin{tabular}{@{}>{\raggedright}p{40mm}>{\raggedright}p{32mm}>{\raggedright\arraybackslash}p{54mm}@{}}
+\toprule
+Recurrence & Solution & Typical algorithm\\\midrule
+$T(n)=T(n/2)+1$ & $O(\log n)$ & binary search\\
+$T(n)=T(n-1)+1$ & $O(n)$ & recursive sum, linear recursion\\
+$T(n)=T(n-1)+n$ & $O(n^2)$ & selection sort, insertion sort (worst)\\
+$T(n)=2\,T(n/2)+n$ & $O(n\log n)$ & merge sort, balanced quicksort\\
+$T(n)=2\,T(n/2)+1$ & $O(n)$ & height of a balanced tree\\
+$T(n)=T(n-1)+T(n-2)$ & $O(1.6^n)$ & naive Fibonacci\\
+$T(n)=2\,T(n-1)+1$ & $O(2^n)$ & towers of Hanoi\\
+\bottomrule
+\end{tabular}
+\vspace{3mm}
+
+{\small \textbf{How to solve}: draw the recursion tree. Cost per level $\times$ number of levels. If the levels cost the same (merge sort), multiply; if the cost doubles every level (Fibonacci), the bottom level dominates; if it halves, the top level dominates.}
+\end{frame}
+
+\begin{frame}{Measured: linear versus quadratic}
+\begin{columns}[T]
+\begin{column}{0.62\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}
+\begin{axis}[apc,width=5cm,height=5.4cm,ylabel={time (ms)},title={\small \texttt{total}: linear},yticklabel style={/pgf/number format/fixed,/pgf/number format/precision=3},scaled y ticks=false,ymin=0,xmin=0]
+  \addplot[tdBlue,mark=*,mark size=1.6pt] table[x=n,y=linear]{snippets/timing_lq.out};
+\end{axis}
+\begin{axis}[apc,width=5cm,height=5.4cm,xshift=5.8cm,title={\small \texttt{has\_duplicate}: quadratic},ymin=0,xmin=0]
+  \addplot[tdRed,mark=*,mark size=1.6pt] table[x=n,y=quadratic]{snippets/timing_lq.out};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize Real timings from this machine (best of several runs), lists of $n$ distinct numbers (the quadratic function must compare every pair). Note the different time scales.}
+\end{column}
+\begin{column}{0.36\textwidth}
+{\small
+\textbf{Doubling experiment}: double $n$ and divide the new time by the old one.}
+\pyouts{\fontsize{7.4}{8.8}}{doubling}
+\vspace{1mm}
+{\small
+Linear: ratio $\approx 2$. Quadratic: ratio $\approx 4$ (the last value is a bit higher: the list no longer fits in the CPU cache).}
 \end{column}
 \end{columns}
 \end{frame}
@@ -246,32 +454,307 @@ $2^n+n^{10}$ & $O(2^n)$\\
 \end{columns}
 \end{frame}
 
-\begin{frame}{Best, worst, average, and memory}
+\begin{frame}{\texttt{x in list} versus \texttt{x in set}, measured}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+\begin{axis}[apc,width=9cm,height=6cm,xmode=log,ymode=log,ylabel={time per lookup ($\mu$s)},legend pos=north west,xtick={1000,10000,100000,1000000},xminorticks=false,yminorticks=false]
+  \addplot[tdRed,mark=*,mark size=1.6pt] table[x=n,y=list_us]{snippets/membership_data.out};
+  \addplot[tdGreen,mark=*,mark size=1.6pt] table[x=n,y=set_us]{snippets/membership_data.out};
+  \legend{\texttt{x in list},\texttt{x in set}}
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.38\textwidth}
+{\small
+Worst case for the list: \texttt{x} is the last item. Real timings for $n=10^3,\dots,10^6$ on log--log axes.
+
+\vspace{2mm}
+The \textbf{list} line has slope $\approx1$: ten times more items, ten times slower. The \textbf{set} line is flat: about 40 ns whatever the size.
+
+\vspace{2mm}
+The price: a set needs extra memory and its items must be \emph{hashable} (numbers, strings, tuples; not lists).}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Tricky loops (1/2): bounds that depend on the loop variable}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\pycode{tricky_a}
+\vspace{1mm}
+{\small
+\textbf{\texttt{tri\_a}}: the inner loop runs $0+1+\dots+(n-1)=\frac{n(n-1)}{2}$ times: $O(n^2)$. A dependent bound does \emph{not} make it cheaper than $n^2$ in Big-O.}
+\end{column}
+\begin{column}{0.48\textwidth}
+\pycode{tricky_b}
+\vspace{1mm}
+{\small
+\textbf{\texttt{tri\_b}}: for each \texttt{i} the \texttt{while} runs about $n/i$ times, so the total is $n(1+\frac12+\frac13+\dots)\approx n\ln n$ (the harmonic series): $O(n\log n)$.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Tricky loops (2/2): geometric sums and triple loops}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\pycode{tricky_c}
+\vspace{1mm}
+{\small
+\textbf{\texttt{tri\_c}}: round $k$ runs the inner loop $2^k$ times; $1+2+4+\dots<2n$. A geometric series is dominated by its last term: $O(n)$, \emph{not} $n\log n$.}
+\end{column}
+\begin{column}{0.48\textwidth}
+\pycode{tricky_d}
+\vspace{1mm}
+{\small
+\textbf{\texttt{tri\_d}}: three nested dependent loops count the triples $k<j<i$: $\binom{n}{3}\approx\frac{n^3}{6}$, so $O(n^3)$.}
+\end{column}
+\end{columns}
+\vspace{1mm}
+\pyout{tricky_demo}
+{\footnotesize Doubling $n$ multiplies the steps by $\approx4$ (\texttt{tri\_a}), $\approx2.3$ ($n\log n$), $2$ (linear) and $\approx8$ (cubic).}
+\end{frame}
+
+\begin{frame}{Best, average and worst case: linear search}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}
+\begin{axis}[apc,width=8.6cm,height=5.4cm,ybar,bar width=4pt,xlabel={position of the target in a list of 20},ylabel={comparisons},ymin=0,ymax=27,xmin=0,xmax=21,legend style={font=\scriptsize,draw=none,fill=none,at={(0.02,0.98)},anchor=north west}]
+  \addplot[fill=tdBlue!50,draw=tdBlue] table[x=position,y=comparisons]{snippets/linear_cases.out};
+  \addplot[tdAmber,very thick,dashed,sharp plot,domain=0:21] {10.5};
+  \addplot[tdRed,very thick,dashed,sharp plot,domain=0:21] {20};
+  \legend{comparisons,average 10.5,worst 20}
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize One bar per possible target: finding item $k$ costs exactly $k$ comparisons.}
+\end{column}
+\begin{column}{0.43\textwidth}
+\pycodes{\fontsize{8}{9.6}}{linsearch}
+\vspace{1mm}
+\pyouts{\fontsize{6.8}{8.2}}{linear_cases_demo}
+\vspace{1mm}
+{\small \textbf{best} $O(1)$; \textbf{average} $\frac{n+1}{2}=O(n)$; \textbf{worst} $O(n)$. Quote the worst case unless told otherwise.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Amortised cost: why \texttt{append} is $O(1)$}
+\begin{columns}[T]
+\begin{column}{0.58\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}
+\begin{axis}[apc,width=9.2cm,height=5.4cm,ybar,bar width=2.2pt,xlabel={append number $i$},ylabel={cost of append $i$},ymin=0,ymax=42,xmin=0,xmax=65,legend pos=north east]
+  \addplot[fill=tdBlue!55,draw=tdBlue!70] table[x=i,y=cost]{snippets/amortised_data.out};
+  \addplot[tdRed,very thick,sharp plot] table[x=i,y=average]{snippets/amortised_data.out};
+  \legend{cost,running average}
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize Cost = 1 for the write + the number of elements copied when the array is full. Spikes at 2, 3, 5, 9, 17, 33.}
+\end{column}
+\begin{column}{0.4\textwidth}
+{\small
+When the array is full, \texttt{append} allocates a block \textbf{twice as big} and copies everything: an expensive step. But it happens only after $1,2,4,8,\dots$ appends, so the copies add up to
+\[1+2+4+\dots+\tfrac n2<n.\]
+Total cost for $n$ appends $<2n$: \textbf{average (amortised) cost per append $<2$}, i.e.\ $O(1)$.}
+\vspace{1mm}
+\pyouts{\fontsize{7}{8.4}}{amortised_demo}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Amortised cost in code, and what CPython really does}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\pycode{dynarray}
+\vspace{2mm}
+{\small
+A \emph{cost model}: it only counts copies. \texttt{copies/n} stays below 2 even for a million appends.}
+\end{column}
+\begin{column}{0.5\textwidth}
+\pyouts{\fontsize{7.6}{9}}{getsizeof_demo}
+\vspace{1mm}
+{\small
+CPython does not double: it grows by about $12.5\%$, so it resizes more often. Any \textbf{constant factor} keeps appends $O(1)$ amortised; a \emph{constant amount} (+10 slots) would make $n$ appends cost $O(n^2)$.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Space complexity: how much extra memory?}
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
-\begin{block}{Which case do we report?}
-{\small
-Take linear search:
-\begin{itemize}\setlength\itemsep{2pt}
-\item \textbf{best} case: target is first, $O(1)$;
-\item \textbf{worst} case: last or absent, $O(n)$;
-\item \textbf{average}: about $n/2$ steps, still $O(n)$.
-\end{itemize}
-Unless told otherwise, quote the \textbf{worst case}: it is a promise that holds for \emph{every} input.}
-\end{block}
+\pycode{space_sum}
+\vspace{2mm}
+\pycode{space_rec}
+\vspace{2mm}
+{\small \texttt{sum\_rec(n)} keeps $n$ calls open at once: $O(n)$ stack space.}
 \end{column}
-\begin{column}{0.46\textwidth}
-\begin{block}{Time is not the only resource}
+\begin{column}{0.47\textwidth}
+\pyouts{\fontsize{7.6}{9}}{space_demo}
+\vspace{2mm}
 {\small
-\textbf{Space complexity} counts extra memory.\\
-\texttt{total(items)} uses $O(1)$ extra space; \texttt{merge\_sort} builds new lists, $O(n)$ extra space.
+The list comprehension builds all $n$ squares before adding them: about 4 MB for $n=10^5$ (\textbf{$O(n)$} space). The generator makes one value at a time: under 1 KB (\textbf{$O(1)$}).
 
 \vspace{2mm}
-Often there is a \textbf{trade-off}: a \texttt{set} answers lookups fast, but spends memory to do it.
+An $n\times n$ table costs $O(n^2)$: doubling $n$ quadruples the memory (84, 325, 1275 KB).
 
 \vspace{2mm}
-\textbf{Amortised} cost: \texttt{list.append} is usually fast and occasionally copies the list when it grows, but averaged over many appends it is $O(1)$.}
-\end{block}
+Python's recursion limit (1000) turns a too-deep recursion into a \texttt{RecursionError}.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Space: the call stack, and trade-offs between time and space}
+\begin{columns}[T]
+\begin{column}{0.42\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+  \foreach \k/\t in {0/{sum\_rec(0) $\to$ 0},1/{sum\_rec(1)},2/{sum\_rec(2)},3/{sum\_rec(3)},4/{sum\_rec(4)}}{
+    \pgfmathtruncatemacro{\fa}{12+\k*5}
+    \node[draw=tdBlue!70,fill=tdBlue!\fa,minimum width=3.6cm,minimum height=6.5mm,font=\small\ttfamily] at (0,\k*0.7) {\t};}
+  \draw[->,thick,tdMuted] (2.2,0) -- node[right,font=\scriptsize,text=tdMuted,align=left] {stack\\grows} (2.2,2.8);
+  \node[font=\scriptsize,text=tdMuted] at (0,-0.7) {one \emph{frame} per open call};
+\end{tikzpicture}
+\end{sfig}
+{\small Each unfinished call keeps its own variables on the \textbf{call stack}. Depth $n$ means $O(n)$ memory, even though the function looks like it only uses a few numbers.}
+\end{column}
+\begin{column}{0.54\textwidth}
+\renewcommand{\arraystretch}{1.28}\footnotesize
+\begin{tabular}{@{}>{\raggedright}p{31mm}>{\raggedright}p{14mm}>{\raggedright\arraybackslash}p{22mm}@{}}
+\toprule
+Algorithm & Time & Extra space\\\midrule
+\texttt{total(items)} & $O(n)$ & $O(1)$\\
+merge sort & $O(n\log n)$ & $O(n)$\\
+in-place quicksort & $O(n\log n)$ & $O(\log n)$ stack\\
+naive \texttt{fib} & $O(1.6^n)$ & $O(n)$ stack\\
+\texttt{fib} with cache & $O(n)$ & $O(n)$\\
+\texttt{x in set} lookup & $O(1)$ & $O(n)$ for the set\\
+\bottomrule
+\end{tabular}
+\vspace{2mm}
+
+{\small \textbf{Trade-off}: memory is often spent to save time. The cache turns exponential time into linear time; the set turns a linear search into a hash lookup. The right choice depends on which resource is scarce.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Strings: three ways to build one}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\pycode{concat}
+\end{column}
+\begin{column}{0.5\textwidth}
+\pyout{concat_demo}
+\vspace{2mm}
+{\small
+\texttt{s = "x" + s} builds a new string of length $k$ at step $k$: $O(m^2)$ in total (200\,000 characters: 450 ms).
+
+\vspace{1mm}
+\texttt{s += "x"} \emph{looks} the same, but CPython can extend the string in place when nothing else refers to it, so it is fast. That is an implementation detail, not a promise.
+
+\vspace{1mm}
+\texttt{"".join(parts)} is the portable $O(m)$ way to build a long string.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Queues: \texttt{list.pop(0)} versus \texttt{deque.popleft()}}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\pycode{drain}
+\end{column}
+\begin{column}{0.5\textwidth}
+\pyout{drain_demo}
+\vspace{2mm}
+{\small
+\texttt{items.pop(0)} removes the first item and shifts all others: $O(n)$ each, so draining a list of $m$ items is $O(m^2)$.
+
+\vspace{1mm}
+A \texttt{deque} is a double-ended queue: \texttt{popleft()} is $O(1)$.
+
+\vspace{1mm}
+If you use a list as a queue (as in BFS), use \texttt{collections.deque} instead.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Measured: \texttt{list.pop(0)} versus \texttt{deque.popleft()}}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+\begin{axis}[apc,width=9cm,height=6cm,xmode=log,ymode=log,xlabel={items $m$},ylabel={time to drain (ms)},legend pos=north west,xtick={20000,40000,80000,160000},xticklabels={20k,40k,80k,160k},xminorticks=false,yminorticks=false]
+  \addplot[tdRed,mark=*,mark size=1.6pt] table[x=m,y=list]{snippets/drain_data.out};
+  \addplot[tdGreen,mark=*,mark size=1.6pt] table[x=m,y=deque]{snippets/drain_data.out};
+  \legend{\texttt{list.pop(0)},\texttt{deque.popleft()}}
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.38\textwidth}
+{\small
+Real timings, log--log axes.
+
+\vspace{2mm}
+\textbf{list}: slope $\approx2$ (each doubling of $m$ gives $\approx4\times$): $O(m^2)$.
+
+\vspace{2mm}
+\textbf{deque}: slope $\approx1$: $O(m)$.
+
+\vspace{2mm}
+At $m=160\,000$ the list is about \textbf{400 times slower}, and the gap keeps widening. The same trap appears in BFS if the queue is a plain list.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Problem: two numbers that add up to a target}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\pycode{twosum_slow}
+\vspace{2mm}
+\pycode{twosum_fast}
+\end{column}
+\begin{column}{0.47\textwidth}
+\pyout{twosum_demo}
+\vspace{2mm}
+{\small
+\textbf{Task}: return the indices of two items whose sum is \texttt{target}.
+
+\vspace{1mm}
+\textbf{Slow}: try every pair, $O(n^2)$ time, $O(1)$ space.
+
+\vspace{1mm}
+\textbf{Fast}: for each \texttt{x}, ask the dict ``have I seen \texttt{target - x}?'' ($O(1)$ lookup). One pass: $O(n)$ time, $O(n)$ space: a \textbf{time--space trade-off}. Both find a valid pair, but not always the same one.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Two-sum: measured, worst case (no pair exists)}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\begin{sfig}[0.64]
+\begin{tikzpicture}
+\begin{axis}[apc,width=9cm,height=6cm,xmode=log,ymode=log,ylabel={time (ms)},legend pos=north west,xtick={500,1000,2000,4000},xticklabels={500,1000,2000,4000},xminorticks=false,yminorticks=false]
+  \addplot[tdRed,mark=*,mark size=1.6pt] table[x=n,y=slow]{snippets/twosum_data.out};
+  \addplot[tdGreen,mark=*,mark size=1.6pt] table[x=n,y=fast]{snippets/twosum_data.out};
+  \legend{\texttt{two\_sum\_slow} $O(n^2)$,\texttt{two\_sum\_fast} $O(n)$}
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.38\textwidth}
+{\small
+Real timings for $n=500,\dots,4000$, with a target that does not exist so that both functions do their full work.
+
+\vspace{2mm}
+Doubling $n$ makes the slow version about $4\times$ slower (slope 2) and the fast version about $2\times$ (slope 1).
+
+\vspace{2mm}
+At $n=4000$: roughly a \textbf{thousand times} faster. At $n=10^6$ the slow version would need hours, the fast one a fraction of a second.}
 \end{column}
 \end{columns}
 \end{frame}
@@ -284,9 +767,11 @@ Operation & Cost & Note\\\midrule
 \texttt{len(items)},\ \texttt{items[i]} & $O(1)$ & direct access by position\\
 \texttt{items.append(x)} & $O(1)$ amortised & adds at the end\\
 \texttt{items.insert(0, x)},\ \texttt{items.pop(0)} & $O(n)$ & shifts every item\\
+\texttt{dq.appendleft(x)},\ \texttt{dq.popleft()} & $O(1)$ & \texttt{collections.deque}\\
 \texttt{x in items} (list) & $O(n)$ & linear search\\
 \texttt{x in s}, \texttt{s.add(x)} (set, dict) & $O(1)$ on average & hashing\\
 \texttt{sorted(items)} & $O(n\log n)$ & Timsort\\
+\texttt{s += t}, \texttt{"".join(parts)} & $O(\text{len})$ & but \texttt{s = c + s} in a loop is $O(m^2)$\\
 \texttt{for x in items:} & $O(n)$ & one pass\\
 \bottomrule
 \end{tabularx}
@@ -299,28 +784,45 @@ Operation & Cost & Note\\\midrule
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
 \begin{block}{Take-aways}
-{\small
-\begin{enumerate}\setlength\itemsep{3pt}
+{\footnotesize
+\begin{enumerate}\setlength\itemsep{2pt}
 \item Big-O describes \key{how steps grow with $n$}, not seconds.
 \item Drop constants and lower-order terms.
-\item Common classes, slow to fast growth: $2^n$, $n^2$, $n\log n$, $n$, $\log n$, $1$.
-\item One loop $O(n)$; nested loops $O(n^2)$; halving $O(\log n)$; halving inside a loop $O(n\log n)$.
-\item The choice of data structure (list vs.\ set) can change the Big-O.
+\item Slow to fast: $2^n$, $n^2$, $n\log n$, $n$, $\log n$, $1$.
+\item Loops: one $O(n)$; nested $O(n^2)$; halving $O(\log n)$; a dependent bound needs a \textbf{sum} (triangle, doubling, harmonic).
+\item Recursion: draw the \key{recursion tree}.
+\item \key{Doubling} test: ratio 2 linear, 4 quadratic.
+\item The data structure changes the Big-O: set, deque, dict.
+\item \textbf{Amortised} cost and \textbf{space} count too.
 \end{enumerate}}
 \end{block}
 \end{column}
 \begin{column}{0.48\textwidth}
 \begin{block}{Practice}
-{\small
-\begin{enumerate}\setlength\itemsep{3pt}
+{\footnotesize
+\begin{enumerate}\setlength\itemsep{2pt}
 \item State the Big-O of \texttt{sum(range(n))}, \texttt{max(items)} and \texttt{items.count(x)}.
-\item Write a function that finds a pair of numbers in a list that adds to a target: first in $O(n^2)$, then in $O(n)$ using a \texttt{set}.
 \item \texttt{for i in range(n): for j in range(i):} How many times does the body run? Is it still $O(n^2)$?
-\item Use \texttt{timeit} to check that \texttt{x in list} doubles when the list doubles.
+\item Use \texttt{timeit} to check that \texttt{x in list} doubles when the list doubles, and that \texttt{x in set} does not.
 \item Why is $O(n^2)$ acceptable for $n=100$ but dangerous for $n=10^6$?
+\item Solve $T(n)=T(n/2)+n$ with a recursion tree.
+\item Change \texttt{DynArray} to grow by $+10$ instead of doubling. How do the copies per append behave?
 \end{enumerate}}
 \end{block}
 \end{column}
 \end{columns}
+\end{frame}
+
+\begin{frame}{Challenge problems}
+\small
+\begin{enumerate}\setlength\itemsep{3pt}
+\item \textbf{Count first, then prove}: for \texttt{for i in range(n): for j in range(i, n, 2):} derive the exact number of steps and check it against a counter for $n=10,100,1000$.
+\item \textbf{Hidden quadratic}: a function builds a result with \texttt{result = result + [x]} in a loop. What is its complexity? Measure it against \texttt{result.append(x)}.
+\item \textbf{Three-sum}: find three items that add up to zero. Write an $O(n^3)$ version, then an $O(n^2)$ one (sort, then two pointers).
+\item \textbf{Duplicates}: write \texttt{has\_duplicate} in $O(n)$ average time with a \texttt{set}, and in $O(n\log n)$ time \emph{without} extra memory (sort first). Compare the three with \texttt{timeit}.
+\item \textbf{Power}: compute $x^n$ with $O(n)$ multiplications, then with $O(\log n)$ (square and halve). Count the multiplications.
+\item \textbf{Space or time?} Compute Fibonacci numbers in $O(n)$ time and $O(1)$ extra space. Why is the memoised version $O(n)$ space?
+\item \textbf{Amortised stack}: design a \texttt{MinStack} with \texttt{push}, \texttt{pop} and \texttt{min} all in $O(1)$.
+\end{enumerate}
 \end{frame}
 \end{document}
