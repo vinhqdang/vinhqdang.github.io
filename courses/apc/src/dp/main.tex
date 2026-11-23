@@ -6,6 +6,8 @@
 \tikzset{ft/.style={circle,draw=tdInk!60,fill=white,minimum size=5.4mm,inner sep=0pt,font=\tiny\bfseries},
   level 1/.style={sibling distance=34mm,level distance=7.5mm},level 2/.style={sibling distance=17mm,level distance=7.5mm},
   level 3/.style={sibling distance=9mm,level distance=7.5mm},level 4/.style={sibling distance=7mm,level distance=7.5mm}}
+% a table figure written by the Python demo
+\newcommand{\figtab}[2][0.5]{\begin{sfig}[#1]\input{snippets/#2.out}\end{sfig}}
 
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
@@ -31,8 +33,9 @@ Of course not: you \textbf{remember} the total so far. \key{Dynamic programming 
 \item see when a recursive solution repeats work;
 \item fix it with \textbf{memoisation} (\texttt{@cache}) or a \textbf{table};
 \item follow the DP recipe: state, recurrence, base case, order;
-\item solve \textbf{coin change} and \textbf{longest common subsequence};
-\item explain why DP turns an exponential algorithm into a polynomial one.
+\item solve \textbf{coin change}, \textbf{LCS}, \textbf{edit distance}, \textbf{knapsack} and more;
+\item rebuild the \emph{solution}, not only its value;
+\item explain why DP turns exponential into polynomial.
 \end{itemize}}
 \end{block}
 \end{column}
@@ -111,6 +114,38 @@ This is the \key{top-down} way: start from the big problem, recurse, and remembe
 \end{columns}
 \end{frame}
 
+\begin{frame}{The call tree with a cache: hits cut the tree}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}[ft,
+  level 1/.style={sibling distance=22mm,level distance=9mm},level 2/.style={sibling distance=13mm,level distance=9mm},
+  level 3/.style={sibling distance=12mm,level distance=9mm},level 4/.style={sibling distance=10mm,level distance=9mm},
+  hit/.style={ft,fill=tdGreen!40,draw=tdGreen!70!black,dashed},miss/.style={ft,fill=tdBlue!12}]
+  \node[miss] {5}
+    child{node[miss]{4}
+      child{node[miss]{3}
+        child{node[miss]{2} child{node[miss]{1}} child{node[miss]{0}}}
+        child{node[hit]{1}}}
+      child{node[hit]{2}}}
+    child{node[hit]{3}};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small \colorbox{tdBlue!12}{blue}: computed (a \emph{miss}). \colorbox{tdGreen!40}{green}: answer found in the cache (a \emph{hit}); nothing below it is explored.}
+\end{column}
+\begin{column}{0.46\textwidth}
+\pyout[\footnotesize]{memo_trace}
+\vspace{2mm}
+{\small
+The real call order of the cached \texttt{fib(5)}: 9 calls instead of 15, and for $n=30$ it is 59 instead of 2.7 million.
+
+\vspace{1mm}
+The left branch does all the work. When the right branch asks for \texttt{fib(3)}, the answer is already stored: \textbf{one lookup, no subtree}.}
+\end{column}
+\end{columns}
+\end{frame}
+
 \begin{frame}{Fix 2: tabulation, or ``build from the bottom''}
 \begin{columns}[T]
 \begin{column}{0.46\textwidth}
@@ -124,12 +159,30 @@ This is the \key{top-down} way: start from the big problem, recurse, and remembe
 \pyout{fib_timing}
 \vspace{2mm}
 {\small
-Memoisation and tabulation give the \emph{same} savings: the exponential tree collapses to $n$ steps. The naive version takes 150 ms for $n=32$; the table takes about one microsecond.
+Memoisation and tabulation give the \emph{same} savings: the exponential tree collapses to $n$ steps. The naive version takes well over 100 ms for $n=32$; the table takes about one microsecond.
 
 \vspace{2mm}
 \begin{block}{Top-down or bottom-up?}
 {\small Top-down is easier to write (add \texttt{@cache}). Bottom-up avoids recursion limits and is slightly faster.}
 \end{block}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Climbing stairs: each entry depends on two earlier ones}
+\figtab[0.22]{fig_stairs}
+\vspace{1mm}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\pycode{stairs}
+\vspace{1mm}
+\pyout{stairs_demo}
+\end{column}
+\begin{column}{0.46\textwidth}
+{\small
+You may climb \textbf{1 or 2 stairs} at a time. To arrive at stair $n$ you came from $n-1$ or from $n-2$, so
+\[\mathrm{ways}(n)=\mathrm{ways}(n-1)+\mathrm{ways}(n-2).\]
+The arrows show which two cells stair 7 reads. It is Fibonacci again (shifted by one): 21 ways to reach stair 7, and about 20 billion for stair 50, computed in an instant.}
 \end{column}
 \end{columns}
 \end{frame}
@@ -178,74 +231,37 @@ DP never commits too early: it tries every coin for every amount.}
 \end{columns}
 \end{frame}
 
-\begin{frame}{Coin change with DP: the table}
-\begin{sfig}[0.3]
-\begin{tikzpicture}
-  \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.6,0) {best[a]};
-  \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.6,-0.55) {amount a};
-  \node[cell,minimum width=8mm,fill=tdBlue!10] at (0.0,0) {0};
-  \node[font=\tiny,text=tdMuted] at (0.0,-0.55) {0};
-  \node[cell,minimum width=8mm,fill=tdBlue!10] at (0.9,0) {1};
-  \node[font=\tiny,text=tdMuted] at (0.9,-0.55) {1};
-  \node[cell,minimum width=8mm,fill=tdBlue!10] at (1.8,0) {1};
-  \node[font=\tiny,text=tdMuted] at (1.8,-0.55) {2};
-  \node[cell,minimum width=8mm,fill=tdBlue!10] at (2.7,0) {2};
-  \node[font=\tiny,text=tdMuted] at (2.7,-0.55) {3};
-  \node[cell,minimum width=8mm,fill=tdBlue!10] at (3.6,0) {2};
-  \node[font=\tiny,text=tdMuted] at (3.6,-0.55) {4};
-  \node[cell,minimum width=8mm,fill=tdBlue!10] at (4.5,0) {1};
-  \node[font=\tiny,text=tdMuted] at (4.5,-0.55) {5};
-  \node[cell,minimum width=8mm,fill=tdBlue!10] at (5.4,0) {2};
-  \node[font=\tiny,text=tdMuted] at (5.4,-0.55) {6};
-  \node[cell,minimum width=8mm,fill=tdBlue!10] at (6.3,0) {2};
-  \node[font=\tiny,text=tdMuted] at (6.3,-0.55) {7};
-  \node[cell,minimum width=8mm,fill=tdBlue!10] at (7.2,0) {3};
-  \node[font=\tiny,text=tdMuted] at (7.2,-0.55) {8};
-  \node[cell,minimum width=8mm,fill=tdBlue!10] at (8.1,0) {3};
-  \node[font=\tiny,text=tdMuted] at (8.1,-0.55) {9};
-  \node[cell,minimum width=8mm,fill=tdBlue!10] at (9.0,0) {2};
-  \node[font=\tiny,text=tdMuted] at (9.0,-0.55) {10};
-  \node[cell,minimum width=8mm,fill=tdGreen!35] at (9.9,0) {3};
-  \node[font=\tiny,text=tdMuted] at (9.9,-0.55) {11};
-\end{tikzpicture}
-\end{sfig}
-\vspace{2mm}
-\begin{columns}[T]
-\begin{column}{0.5\textwidth}
-{\small
-Coins $\{1,2,5\}$, amount $11$. To make amount $a$, the last coin is some $c$; the rest is the best way to make $a-c$:
-\[\mathrm{best}[a]=1+\min_{c\le a}\mathrm{best}[a-c],\qquad \mathrm{best}[0]=0.\]}
-\end{column}
-\begin{column}{0.46\textwidth}
-{\small
-Example: $\mathrm{best}[11]=1+\min(\mathrm{best}[10],\mathrm{best}[9],\mathrm{best}[6])=1+\min(2,3,2)=3$.
+\begin{frame}{Coin change with DP: filling the table step by step}
+{\small Coins $\{1,2,5\}$, amount $11$. $\mathrm{best}[a]=1+\min_{c\le a}\mathrm{best}[a-c]$, $\ \mathrm{best}[0]=0$.}
 
 \vspace{1mm}
-Each of the $A$ amounts tries $k$ coins: $O(A\cdot k)$. Brute force would try all combinations: exponential.}
-\end{column}
-\end{columns}
+{\footnotesize\textbf{Step 1.} The base case and the first small amounts are filled.}\\
+\figtab[0.13]{fig_coin1}
+
+\vspace{1mm}
+{\footnotesize\textbf{Step 2.} For $a=6$ look back by each coin: $a-1=5$, $a-2=4$, $a-5=1$. Best: $1+\mathrm{best}[5]=2$ or $1+\mathrm{best}[1]=2$ (green).}\\
+\figtab[0.17]{fig_coin2}
+
+\vspace{1mm}
+{\footnotesize\textbf{Step 3.} The finished table. $\mathrm{best}[11]=1+\min(\mathrm{best}[10],\mathrm{best}[9],\mathrm{best}[6])=1+\min(2,3,2)=3$.}\\
+\figtab[0.17]{fig_coin3}
 \end{frame}
 
-\begin{frame}{Coin change in Python}
-\begin{columns}[T]
-\begin{column}{0.5\textwidth}
+\begin{frame}[allowframebreaks]{Coin change in Python}
 \pycode{coins}
 \vspace{2mm}
+{\small
+\texttt{best[a]} is the table; \texttt{choice[a]} remembers \emph{which coin} gave the best answer. Each of the $A$ amounts tries $k$ coins: $O(A\cdot k)$. Brute force would try all combinations: exponential. \texttt{INF} marks amounts that cannot be made.}
+\framebreak
 \pycode{coin_path}
-\end{column}
-\begin{column}{0.46\textwidth}
+\vspace{2mm}
 \pyout{coin_demo}
 \vspace{2mm}
 {\small
-\texttt{best[a]} is the table; \texttt{choice[a]} remembers \emph{which coin} gave the best answer. To list the coins, start at the target amount and repeatedly subtract the stored choice: $11\to6\to1\to0$ uses $5,5,1$.
+To list the coins, start at the target amount and repeatedly subtract the stored choice: $11\to6\to1\to0$ uses $5,5,1$.
 
-\vspace{2mm}
-\textbf{Tip:} always store a \emph{choice} (or parent) next to the value, so you can rebuild the solution, not just its size.
-
-\vspace{2mm}
-\texttt{INF} marks amounts that cannot be made at all.}
-\end{column}
-\end{columns}
+\vspace{1mm}
+\textbf{Tip:} always store a \emph{choice} (or parent) next to the value, so you can rebuild the solution, not just its size.}
 \end{frame}
 
 \begin{frame}{Longest common subsequence (LCS)}
@@ -263,11 +279,11 @@ A \textbf{subsequence} keeps the order but may skip letters. The LCS of two stri
 \begin{column}{0.46\textwidth}
 \begin{block}{The recurrence}
 {\small Let $t[i][j]$ = LCS length of the first $i$ letters of $a$ and the first $j$ letters of $b$.
-\[
+{\footnotesize\[
 t[i][j]=\begin{cases}
 t[i-1][j-1]+1 & a_i=b_j\\[2pt]
-\max(t[i-1][j],\,t[i][j-1]) & \text{otherwise}
-\end{cases}\]
+\max(t[i-1][j],\,t[i][j-1]) & \text{else}
+\end{cases}\]}
 with $t[0][j]=t[i][0]=0$.}
 \end{block}
 \vspace{1mm}
@@ -276,132 +292,410 @@ with $t[0][j]=t[i][0]=0$.}
 \end{columns}
 \end{frame}
 
-\begin{frame}{The LCS table, and how to read the answer back}
+\begin{frame}{The LCS grid: filling it row by row}
 \begin{columns}[T]
 \begin{column}{0.52\textwidth}
-\begin{sfig}[0.78]
-\begin{tikzpicture}
-  \node[font=\scriptsize,text=tdMuted,anchor=east] at (-1.3,0.55) {$b\to$};
-  \node[font=\scriptsize,text=tdMuted,anchor=east] at (-1.3,-0.5) {$a\downarrow$};
-  \node[font=\scriptsize\bfseries,text=tdBlue] at (0.00,0.55) {};
-  \node[font=\scriptsize\bfseries,text=tdBlue] at (0.68,0.55) {B};
-  \node[font=\scriptsize\bfseries,text=tdBlue] at (1.36,0.55) {D};
-  \node[font=\scriptsize\bfseries,text=tdBlue] at (2.04,0.55) {C};
-  \node[font=\scriptsize\bfseries,text=tdBlue] at (2.72,0.55) {A};
-  \node[font=\scriptsize\bfseries,text=tdBlue] at (3.40,0.55) {B};
-  \node[font=\scriptsize\bfseries,text=tdBlue] at (4.08,0.55) {A};
-  \node[font=\scriptsize\bfseries,text=tdBlue] at (-0.7,0.00) {};
-  \node[font=\scriptsize\bfseries,text=tdBlue] at (-0.7,-0.58) {A};
-  \node[font=\scriptsize\bfseries,text=tdBlue] at (-0.7,-1.16) {B};
-  \node[font=\scriptsize\bfseries,text=tdBlue] at (-0.7,-1.74) {C};
-  \node[font=\scriptsize\bfseries,text=tdBlue] at (-0.7,-2.32) {B};
-  \node[font=\scriptsize\bfseries,text=tdBlue] at (-0.7,-2.90) {D};
-  \node[font=\scriptsize\bfseries,text=tdBlue] at (-0.7,-3.48) {A};
-  \node[font=\scriptsize\bfseries,text=tdBlue] at (-0.7,-4.06) {B};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.00,0.00) {\scriptsize 0};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.68,0.00) {\scriptsize 0};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (1.36,0.00) {\scriptsize 0};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.04,0.00) {\scriptsize 0};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.72,0.00) {\scriptsize 0};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (3.40,0.00) {\scriptsize 0};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (4.08,0.00) {\scriptsize 0};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdAmber!28] at (0.00,-0.58) {\scriptsize 0};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.68,-0.58) {\scriptsize 0};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (1.36,-0.58) {\scriptsize 0};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.04,-0.58) {\scriptsize 0};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.72,-0.58) {\scriptsize 1};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (3.40,-0.58) {\scriptsize 1};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (4.08,-0.58) {\scriptsize 1};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.00,-1.16) {\scriptsize 0};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdGreen!40] at (0.68,-1.16) {\scriptsize 1};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdAmber!28] at (1.36,-1.16) {\scriptsize 1};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.04,-1.16) {\scriptsize 1};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.72,-1.16) {\scriptsize 1};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (3.40,-1.16) {\scriptsize 2};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (4.08,-1.16) {\scriptsize 2};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.00,-1.74) {\scriptsize 0};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.68,-1.74) {\scriptsize 1};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (1.36,-1.74) {\scriptsize 1};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdGreen!40] at (2.04,-1.74) {\scriptsize 2};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdAmber!28] at (2.72,-1.74) {\scriptsize 2};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (3.40,-1.74) {\scriptsize 2};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (4.08,-1.74) {\scriptsize 2};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.00,-2.32) {\scriptsize 0};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.68,-2.32) {\scriptsize 1};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (1.36,-2.32) {\scriptsize 1};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.04,-2.32) {\scriptsize 2};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.72,-2.32) {\scriptsize 2};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdGreen!40] at (3.40,-2.32) {\scriptsize 3};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (4.08,-2.32) {\scriptsize 3};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.00,-2.90) {\scriptsize 0};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.68,-2.90) {\scriptsize 1};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (1.36,-2.90) {\scriptsize 2};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.04,-2.90) {\scriptsize 2};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.72,-2.90) {\scriptsize 2};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdAmber!28] at (3.40,-2.90) {\scriptsize 3};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (4.08,-2.90) {\scriptsize 3};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.00,-3.48) {\scriptsize 0};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.68,-3.48) {\scriptsize 1};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (1.36,-3.48) {\scriptsize 2};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.04,-3.48) {\scriptsize 2};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.72,-3.48) {\scriptsize 3};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (3.40,-3.48) {\scriptsize 3};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdGreen!40] at (4.08,-3.48) {\scriptsize 4};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.00,-4.06) {\scriptsize 0};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.68,-4.06) {\scriptsize 1};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (1.36,-4.06) {\scriptsize 2};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.04,-4.06) {\scriptsize 2};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.72,-4.06) {\scriptsize 3};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (3.40,-4.06) {\scriptsize 4};
-  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdAmber!28] at (4.08,-4.06) {\scriptsize 4};
-\end{tikzpicture}
-\end{sfig}
+\figtab[0.78]{fig_lcs1}
 \end{column}
 \begin{column}{0.44\textwidth}
 {\small
-Fill row by row; each cell needs only its three neighbours above and to the left, so we get $O(n\cdot m)$ steps for strings of length $n$ and $m$.
+The table is filled row by row. Here we stand at the amber cell: $a_3=\texttt C$ and $b_3=\texttt C$ \textbf{match}, so the cell is the \colorbox{tdGreen!35}{diagonal} neighbour plus 1: $t[3][3]=t[2][2]+1=2$.
 
 \vspace{2mm}
-\textbf{Traceback} (amber path, from the bottom-right corner): at a \colorbox{tdGreen!40}{green} cell the letters matched, so that letter is in the LCS and we move diagonally; otherwise we move up or left towards the larger neighbour.
+If the letters had differed, the cell would be the larger of the two \colorbox{tdBlue!14}{blue} neighbours (above, left).
 
 \vspace{2mm}
-Reading the green cells bottom to top gives \textbf{B, C, B, A}.}
+Each cell needs just three neighbours, so the whole table costs $O(n\cdot m)$ steps for strings of length $n$ and $m$. Empty cells are not computed yet.}
 \end{column}
 \end{columns}
 \end{frame}
 
-\begin{frame}{LCS in Python}
+\begin{frame}{The LCS table, and how to read the answer back}
 \begin{columns}[T]
 \begin{column}{0.52\textwidth}
-\pycode{lcs}
+\figtab[0.78]{fig_lcs2}
 \end{column}
 \begin{column}{0.44\textwidth}
-\pycode{lcs_trace}
+{\small
+\textbf{Traceback} (amber path, from the bottom-right corner): at a \colorbox{tdGreen!40}{green} cell the letters matched, so that letter is in the LCS and we move diagonally; otherwise we move up or left towards the larger neighbour.
+
 \vspace{2mm}
+Reading the green cells bottom to top gives \textbf{B, C, B, A}.
+
+\vspace{2mm}
+The bottom-right entry, 4, is the length. The path is the \emph{solution}. The figure is drawn from the real table printed by the code on the next slide.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{LCS in Python}
+\pycode{lcs}
+\vspace{2mm}
+{\small
+\texttt{lcs\_table} fills the grid with two loops. A match adds 1 to the diagonal; otherwise the cell takes the larger of the cell above and the cell to the left. Time and memory $O(n\cdot m)$.}
+\framebreak
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\pycode{lcs_trace}
+\end{column}
+\begin{column}{0.42\textwidth}
 \pyout{lcs_demo}
+\end{column}
+\end{columns}
+\vspace{1mm}
+{\small
+\texttt{lcs\_string} starts at the corner and walks back as in the figure, collecting the matched letters in reverse. The printed table is the one drawn two slides earlier.}
+\end{frame}
+
+\begin{frame}{Edit distance: how far apart are two words?}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\small
+The \key{edit distance} (Levenshtein) is the fewest single-letter \textbf{insertions, deletions and replacements} that turn one word into another. Spell checkers, search suggestions (``did you mean\ldots'') and DNA alignment use it.
+
+\vspace{2mm}
+\texttt{kitten} $\to$ \texttt{sitting}:
+\begin{enumerate}\setlength\itemsep{1pt}
+\item \texttt{\textbf{k}itten} $\to$ \texttt{\textbf{s}itten} (replace k by s)
+\item \texttt{sitt\textbf{e}n} $\to$ \texttt{sitt\textbf{i}n} (replace e by i)
+\item \texttt{sittin} $\to$ \texttt{sittin\textbf{g}} (insert g)
+\end{enumerate}
+Three edits; no way with two.}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{block}{The recurrence}
+{\small $d[i][j]$ = distance between the first $i$ letters of $a$ and the first $j$ of $b$.
+{\footnotesize\[
+d[i][j]=\min\begin{cases}
+d[i-1][j]+1 & \text{del}\\
+d[i][j-1]+1 & \text{ins}\\
+d[i-1][j-1]+[a_i\ne b_j] & \text{sub}
+\end{cases}\]}
+Base: $d[i][0]=i$, $d[0][j]=j$. \emph{del} = delete $a_i$, \emph{ins} = insert $b_j$.}
+\end{block}
+\vspace{1mm}
+{\small Same shape as LCS: a 2-D table and three neighbours.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The edit-distance grid and its traceback}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\figtab[0.8]{fig_edit}
+\end{column}
+\begin{column}{0.4\textwidth}
+{\small
+Row 0 and column 0 are the base cases: turning a word into the empty word costs one deletion per letter.
+
+\vspace{2mm}
+The \colorbox{tdAmber!40}{amber path} starts at the bottom-right cell, the answer $d=3$, and walks back to the corner. A \emph{diagonal} step is a keep or a replace, a step \emph{up} is a deletion, a step \emph{left} is an insertion. Where the value rises along a diagonal step, that is a replacement.
+
+\vspace{2mm}
+The path is what the code prints on the next slides: \texttt{k->s,e->i,ins g}.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Edit distance in Python: the table}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\pycode{edit}
+\end{column}
+\begin{column}{0.42\textwidth}
+\pyout{edit_demo}
+\vspace{2mm}
+{\small
+The first two loops write the base cases, the double loop applies the recurrence. Time and memory $O(n\cdot m)$.
+
+\vspace{2mm}
+\texttt{cost} is 0 when the letters agree and 1 for a replacement. The demo shows two classic pairs and the case of an empty word (three insertions).}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Edit distance in Python: the traceback}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\pycode[\fontsize{7.8}{9.2}\selectfont]{edit_ops}
+\end{column}
+\begin{column}{0.4\textwidth}
+{\small
+\texttt{edit\_ops} walks back from the corner. At each cell it picks the move that \emph{explains} the cell's value: a diagonal step (keep, or replace when the letters differ), a step up (delete) or a step left (insert).
+
+\vspace{2mm}
+It returns the list of edits, in order, and the path of cells (used for the picture two slides earlier).}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Counting grid paths with obstacles}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\figtab[0.6]{fig_grid}
+\vspace{1mm}
+{\small
+A robot walks from the top-left to the bottom-right corner, moving only \textbf{right} or \textbf{down}. Dark cells are blocked. How many routes?}
+\end{column}
+\begin{column}{0.5\textwidth}
+{\small
+$\mathrm{ways}[r][c]$ = number of routes to cell $(r,c)$. A route arrives from above or from the left:
+\[\mathrm{ways}[r][c]=\mathrm{ways}[r-1][c]+\mathrm{ways}[r][c-1],\]
+and a blocked cell has \textbf{0} ways.
+
+\vspace{2mm}
+Read the picture: the cell right of the wall has $1+1=2$, the cell below the second wall has $1+2=3$. The last cell collects $3+2=5$.
+
+\vspace{2mm}
+Without walls a $4\times5$ grid has $\binom{7}{3}=35$ routes (choose which 3 of the 7 moves go down). Walls remove 30 of them.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Grid paths in Python}
+\pycode{grid}
+\framebreak
+\pyout{grid_demo}
+\vspace{2mm}
+{\small
+Rows and columns are processed in order, so \texttt{up} and \texttt{left} are already known. The guards \texttt{if r} and \texttt{if c} avoid reading outside the table. Time and memory $O(\text{rows}\times\text{cols})$.
+
+\vspace{2mm}
+\textbf{Variation:} keep only one row at a time to use $O(\text{cols})$ memory. A related puzzle, the \emph{minimum-cost path}, replaces ``add'' by ``min'' plus the cell's cost.}
+\end{frame}
+
+\begin{frame}{0/1 knapsack: take it or leave it}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\small
+You met knapsack in the optimization lecture. Here is the DP \textbf{table} that also tells us \emph{which} items to take.
+
+\vspace{2mm}
+Items (weight, value): $(1,1)$, $(3,4)$, $(4,5)$, $(5,7)$. Capacity $7$.
+
+\vspace{2mm}
+\textbf{State:} $t[i][c]$ = best value using the first $i$ items with capacity $c$.}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{block}{The recurrence}
+{\small For item $i$ with weight $w$ and value $v$:
+\[
+t[i][c]=\max\begin{cases}
+t[i-1][c] & \text{skip}\\
+t[i-1][c-w]+v & \text{take}
+\end{cases}\]
+$t[0][c]=0$; \emph{take} only if $w\le c$. Answer: $t[n][W]$.}
+\end{block}
+\vspace{1mm}
+{\small Each cell is one decision: \emph{is item $i$ worth the room it needs?}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The knapsack table and the chosen items}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\figtab[0.82]{fig_knap}
+\end{column}
+\begin{column}{0.4\textwidth}
+{\small
+Rows are items (in order), columns are capacities $0\ldots7$. The bottom-right cell is the answer: \textbf{9}.
+
+\vspace{2mm}
+\textbf{Reconstruction} (amber path): start at the corner. If the value is the \emph{same} as the cell above, the item was skipped, so move up. If it \emph{differs}, the item was taken (\colorbox{tdGreen!40}{green}): move up and left by its weight.
+
+\vspace{2mm}
+Items 3 and 2 are taken: weights $4+3=7$, values $5+4=9$.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Knapsack with item recovery in Python}
+\pycode{knap_table}
+\vspace{2mm}
+{\small
+\texttt{t[i][c]} starts as ``skip item $i$'' (copy the cell above); if the item fits, we take the better of that and ``take it''. Time and memory $O(n\cdot W)$. The 1-D version of the optimization lecture saves memory but loses the information needed to recover the items. The printed matrix (next page) is the one drawn on the previous slide; \texttt{knap\_pick} walks back from the corner: a changed value means the item was taken.}
+\framebreak
+\pycode{knap_pick}
+\vspace{2mm}
+\pyout{knap01_demo}
+\end{frame}
+
+\begin{frame}{House robber: never rob two neighbours}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\figtab[0.3]{fig_rob}
+\vspace{1mm}
+{\small
+Houses in a row hold money. Alarms ring if you rob two \textbf{adjacent} houses. Maximise the loot.
+
+\vspace{1mm}
+\textbf{State:} $\mathrm{best}[i]$ = most money from the first $i$ houses.
+
+\vspace{1mm}
+$\mathrm{best}[i]=\max(\mathrm{best}[i-1],\ \mathrm{best}[i-2]+m_i)$: skip house $i$, or rob it and the best of the first $i-2$.
+
+\vspace{1mm}
+Answer: 19, by robbing houses 0, 2 and 5 (money 2, 9, 8).}
+\end{column}
+\begin{column}{0.46\textwidth}
+\pycode{rob}
+\vspace{2mm}
+{\small
+Only the last two values matter, so two variables are enough: memory $O(1)$. \texttt{take} is the best loot if we rob the current house, \texttt{skip} if we do not.
+
+\vspace{1mm}
+To recover \emph{which} houses, we keep the whole table (next slide).}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{House robber: recovering the houses}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\pycode[\fontsize{7.8}{9.2}\selectfont]{rob_plan}
+\end{column}
+\begin{column}{0.44\textwidth}
+\pyout{rob_demo}
+\vspace{2mm}
+{\small
+\texttt{best[i]} is the table of the previous slide. \textbf{Traceback:} if \texttt{best[i]} equals \texttt{best[i-1]}, house $i-1$ was skipped; otherwise it was robbed and we jump two houses back.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Longest increasing subsequence (LIS)}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\figtab[0.3]{fig_lis}
+\vspace{1mm}
+{\small
+Find the longest subsequence of a list whose values strictly \textbf{increase}. Here $[10,9,2,5,3,7,101,18]$ has the LIS $2,5,7,101$, length 4.
+
+\vspace{1mm}
+\textbf{State:} $\mathrm{best}[i]$ = length of the longest increasing subsequence that \emph{ends} at position $i$.
+
+\vspace{1mm}
+$\mathrm{best}[i]=1+\max\{\mathrm{best}[j]: j<i,\ a_j<a_i\}$ (or 1 if no such $j$). The answer is the \emph{maximum} over all $i$, not the last entry.}
+\end{column}
+\begin{column}{0.42\textwidth}
+\pyout[\footnotesize]{lis_tails}
+\vspace{1mm}
+{\footnotesize
+\textbf{Faster ($O(n\log n)$).} \texttt{tails[k]} = smallest value that ends an increasing subsequence of length $k+1$. \texttt{bisect\_left} places each $x$: it extends the list or replaces a larger tail. The list stays sorted; its length is the LIS length. (\texttt{tails} is \emph{not} the subsequence.)}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{LIS in Python: the $O(n^2)$ version}
+\pycode[\fontsize{7.8}{9.2}\selectfont]{lis_n2}
+\vspace{1mm}
+{\small
+For each $i$ look at every earlier $j$. The test \texttt{best[j] >= best[i]} means ``extending $j$ beats the best chain found so far for $i$''. The chain is rebuilt through the \texttt{prev} links.}
+\end{frame}
+
+\begin{frame}{LIS in Python: the $O(n\log n)$ version}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\pycode{lis_fast}
+\end{column}
+\begin{column}{0.46\textwidth}
+\pyout{lis_demo}
+\vspace{2mm}
+{\small
+\texttt{lis\_length} is $O(n\log n)$ and returns only the length; \texttt{bisect\_left} is a binary search on the sorted list \texttt{tails}. Both versions agree: 4.
+
+\vspace{2mm}
+To recover the subsequence itself in $O(n\log n)$ you also store, for each tail, the index of its predecessor (a challenge for you).}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Partition into two equal sums}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\figtab[0.6]{fig_part}
+\vspace{1mm}
+{\small Numbers $[1,5,11,5]$ add up to 22, so we need a subset with sum \textbf{11}. Green = this sum can be made with the numbers so far.}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small
+\textbf{Question:} can a list be split into two groups with the same sum?
+
+\vspace{1mm}
+Half of the total is the target $T$. If some subset sums to $T$, the rest does too. So: \emph{is $T$ reachable as a subset sum?}
+
+\vspace{1mm}
+\textbf{State:} the set of reachable sums. Adding a number $x$: every old sum $s$ gives a new sum $s+x$. The last row shows $11$ reachable: $1+5+5$.
+
+\vspace{1mm}
+Python trick: store the set as the bits of one integer; \texttt{reach << x} shifts every sum by $x$ in a single operation.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Partition: the code and a few tests}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\pycode{partition}
+\vspace{2mm}
+\pyout{part_demo}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small
+\texttt{reach} is a \textbf{bitset}: bit $s$ is 1 when sum $s$ can be made. Start with only sum 0. For each number, \texttt{reach |= reach << x} adds the new sums.
+
+\vspace{2mm}
+An odd total can never split. $[1,2,3,5]$ adds to 11: odd, so \texttt{False}. $[3,3,3,4,5]$ sums to 18, and $4+5=3+3+3=9$.
+
+\vspace{2mm}
+Time: $O(n\cdot T)$ bit-steps, and Python's big integers do 64 of them per machine word. This is a \emph{subset-sum} problem, a cousin of knapsack.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Word break: can the text be cut into dictionary words?}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\figtab[0.22]{fig_wb}
+\vspace{1mm}
+{\small
+Dictionary: \texttt{cat, cats, and, sand, dog}. Text: \texttt{catsanddog}. A cell \texttt{T} at position $i$ means \textbf{the first $i$ letters can be cut into words}.
+
+\vspace{1mm}
+Position $i$ is \texttt{T} if for some word $w$ the prefix of length $i-|w|$ is \texttt{T} and the text ends there with $w$. Here: 3 (\texttt{cat}), 4 (\texttt{cats}), 7 (\texttt{cat+sand} or \texttt{cats+and}), 10 (\ldots\texttt{dog}). Position 10 is \texttt{T}: success.}
+\end{column}
+\begin{column}{0.46\textwidth}
+\pycode[\fontsize{7.6}{9}\selectfont]{word_break}
+\vspace{1mm}
+\pyout[\fontsize{7.6}{9}\selectfont]{wb_demo}
 \end{column}
 \end{columns}
 \end{frame}
 
 \begin{frame}{When to use dynamic programming}
-\renewcommand{\arraystretch}{1.3}\footnotesize
+\renewcommand{\arraystretch}{1.1}\footnotesize
 \begin{tabular}{@{}>{\raggedright\bfseries}p{40mm}>{\raggedright}p{52mm}>{\raggedright\arraybackslash}p{44mm}@{}}
 \toprule
 Problem & State & Cost\\\midrule
-Fibonacci & \texttt{F[i]} & $O(n)$ instead of exponential\\
+Fibonacci, climbing stairs & \texttt{F[i]} & $O(n)$ instead of exponential\\
 Coin change & \texttt{best[amount]} & $O(\text{amount}\times\text{coins})$\\
 Longest common subsequence & \texttt{t[i][j]} (prefix of $a$, prefix of $b$) & $O(n\cdot m)$\\
-0/1 knapsack (next lecture) & \texttt{best[item][capacity]} & $O(n\cdot W)$\\
-Edit distance (spell checkers) & \texttt{d[i][j]} & $O(n\cdot m)$\\
-Shortest paths with negative edges (Bellman--Ford) & \texttt{dist[v][steps]} & $O(V\cdot E)$\\
+Edit distance & \texttt{d[i][j]} (prefixes) & $O(n\cdot m)$\\
+0/1 knapsack & \texttt{t[item][capacity]} & $O(n\cdot W)$\\
+Longest increasing subsequence & \texttt{best[i]} (ends at $i$) & $O(n^2)$ or $O(n\log n)$\\
+House robber & \texttt{best[i]} (first $i$ houses) & $O(n)$\\
+Grid paths & \texttt{ways[r][c]} & $O(\text{rows}\times\text{cols})$\\
+Partition, word break & reachable sums, good prefixes & $O(n\cdot T)$, $O(n\cdot\text{words})$\\
+Shortest paths, negative edges (Bellman--Ford) & \texttt{dist[v][steps]} & $O(V\cdot E)$\\
 \bottomrule
 \end{tabular}
-\vspace{4mm}
+\vspace{3mm}
 
 {\small \textbf{Not a fit:} problems with no repeated sub-problems (then plain recursion is already fine), or where the state is too large to store. DP trades \textbf{memory for time}.}
 \end{frame}
 
-\begin{frame}{Recap and practice}
+\begin{frame}{Recap}
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
 \begin{block}{Take-aways}
@@ -412,21 +706,46 @@ Shortest paths with negative edges (Bellman--Ford) & \texttt{dist[v][steps]} & $
 \item \key{Top-down}: recursion + \texttt{@cache}. \key{Bottom-up}: fill a table in the right order.
 \item Recipe: \textbf{state}, \textbf{recurrence}, \textbf{base case}, \textbf{order}, \textbf{answer}.
 \item Greedy can fail where DP succeeds (coin change with $\{1,3,4\}$).
-\item Store the \textbf{choice} too, to rebuild the solution.
+\item Store the \textbf{choice} too, to rebuild the solution by \emph{traceback}.
 \end{enumerate}}
 \end{block}
 \end{column}
 \begin{column}{0.48\textwidth}
-\begin{block}{Practice}
+\begin{block}{Common table shapes}
 {\small
-\begin{enumerate}\setlength\itemsep{3pt}
-\item Stair climbing: you can climb 1 or 2 steps at a time. In how many ways can you reach step $n$? Write it with \texttt{@cache}. What famous sequence appears?
-\item Change \texttt{min\_coins} to count the \emph{number of ways} to make an amount.
-\item Compute the LCS of \texttt{"AGGTAB"} and \texttt{"GXTXAYB"} by hand, then check with the code.
-\item Write \texttt{edit\_distance(a, b)} (insert, delete, replace). Start from the LCS table.
-\item Measure the time of \texttt{fib\_naive(35)} and of \texttt{fib\_memo(35)}.
-\end{enumerate}}
+\begin{itemize}\setlength\itemsep{3pt}
+\item \textbf{1-D, depends on a few earlier cells}: Fibonacci, stairs, robber, coins.
+\item \textbf{1-D, depends on all earlier cells}: LIS, word break.
+\item \textbf{2-D, two prefixes}: LCS, edit distance.
+\item \textbf{2-D, items $\times$ capacity}: knapsack, partition.
+\item \textbf{2-D, positions}: grid paths.
+\end{itemize}}
 \end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Challenge problems (no solutions: try them!)}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\footnotesize
+\begin{enumerate}\setlength\itemsep{3pt}
+\item \textbf{Count the ways} to make an amount with given coins (order does not matter). Change \texttt{min\_coins} to add instead of minimise; watch the loop order.
+\item \textbf{Minimum path sum}: in a grid of costs, find the cheapest right/down route from corner to corner, and print the route.
+\item \textbf{Rod cutting}: a rod of length $n$ can be cut in integer pieces with a price per length. Maximise the total price and list the cuts.
+\item \textbf{Longest palindromic subsequence} of a string. Hint: it is the LCS of the string and its reverse.
+\item \textbf{House robber II}: the houses stand in a \emph{circle}, so the first and the last are neighbours.
+\end{enumerate}}
+\end{column}
+\begin{column}{0.46\textwidth}
+{\footnotesize
+\begin{enumerate}\setlength\itemsep{3pt}\setcounter{enumi}{5}
+\item \textbf{Unbounded knapsack}: every item may be used any number of times. Which loop in \texttt{knapsack\_dp} changes?
+\item \textbf{Matrix-chain multiplication}: choose the order of multiplying $n$ matrices to minimise the scalar products. State: $d[i][j]$ for the sub-chain $i\ldots j$.
+\item \textbf{Edit distance with costs}: replace costs 2, insert and delete cost 1. Relate the answer to the LCS length.
+\item \textbf{Longest common substring} (contiguous!): what changes in the recurrence?
+\item \textbf{Count the LIS}: how many different longest increasing subsequences does $[1,3,5,4,7]$ have?
+\end{enumerate}}
 \end{column}
 \end{columns}
 \end{frame}

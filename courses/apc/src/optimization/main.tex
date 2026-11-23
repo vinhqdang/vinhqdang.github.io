@@ -3,6 +3,10 @@
 \apcfooter{Optimization}
 \apctitle{Optimization}{Finding the best answer among too many candidates}
 
+% a TikZ figure written by the Python demo
+\newcommand{\figtab}[2][0.5]{\begin{sfig}[#1]\input{snippets/#2.out}\end{sfig}}
+\pgfplotsset{apc/.style={axis lines=left,tick label style={font=\scriptsize},label style={font=\small},legend style={font=\scriptsize}}}
+
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
 
@@ -27,12 +31,15 @@ Every optimization problem has three parts:
 \begin{column}{0.46\textwidth}
 \begin{block}{After this lecture you can}
 {\small
-\begin{itemize}\setlength\itemsep{2pt}
+\begin{itemize}\setlength\itemsep{1pt}
 \item write the three parts of a problem;
-\item solve \textbf{knapsack} by brute force, greedy and DP;
-\item explain \textbf{local} versus \textbf{global} optimum;
-\item run \textbf{hill climbing} and \textbf{gradient descent};
-\item see why \textbf{TSP} is hard and why heuristics are useful.
+\item solve \textbf{knapsack} (brute force, greedy, DP) and recover the items;
+\item compare greedy, DP and exact search on \textbf{scheduling};
+\item solve a tiny \textbf{linear program};
+\item tell \textbf{local} from \textbf{global} optima: hill climbing, \textbf{annealing}, \textbf{genetic} search;
+\item run \textbf{gradient descent} in 1-D and 2-D;
+\item attack \textbf{TSP}: nearest neighbour, 2-opt, annealing;
+\item tune settings: grid versus random search.
 \end{itemize}}
 \end{block}
 \end{column}
@@ -48,7 +55,7 @@ Every optimization problem has three parts:
 A bag holds weight $50$. Each item can be taken or left. Which items give the largest total value?
 
 \vspace{2mm}
-\begin{tabular}{@{}lccc@{}}\toprule item & weight & value & value/weight\\\midrule A & 10 & 60 & 6.0\\ B & 20 & 100 & 5.0\\ C & 30 & 120 & 4.0\\\bottomrule\end{tabular}}
+\footnotesize\setlength\tabcolsep{3pt}\begin{tabular}{@{}lccc@{}}\toprule item & weight & value & value/weight\\\midrule A & 10 & 60 & 6.0\\ B & 20 & 100 & 5.0\\ C & 30 & 120 & 4.0\\\bottomrule\end{tabular}}
 \end{column}
 \begin{column}{0.46\textwidth}
 \begin{sfig}[0.7]
@@ -89,12 +96,12 @@ The best choice is B + C with value 220. But there are $2^n$ subsets: what happe
 \pyout{knap_growth}
 \vspace{2mm}
 {\small
-Each 4 extra items multiplies the subsets by 16, and the time with it. For 18 items brute force needs \textbf{0.18 s}. For 40 items it would need days. The DP column barely moves: we come to it in a few slides.}
+Each 4 extra items multiplies the subsets by 16, and the time with it. For 18 items brute force already needs over \textbf{0.1 s}. For 40 items it would need days. The DP column barely moves: we come to it in a few slides.}
 \end{column}
 \begin{column}{0.46\textwidth}
 \begin{sfig}[0.78]
 \begin{tikzpicture}
-\begin{axis}[width=8cm,height=5.4cm,ymode=log,xlabel={items $n$},ylabel={subsets $2^n$},axis lines=left,tick label style={font=\scriptsize},label style={font=\small}]
+\begin{axis}[apc,width=8cm,height=5.4cm,ymode=log,xlabel={items $n$},ylabel={subsets $2^n$}]
 \addplot[tdRed,very thick,domain=1:40,samples=40] {2^x};
 \end{axis}
 \end{tikzpicture}
@@ -140,14 +147,45 @@ Greedy takes A (ratio 6), then B (5). C no longer fits. Total $160$.}
 The loop runs backwards so each item is used at most once. Work: $O(n\times\text{capacity})$, \textbf{polynomial} in the number of items.
 
 \vspace{2mm}
-It gives 220, like brute force, in microseconds.}
+It gives 220, like brute force, in microseconds. But it returns only the \emph{value}. Which items? Next slide.}
 \end{column}
 \end{columns}
 \end{frame}
 
+\begin{frame}{The DP table: which items did we take?}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\figtab[0.55]{fig_knap}
+\vspace{1mm}
+{\footnotesize Weights divided by 10, so capacity $=5$. Rows: items considered so far. Columns: capacity. Cell = best value.}
+\end{column}
+\begin{column}{0.4\textwidth}
+{\small
+Keep the whole table $t[i][c]$ instead of a single row.
+
+\vspace{2mm}
+\textbf{Read the answer back} (amber path): start at the bottom-right corner, value $220$. If the cell equals the one above, item $i$ was \emph{not} needed: go up. If it differs, item $i$ \colorbox{tdGreen!40}{was taken}: go up and left by its weight.
+
+\vspace{2mm}
+Here: C taken ($5\to2$), B taken ($2\to0$), A skipped: \textbf{B + C}.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Knapsack with item recovery in Python}
+\pycode{knap_table}
+\vspace{2mm}
+{\small
+The table has one row per item and one column per capacity: $O(n\cdot W)$ time and memory. Cell \texttt{t[i][c]} starts as ``skip item $i$'' and becomes ``take it'' when that is better. \texttt{chosen\_items} (next page) is the traceback; the printed matrix is the one in the picture.}
+\framebreak
+\pycode{knap_recover}
+\vspace{1mm}
+\pyout{knap_recover_demo}
+\end{frame}
+
 \begin{frame}{Three methods compared}
 \renewcommand{\arraystretch}{1.4}\small
-\begin{tabular}{@{}>{\bfseries}p{26mm}>{\raggedright}p{38mm}>{\raggedright}p{36mm}>{\raggedright\arraybackslash}p{40mm}@{}}
+\begin{tabular}{@{}>{\bfseries}p{22mm}>{\raggedright}p{32mm}>{\raggedright}p{32mm}>{\raggedright\arraybackslash}p{36mm}@{}}
 \toprule & Brute force & Greedy & Dynamic programming\\\midrule
 Optimal? & \good{yes} & \bad{not always} & \good{yes}\\
 Time & $O(2^n)$ & $O(n\log n)$ & $O(n\cdot W)$\\
@@ -159,12 +197,142 @@ Use when & $n$ tiny & a good-enough answer is fine & sub-problems overlap\\\bott
 {\small $W$ is the capacity. The DP time is polynomial in the \emph{value} of $W$, not in its number of digits; this is why knapsack is still a hard problem in theory.}
 \end{frame}
 
+\begin{frame}{Scheduling: when is greedy exactly right?}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\figtab[0.62]{fig_act}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small
+\textbf{Activity selection.} Eleven talks want one room; each has a start and an end. Choose the \emph{largest number} of talks that do not overlap.
+
+\vspace{2mm}
+\key{Greedy rule:} sort by \textbf{earliest finish}, take a talk whenever it starts after the last chosen one ends. Green bars: 4 talks.
+
+\vspace{2mm}
+Unlike knapsack, this greedy rule is \good{provably optimal}: finishing early leaves the most room for the rest. The choice of the \emph{rule} matters: ``earliest start'' or ``shortest'' are wrong.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Scheduling in Python: greedy against exact}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\pycode{act_greedy}
+\vspace{2mm}
+\pyout{act_demo}
+\end{column}
+\begin{column}{0.4\textwidth}
+{\small
+\texttt{pick\_by\_finish} sorts by the end time ($O(n\log n)$) and keeps a single number, \texttt{free\_at}.
+
+\vspace{2mm}
+The demo also tries \emph{all} $2^{11}$ subsets and finds that no set of 5 non-overlapping talks exists: the greedy answer 4 is optimal.
+
+\vspace{2mm}
+\textbf{But} if every talk has a \emph{value}, the greedy rule breaks. Next slide.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Weighted scheduling: the exact reference}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\pycode[\fontsize{7.8}{9.2}\selectfont]{act_exact}
+\end{column}
+\begin{column}{0.36\textwidth}
+{\small
+Now every job has a \textbf{weight} (value); maximise the total weight of non-overlapping jobs. Jobs are triples (start, end, weight).
+
+\vspace{2mm}
+\texttt{disjoint} sorts a combination by start time and checks that consecutive jobs do not overlap; \texttt{pairwise} yields neighbouring pairs.
+
+\vspace{2mm}
+\texttt{best\_exact} tries all $2^n$ subsets: the safe, slow reference for testing the others.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Weighted scheduling: greedy and DP}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\pycode[\fontsize{7.8}{9.2}\selectfont]{act_weight}
+\vspace{2mm}
+\pycode[\fontsize{7.8}{9.2}\selectfont]{act_dp}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small
+\texttt{pick\_by\_weight} is a greedy: take the heaviest job that still fits.
+
+\vspace{2mm}
+\texttt{best\_weight} is DP. \texttt{best[k]} = best total among the first $k$ jobs (sorted by end time). For job $k$ either skip it, or take it and add \texttt{best[j]}, where $j$ is the number of jobs that end before it starts. Binary search (\texttt{bisect\_right}) finds $j$.
+
+\vspace{2mm}
+Time $O(n\log n)$.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Weighted scheduling: the results}
+\pyout{act_weighted}
+\vspace{2mm}
+{\small
+Seven weighted jobs. \textbf{Heaviest first} gets 20, \textbf{earliest finish} gets 17, but the DP finds \textbf{21} (jobs 0--5, 5--10 and 11--15), the same as the exact search over all subsets. DP: $O(n\log n)$; exact: $O(2^n)$.
+
+\vspace{2mm}
+\emph{Moral:} greedy is right for some problems (unweighted scheduling) and wrong for others (knapsack, weighted scheduling). Always test a greedy rule against an exact method on small cases.}
+\end{frame}
+
+\begin{frame}{Linear programming: optimizing with straight-line constraints}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\figtab[0.72]{fig_lp}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small
+A workshop makes $x$ tables and $y$ chairs for profit $2x+3y$. Constraints (wood, time, space):
+\[x+y\le4,\quad x+3y\le7,\quad x\le3,\quad x,y\ge0.\]
+The blue region is every \textbf{feasible} plan. The best plan lies at a \textbf{corner}: slide the dashed profit line outwards until it just touches the region.
+
+\vspace{2mm}
+\key{Idea:} an LP has an optimum at a corner of the feasible region. Corners are intersections of two constraint lines: check them all. Best: $x=2.5$, $y=1.5$, profit $9.5$.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{LP in Python: corners}
+\begin{columns}[T]
+\begin{column}{0.58\textwidth}
+\pycode[\fontsize{8}{9.6}\selectfont]{lp}
+\end{column}
+\begin{column}{0.38\textwidth}
+{\small
+Each rule $(a,b,c)$ means $ax+by\le c$. The last two rules are $x\ge0$ and $y\ge0$ written as $-x\le0$, $-y\le0$.
+
+\vspace{2mm}
+\texttt{corner} solves the two equations $a_1x+b_1y=c_1$ and $a_2x+b_2y=c_2$ with Cramer's rule (parallel lines have \texttt{det == 0}: no corner).
+
+\vspace{2mm}
+\texttt{allowed} keeps a point only if it obeys \emph{every} rule.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{LP in Python: the best corner}
+\pycode[\fontsize{8}{9.6}\selectfont]{lp_solve}
+\vspace{2mm}
+\pyout{lp_demo}
+\vspace{2mm}
+{\small
+The walrus operator \texttt{:=} computes the corner once and tests it in the same condition. The \texttt{max} picks the corner with the best profit. Real solvers (the \emph{simplex} method) walk from corner to corner instead of testing all of them: with $m$ rules and $n$ variables there are up to $\binom{m}{n}$ corners.}
+\end{frame}
+
 \begin{frame}{Continuous problems: climbing a hill}
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
 \begin{sfig}[0.85]
 \begin{tikzpicture}
-\begin{axis}[width=8.4cm,height=5.8cm,xmin=0,xmax=10,ymin=-4,ymax=10,xlabel={$x$},ylabel={$f(x)=x\sin x$},axis lines=left,tick label style={font=\scriptsize},label style={font=\small},clip=false]
+\begin{axis}[apc,width=8.4cm,height=5.8cm,xmin=0,xmax=10,ymin=-4,ymax=10,xlabel={$x$},ylabel={$f(x)=x\sin x$},clip=false]
 \addplot[tdBlue,very thick,domain=0:10,samples=120] {x*sin(deg(x))};
 \addplot[only marks,mark=*,mark size=2.6pt,tdAmber] coordinates {(2.03,1.82)};
 \addplot[only marks,mark=*,mark size=2.6pt,tdGreen] coordinates {(7.98,7.92)};
@@ -189,10 +357,10 @@ The curve has two peaks. The \textbf{global} optimum is the highest point; a \te
 
 \begin{frame}{Hill climbing in Python}
 \begin{columns}[T]
-\begin{column}{0.54\textwidth}
+\begin{column}{0.58\textwidth}
 \pycode{hill}
 \end{column}
-\begin{column}{0.42\textwidth}
+\begin{column}{0.38\textwidth}
 \pyout{hill_demo}
 {\small
 \vspace{2mm}
@@ -204,19 +372,170 @@ The result depends on where we start.}
 \end{columns}
 \end{frame}
 
+\begin{frame}{Two climbs, drawn on the curve}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\begin{sfig}[0.86]
+\begin{tikzpicture}
+\begin{axis}[apc,width=10cm,height=6.2cm,xmin=0,xmax=10,ymin=-4,ymax=10,xlabel={$x$},ylabel={$f(x)$},clip=false]
+\addplot[tdBlue!50,thick,domain=0:10,samples=120] {x*sin(deg(x))};
+\addplot[tdAmber!85!black,very thick,mark=*,mark size=1.3pt] table[x=x,y=y]{snippets/hc_a.out};
+\addplot[tdGreen!70!black,very thick,mark=*,mark size=1.3pt] table[x=x,y=y]{snippets/hc_b.out};
+\node[font=\scriptsize,tdAmber!80!black,anchor=north] at (axis cs:1,0.2) {start 1};
+\node[font=\scriptsize,tdGreen!60!black,anchor=north] at (axis cs:6,-1.9) {start 6};
+\node[font=\scriptsize,tdAmber!80!black,anchor=south] at (axis cs:2.03,2.2) {stuck: 1.82};
+\node[font=\scriptsize,tdGreen!60!black,anchor=south] at (axis cs:7.98,8.3) {global: 7.92};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.36\textwidth}
+{\small
+The dots are the positions visited by the real run (every 10th step, step size $0.01$).
+
+\vspace{2mm}
+\textcolor{tdAmber!80!black}{\textbf{Amber}}: the climber from $x=1$ walks up the first small hill and stops: both neighbours are lower.
+
+\vspace{2mm}
+\textcolor{tdGreen!60!black}{\textbf{Green}}: the climber from $x=6$ walks up the big hill.
+
+\vspace{2mm}
+A hill climber never goes downhill, so it can never cross the valley.}
+\end{column}
+\end{columns}
+\end{frame}
+
 \begin{frame}{Escaping local peaks: random restarts}
 \begin{columns}[T]
 \begin{column}{0.54\textwidth}
 \pycode{restarts}
+\vspace{2mm}
+\pyout{restart_demo}
 \end{column}
 \begin{column}{0.42\textwidth}
 {\small
-Climb from many random starting points and keep the best peak found. With 10 restarts the global peak was found ($x=7.98$, $f=7.92$, see the previous slide).
+Climb from many random starting points and keep the best peak found. With 10 restarts the global peak was found ($x=7.98$, $f=7.92$, see the earlier slide).
 
 \vspace{2mm}
-No guarantee, but it is simple and often works. Better-known variants add controlled randomness, such as \textbf{simulated annealing} and \textbf{genetic algorithms}.}
+Counting single climbs from 20 random starts: only about two thirds reach the global peak. With restarts, the chance that \emph{all} climbs miss it becomes tiny.
+
+\vspace{2mm}
+No guarantee, but it is simple and often works. Two smarter ways to use randomness come next: \textbf{simulated annealing} and \textbf{genetic algorithms}.}
 \end{column}
 \end{columns}
+\end{frame}
+
+\begin{frame}{Simulated annealing: sometimes accept a worse move}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\begin{sfig}[0.8]
+\begin{tikzpicture}
+\begin{axis}[apc,width=8.6cm,height=5.6cm,xmin=-8,xmax=0,ymin=0,ymax=1.05,xlabel={$\Delta=f(\text{new})-f(\text{old})$ (negative = worse)},ylabel={accept probability $e^{\Delta/T}$},legend pos=north west,legend cell align=left]
+\addplot[tdRed,very thick,domain=-8:0,samples=60] {exp(x/0.5)};
+\addplot[tdAmber,very thick,domain=-8:0,samples=60] {exp(x/1)};
+\addplot[tdGreen,very thick,domain=-8:0,samples=60] {exp(x/2)};
+\addplot[tdBlue,very thick,domain=-8:0,samples=60] {exp(x/5)};
+\legend{$T=0.5$,$T=1$,$T=2$,$T=5$}
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small
+\key{Simulated annealing} copies a trick from metallurgy: cool slowly.
+
+\vspace{1mm}
+Propose a random nearby move. \textbf{Better}: always accept. \textbf{Worse}: accept with probability $e^{\Delta/T}$.
+
+\vspace{1mm}
+The \emph{temperature} $T$ starts high (almost anything is accepted: wide exploration) and shrinks each step (only improvements survive: fine climbing).
+
+\vspace{1mm}
+The curves show the effect. A big drop ($\Delta=-4$) is accepted often at $T=5$ (45\%), rarely at $T=1$ (2\%), almost never at $T=0.5$.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Simulated annealing in Python}
+\pycode{anneal}
+\framebreak
+\pyout{sa_demo}
+\vspace{2mm}
+{\small
+\texttt{anneal} proposes $y=x+\text{noise}$ (clamped to $[0,10]$), accepts it if better or with probability $e^{\Delta/T}$, and multiplies $T$ by \texttt{cool} every step. It remembers the best $x$ seen.
+
+\vspace{2mm}
+Started where the hill climber got stuck ($x=1$), annealing reaches the global peak in most runs, for 3\,000 evaluations of $f$. Still no guarantee: it is a heuristic.}
+\end{frame}
+
+\begin{frame}{One annealing run: wandering, then settling}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\begin{sfig}[0.85]
+\begin{tikzpicture}
+\begin{axis}[apc,width=10cm,height=6cm,xmin=0,xmax=3000,ymin=0,ymax=10,xlabel={iteration},ylabel={current $x$}]
+\addplot[tdBlue,thick] table[x=it,y=x]{snippets/fig_sa_trace.out};
+\addplot[dashed,tdGreen!70!black] coordinates {(0,7.98) (3000,7.98)};
+\addplot[dashed,tdAmber!80!black] coordinates {(0,2.03) (3000,2.03)};
+\node[font=\scriptsize,tdGreen!60!black,anchor=south west] at (axis cs:2000,8.05) {global peak $x=7.98$};
+\node[font=\scriptsize,tdAmber!80!black,anchor=south west] at (axis cs:2000,2.1) {local peak $x=2.03$};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.36\textwidth}
+{\small
+Real run, starting at $x=1$ (next to the local peak).
+
+\vspace{2mm}
+At the start $T$ is high: the walk is almost free and leaves the small hill, crosses the valley and finds the big hill.
+
+\vspace{2mm}
+Later $T$ is small: the walk jitters closer and closer around the global peak.
+
+\vspace{2mm}
+This is the same ``explore, then exploit'' pattern as in many learning algorithms.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Genetic algorithms: evolution as a search}
+\begin{sfig}[0.55]
+\begin{tikzpicture}[node distance=14mm]
+  \node[card=tdBlue,minimum width=2.6cm] (pop) {\textbf{population}\\\scriptsize many candidate answers};
+  \node[card=tdAmber,minimum width=2.6cm,right=of pop] (sel) {\textbf{selection}\\\scriptsize fitter ones are picked more often};
+  \node[card=tdGreen,minimum width=2.6cm,right=of sel] (cro) {\textbf{crossover}\\\scriptsize mix two parents into a child};
+  \node[card=tdPurple,minimum width=2.6cm,right=of cro] (mut) {\textbf{mutation}\\\scriptsize small random change};
+  \draw[arr] (pop) -- (sel); \draw[arr] (sel) -- (cro); \draw[arr] (cro) -- (mut);
+  \draw[arr] (mut.south) -- ++(0,-0.9) -| node[pos=0.25,below,font=\scriptsize] {the children are the next generation} (pop.south);
+  \begin{scope}[yshift=-3.6cm,xshift=1.2cm]
+    \node[font=\scriptsize\bfseries,anchor=east] at (-0.2,0.35) {parent 1};
+    \node[font=\scriptsize\bfseries,anchor=east] at (-0.2,-0.2) {parent 2};
+    \foreach \b [count=\i from 0] in {1,0,1,1,0,0,1,0}{\node[cell,minimum size=5mm,fill=tdBlue!20] at (\i*0.55,0.35) {\scriptsize\b};}
+    \foreach \b [count=\i from 0] in {0,1,1,0,1,1,0,1}{\node[cell,minimum size=5mm,fill=tdAmber!25] at (\i*0.55,-0.2) {\scriptsize\b};}
+    \draw[tdRed,thick,dashed] (1.925,0.8) -- (1.925,-0.65);
+    \node[font=\scriptsize,text=tdRed] at (1.925,1.0) {cut point};
+    \draw[arr] (4.6,0.08) -- (5.5,0.08) node[midway,above,font=\scriptsize] {child};
+    \foreach \b/\c [count=\i from 0] in {1/tdBlue!20,0/tdBlue!20,1/tdBlue!20,1/tdBlue!20,1/tdAmber!25,1/tdAmber!25,0/tdAmber!25,1/tdAmber!25}{\node[cell,minimum size=5mm,fill=\c] at (6.0+\i*0.55,0.08) {\scriptsize\b};}
+    \node[cell,minimum size=5mm,fill=tdRed!25] at (6.0+5*0.55,-0.7) {\scriptsize 0};
+    \node[font=\scriptsize,text=tdRed,anchor=west] at (6.0+5.4*0.55,-0.7) {mutation flips one bit};
+  \end{scope}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small A candidate can be a number, a bit string (which items to take), or a tour. Fitness = the objective. No gradient needed: only the ability to \emph{score} a candidate. Good for rough landscapes; slow and without guarantees.}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{A small genetic algorithm in Python}
+\pycode{genetic}
+\framebreak
+\pyout{ga_demo}
+\vspace{2mm}
+{\small
+Eight random numbers in $[0,10]$ are the first generation. Each round: keep the best one (\emph{elitism}); build the rest as the average of two tournament winners (\emph{selection} and \emph{crossover}) plus a Gaussian nudge (\emph{mutation}).
+
+\vspace{2mm}
+The best fitness climbs from 4.88 to the global peak 7.92 within a few generations. The nested function \texttt{pick} is a \emph{tournament}: two random people compete, the fitter one wins.}
 \end{frame}
 
 \begin{frame}{Gradient descent: use the slope}
@@ -243,12 +562,39 @@ $\eta$ (\texttt{lr}) is the \textbf{learning rate}, the step size. This single i
 \end{columns}
 \end{frame}
 
+\begin{frame}{Gradient descent on the curve itself}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.78]
+\begin{tikzpicture}
+\begin{axis}[apc,width=7.2cm,height=5.2cm,xmin=-4,xmax=11,ymin=0,ymax=52,xlabel={$x$},ylabel={$f(x)=(x-3)^2+1$},title={\small small step: $\eta=0.1$}]
+\addplot[tdBlue!50,thick,domain=-4:11,samples=60] {(x-3)^2+1};
+\addplot[tdGreen!70!black,very thick,mark=*,mark size=1.6pt] table[x=x,y=y]{snippets/gd_curve_a.out};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.78]
+\begin{tikzpicture}
+\begin{axis}[apc,width=7.2cm,height=5.2cm,xmin=-4,xmax=11,ymin=0,ymax=52,xlabel={$x$},ylabel={$f(x)$},title={\small big step: $\eta=0.9$}]
+\addplot[tdBlue!50,thick,domain=-4:11,samples=60] {(x-3)^2+1};
+\addplot[tdAmber!85!black,very thick,mark=*,mark size=1.6pt] table[x=x,y=y]{snippets/gd_curve_b.out};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\end{columns}
+\vspace{1mm}
+{\small Dots are the iterates of the real run (12 steps from $x=10$). With a small step the path slides down the right side and slows near the bottom, where the slope is small. With $\eta=0.9$ it jumps from side to side but each jump is smaller: it still converges, just by zig-zagging.}
+\end{frame}
+
 \begin{frame}{The learning rate in a picture}
 \begin{columns}[T]
 \begin{column}{0.58\textwidth}
 \begin{sfig}[0.85]
 \begin{tikzpicture}
-\begin{axis}[width=9.6cm,height=6cm,xmin=0,xmax=12,ymin=-20,ymax=20,xlabel={step},ylabel={$x$},axis lines=left,legend pos=north east,legend style={font=\scriptsize},tick label style={font=\scriptsize},label style={font=\small},clip=true]
+\begin{axis}[apc,width=9.6cm,height=6cm,xmin=0,xmax=12,ymin=-20,ymax=20,xlabel={step},ylabel={$x$},legend pos=north east,clip=true]
 \addplot[tdGreen,very thick,mark=*,mark size=1.4pt] table[x=step,y=lr01]{snippets/gd_data.out};
 \addplot[tdAmber,very thick,mark=*,mark size=1.4pt] table[x=step,y=lr10]{snippets/gd_data.out};
 \addplot[tdRed,very thick,mark=*,mark size=1.4pt] table[x=step,y=lr11]{snippets/gd_data.out};
@@ -267,6 +613,78 @@ Green walks to the minimum. Amber bounces between two values. Red swings wider e
 
 \vspace{2mm}
 In machine learning, picking the learning rate is one of the most important settings of the training.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Learning-rate sweep: how good is each step size?}
+\begin{columns}[T]
+\begin{column}{0.58\textwidth}
+\begin{sfig}[0.85]
+\begin{tikzpicture}
+\begin{axis}[apc,width=9.6cm,height=6cm,ymode=log,xmin=0,xmax=1.15,ymin=1e-12,ymax=1e6,xlabel={learning rate $\eta$},ylabel={$(x-3)^2$ after 20 steps}]
+\addplot[tdBlue,very thick,mark=*,mark size=1.6pt] table[x=lr,y=loss]{snippets/gd_sweep.out};
+\draw[dashed,tdRed] (axis cs:1,1e-12) -- (axis cs:1,1e6);
+\node[font=\scriptsize,tdRed,anchor=west] at (axis cs:1.01,1e-8) {$\eta\ge1$: diverges};
+\node[font=\scriptsize,tdGreen!60!black,anchor=south] at (axis cs:0.5,1e-10) {best: $\eta=0.5$};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.4\textwidth}
+{\small
+Distance from the minimum after 20 steps, for twelve learning rates (real data; log scale). Lower is better.
+
+\vspace{2mm}
+For this parabola the error shrinks by the factor $|1-2\eta|$ each step. So the \emph{best} step is $\eta=0.5$ (one jump to the bottom), and the picture is symmetric around it. At $\eta=1$ the factor is exactly $-1$: no progress. Beyond: divergence.
+
+\vspace{2mm}
+Real functions are not parabolas, so $\eta$ is found by \textbf{trying values}, the topic of the last slides.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Gradient descent in two dimensions}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\begin{sfig}[0.88]
+\begin{tikzpicture}
+\begin{axis}[apc,width=9.4cm,height=6.2cm,xmin=-5,xmax=5,ymin=-2.6,ymax=2.6,xlabel={$x$},ylabel={$y$},axis lines=box,legend pos=south east,legend style={at={(0.98,0.04)}}]
+\foreach \c in {1,4,9,16,25}{\addplot[tdBlue!40,domain=0:360,samples=70] ({sqrt(\c)*cos(x)},{sqrt(\c/3)*sin(x)});}
+\addplot[tdGreen!70!black,very thick,mark=*,mark size=1.3pt] table[x=x,y=y]{snippets/gd2_slow.out};
+\addplot[tdAmber!85!black,very thick,mark=*,mark size=1.3pt] table[x=x,y=y]{snippets/gd2_fast.out};
+\addplot[only marks,mark=star,mark size=4pt,tdRed] coordinates {(0,0)};
+\legend{,,,,,$\eta=0.05$,$\eta=0.3$,minimum}
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.44\textwidth}
+\pycode[\fontsize{7.4}{8.8}\selectfont]{gradient2d}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Reading the 2-D picture}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\small
+$f(x,y)=x^2+3y^2$ is a long narrow bowl. The blue ellipses are \textbf{level lines} (the same height); the minimum is the red star. The gradient $(2x,6y)$ is steeper in $y$.
+
+\vspace{2mm}
+\good{$\eta=0.05$} (green): smooth and safe, but slow along $x$. After 20 steps it is still at $x=-0.49$.
+
+\vspace{2mm}
+\textcolor{tdAmber!80!black}{\textbf{$\eta=0.3$}} (amber): fast along $x$ (almost 0 after 5 steps) but the steep $y$ direction \bad{overshoots} each time and zig-zags across the valley.}
+\end{column}
+\begin{column}{0.46\textwidth}
+\pyout{gd2_demo}
+\vspace{2mm}
+{\small
+\textbf{Moral:} when the valley is steep in one direction and flat in another, one learning rate cannot suit both. This is why practical optimizers (momentum, Adam) adapt the step per direction.
+
+\vspace{2mm}
+\texttt{grad2} returns a pair, and \texttt{descend} updates both coordinates at once. The same loop works for millions of parameters.}
 \end{column}
 \end{columns}
 \end{frame}
@@ -291,13 +709,13 @@ Visit every city once and return home, with the shortest total distance.
 
 \begin{frame}{TSP: the exact answer by brute force}
 \begin{columns}[T]
-\begin{column}{0.52\textwidth}
-\pycode{tsp_brute}
+\begin{column}{0.6\textwidth}
+\pycode[\fontsize{7.6}{9}\selectfont]{tsp_brute}
 \vspace{2mm}
 {\small
 Try all $(n-1)!$ orders (\texttt{permutations}) and keep the shortest. City 0 is fixed as the start.}
 \end{column}
-\begin{column}{0.44\textwidth}
+\begin{column}{0.36\textwidth}
 {\small On 8 cities:}
 \pyout{tsp_demo}
 {\small
@@ -305,6 +723,83 @@ Try all $(n-1)!$ orders (\texttt{permutations}) and keep the shortest. City 0 is
 The greedy tour is 25\% longer than the best. Is exactness worth it? It depends on how many cities we have.}
 \end{column}
 \end{columns}
+\end{frame}
+
+\begin{frame}{The two tours on the map}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\figtab[0.62]{fig_tsp_nn}
+\end{column}
+\begin{column}{0.48\textwidth}
+\figtab[0.62]{fig_tsp_opt}
+\end{column}
+\end{columns}
+\vspace{1mm}
+{\small Same eight cities (amber = start). \textbf{Nearest neighbour} (left, red) takes the closest city every time and is forced into a long return leg and a crossing. The \textbf{optimal} tour (right, green) accepts a slightly longer first step to avoid the long jump at the end: $32.07$ against $40.12$.}
+\end{frame}
+
+\begin{frame}{2-opt: remove a crossing by reversing a segment}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.6]
+\begin{tikzpicture}
+  \begin{scope}
+    \node[font=\scriptsize\bfseries] at (1.2,2.6) {before: edges cross};
+    \foreach \n/\x/\y in {a/0/0,b/2.4/0,c/2.4/2,d/0/2}{\node[tn] (\n) at (\x,\y) {\n};}
+    \draw[tdRed,thick] (a) -- (c); \draw[tdRed,thick] (c) -- (b); \draw[tdRed,thick] (b) -- (d); \draw[tdRed,thick] (d) -- (a);
+    \node[font=\tiny,text=tdRed] at (1.2,-0.7) {tour a, c, b, d};
+  \end{scope}
+  \begin{scope}[xshift=5.2cm]
+    \node[font=\scriptsize\bfseries] at (1.2,2.6) {after: reverse the segment c, b};
+    \foreach \n/\x/\y in {a/0/0,b/2.4/0,c/2.4/2,d/0/2}{\node[tn] (\n) at (\x,\y) {\n};}
+    \draw[tdGreen!70!black,thick] (a) -- (b); \draw[tdGreen!70!black,thick] (b) -- (c); \draw[tdGreen!70!black,thick] (c) -- (d); \draw[tdGreen!70!black,thick] (d) -- (a);
+    \node[font=\tiny,text=tdGreen!60!black] at (1.2,-0.7) {tour a, b, c, d};
+  \end{scope}
+  \draw[arr] (3.1,1) -- (4.3,1);
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.46\textwidth}
+{\small
+A tour whose edges \textbf{cross} is never optimal: by the triangle inequality, replacing the two crossing edges by the two uncrossed ones is always shorter.
+
+\vspace{2mm}
+\key{2-opt:} for every pair of positions $i<j$, \textbf{reverse} the part of the tour between them. If the new tour is shorter, keep it. Repeat until no pair helps.
+
+\vspace{2mm}
+It is a \emph{local search}: each accepted step improves the tour, and it stops at a tour that no single reversal can improve (a local optimum, like the hill climber).}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{2-opt in Python and its result}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\pycode[\fontsize{8}{9.6}\selectfont]{two_opt}
+\end{column}
+\begin{column}{0.42\textwidth}
+\pyout{tsp_opt_demo}
+\vspace{2mm}
+{\small
+Start from the nearest-neighbour tour (40.12). Each reversal that shortens the tour is kept. 2-opt ends at \textbf{32.07}, the same as brute force, but it needed only a few thousand length computations instead of 5\,040 full tours. On bigger maps it is not always optimal, but usually within a few percent.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{NN, optimal and 2-opt on the same map}
+\begin{columns}[T]
+\begin{column}{0.32\textwidth}
+\figtab[0.5]{fig_tsp_nn}
+\end{column}
+\begin{column}{0.32\textwidth}
+\figtab[0.5]{fig_tsp_2opt}
+\end{column}
+\begin{column}{0.32\textwidth}
+\figtab[0.5]{fig_tsp_opt}
+\end{column}
+\end{columns}
+\vspace{1mm}
+{\small Left to right: nearest neighbour (40.12), after 2-opt (32.07), brute force (32.07). Here the cheap local search recovers the exact optimum. The crossing edges and the long return leg are gone.}
 \end{frame}
 
 \begin{frame}{Why TSP is hard}
@@ -323,40 +818,106 @@ Nearest neighbour was 25\% longer than the best tour, but it needs no search at 
 No one knows a fast exact algorithm for TSP; it belongs to the family of \textbf{NP-hard} problems. In practice we use:
 \begin{itemize}\setlength\itemsep{2pt}
 \item \textbf{heuristics} that are fast and usually good;
-\item \textbf{local search} that improves a tour (e.g.\ 2-opt);
+\item \textbf{local search} that improves a tour (2-opt, annealing);
 \item \textbf{approximation} with a guaranteed quality.\end{itemize}}
 \end{column}
 \end{columns}
 \end{frame}
 
+\begin{frame}[allowframebreaks]{Simulated annealing for TSP}
+\pycode{anneal_tsp}
+\framebreak
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\pyout{tsp_big}
+\end{column}
+\begin{column}{0.5\textwidth}
+{\small
+Same idea as before, now the \emph{move} is a 2-opt reversal of a random segment. Worse tours are accepted with probability $e^{-\Delta/T}$ ($\Delta$ = extra length). 30 random cities, 40\,000 moves.
+
+\vspace{2mm}
+Nearest neighbour: 86.2. 2-opt: 79.8. Annealing: \textbf{78.1}. It can climb out of the local optima where plain 2-opt stops. We cannot prove 78.1 is optimal (30 cities means $29!\approx 10^{31}$ tours) but it is a strong answer in about a second.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{30 cities: greedy against annealing}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\figtab[0.7]{fig_big_nn}
+\end{column}
+\begin{column}{0.48\textwidth}
+\figtab[0.7]{fig_big_sa}
+\end{column}
+\end{columns}
+\vspace{1mm}
+{\small Left: nearest neighbour wanders into dead ends and then makes long jumps (86.2). Right: simulated annealing produces a tour with no crossings (78.1), about 9\% shorter. Both drawn from the real run.}
+\end{frame}
+
+\begin{frame}{Tuning settings: grid search against random search}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\figtab[0.7]{fig_search}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small
+Many programs have \textbf{settings} (learning rate, regularisation, \ldots) that we must choose. Every trial is expensive: we want the best setting with a \emph{small budget}.
+
+\vspace{2mm}
+\textbf{Grid search}: a regular lattice. Only 3 distinct values of each setting are ever tried.
+
+\vspace{2mm}
+\textbf{Random search}: random points. 9 trials give 9 distinct values of \emph{each} setting.
+
+\vspace{2mm}
+Green band: the narrow range of learning rates that works. The grid misses it; random search has a point inside.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Grid against random search in Python}
+\pycode{search}
+\framebreak
+\pyout{search_demo}
+\vspace{2mm}
+{\small
+\texttt{score(lr, reg)} stands for a validation score; only the learning rate matters much (a narrow peak at 0.37). Best of the grid vs the mean of 300 random searches with the \emph{same budget}.
+
+\vspace{2mm}
+The random search improves steadily with the budget. The grid is \emph{erratic}: at 16 trials a grid line happens to fall on the peak (1.27), at 9 and 25 trials it misses it (0.30, 0.44). When only a few settings matter, random search wastes fewer trials on repeated values.}
+\end{frame}
+
 \begin{frame}{Choosing a strategy}
-\renewcommand{\arraystretch}{1.35}\small
-\begin{tabular}{@{}>{\raggedright\bfseries}p{38mm}>{\raggedright}p{50mm}>{\raggedright\arraybackslash}p{58mm}@{}}
+\renewcommand{\arraystretch}{1.05}\footnotesize
+\begin{tabular}{@{}>{\raggedright\bfseries}p{36mm}>{\raggedright}p{44mm}>{\raggedright\arraybackslash}p{50mm}@{}}
 \toprule Situation & Method & Warning\\\midrule
 Few candidates & brute force & $2^n$ and $n!$ explode quickly\\
 Overlapping sub-problems & dynamic programming & you must find the right state\\
+Greedy choice is provably safe (unweighted scheduling) & greedy & a wrong rule is silently wrong\\
+Linear objective and constraints & linear programming (corners, simplex) & integer answers are harder\\
 Smooth function, slope known & gradient descent & learning rate; local minima\\
-Rough landscape, no slope & hill climbing + restarts & may stop at a local peak\\
-Huge hard problem (TSP) & heuristics, local search & no guarantee of the best answer\\\bottomrule
+Rough landscape, no slope & hill climbing + restarts, annealing, genetic & may stop at a local peak\\
+Huge hard problem (TSP) & heuristics, 2-opt, annealing & no guarantee of the best answer\\
+Settings to tune & random search before grid search & each trial costs time\\\bottomrule
 \end{tabular}
 
-\vspace{4mm}
-{\small Searching, sorting, graphs and DP from the earlier lectures are the building blocks: optimization is where they are used together.}
+\vspace{2mm}
+{\footnotesize Searching, sorting, graphs and DP are the building blocks: optimization is where they are used together.}
 \end{frame}
 
-\begin{frame}{Recap and practice}
+\begin{frame}{Recap}
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
 \begin{block}{Take-aways}
 {\small
-\begin{enumerate}\setlength\itemsep{3pt}
+\begin{enumerate}\setlength\itemsep{1pt}
 \item An optimization problem = \key{variables, constraints, objective}.
 \item \key{Brute force} is exact but exponential.
-\item \key{Greedy} is fast but may be wrong (knapsack).
-\item \key{DP} is exact and polynomial when sub-problems overlap.
-\item \key{Local search} can stop at a local optimum; restarts help.
+\item \key{Greedy} is fast but may be wrong (knapsack); exact for some problems.
+\item \key{DP} is exact when sub-problems overlap; keep the table to recover items.
+\item \key{Local search} can stall at a local optimum; \key{restarts}, \key{annealing}, \key{genetic} search help.
 \item \key{Gradient descent} needs a good learning rate.
-\item \key{TSP}: we accept good heuristic answers.
+\item \key{TSP}: we accept good heuristic answers (2-opt, annealing).
 \end{enumerate}}
 \end{block}
 \end{column}
@@ -365,12 +926,37 @@ Huge hard problem (TSP) & heuristics, local search & no guarantee of the best an
 {\small
 \begin{enumerate}\setlength\itemsep{3pt}
 \item Find a 3-item knapsack where greedy gives the worst possible answer.
-\item Make \texttt{knapsack\_dp} return the \emph{chosen items}, not only the value.
 \item Run \texttt{hill\_climb} from 20 different starts. How many reach the global peak?
 \item Try \texttt{lr = 0.5} and \texttt{lr = 0.9}. Which converges faster than 0.1?
-\item Implement 2-opt: reverse a part of the tour while it gets shorter. Compare with nearest neighbour.
+\item Change \texttt{cool} in \texttt{anneal} to 0.9 and to 0.9999. What happens to the success rate?
+\item Run \texttt{two\_opt} on 20 random cities. How much shorter is it than nearest neighbour?
 \end{enumerate}}
 \end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Challenge problems (no solutions: try them!)}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\footnotesize
+\begin{enumerate}\setlength\itemsep{3pt}
+\item \textbf{Fractional knapsack}: items may be cut into pieces. Show that the greedy rule by value/weight is now optimal, and write it.
+\item \textbf{Counter-example hunt}: write a loop that tries random knapsack instances and reports the first one where greedy loses to DP by more than 30\%.
+\item \textbf{Or-opt / 3-opt}: add a move that relocates one city to another position in the tour. Does it improve 2-opt on 30 cities?
+\item \textbf{Restarts for TSP}: run 2-opt from 20 random start tours and keep the best. Compare with one annealing run of equal time.
+\item \textbf{Cooling schedules}: compare $T\leftarrow 0.995T$ with $T=T_0/(1+k)$ on the $x\sin x$ curve.
+\end{enumerate}}
+\end{column}
+\begin{column}{0.46\textwidth}
+{\footnotesize
+\begin{enumerate}\setlength\itemsep{3pt}\setcounter{enumi}{5}
+\item \textbf{Minimum number of rooms}: given talk times, what is the fewest rooms that hold all of them? (Hint: sort the start and end times.)
+\item \textbf{LP by hand}: add the rule $2x+y\le6$ to the workshop problem. Recompute the corners and the best plan, and redraw the picture.
+\item \textbf{Momentum}: add $v\leftarrow0.9v-\eta f'(x)$, $x\leftarrow x+v$ to gradient descent on $x^2+3y^2$. Does it zig-zag less?
+\item \textbf{Genetic knapsack}: encode a bag as a list of bits, write crossover and mutation, and compare with the DP answer on 30 items.
+\item \textbf{Random vs grid}: change \texttt{score} so that both settings matter equally. Which method wins now?
+\end{enumerate}}
 \end{column}
 \end{columns}
 \end{frame}
