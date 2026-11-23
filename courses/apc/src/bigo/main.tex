@@ -1,0 +1,326 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\input{../../common/preamble}
+\apcfooter{Big-O and complexity}
+\apctitle{Big-O and complexity}{How the cost of an algorithm grows with the size of its input}
+
+\begin{document}
+\begin{frame}[plain]\titlepage\end{frame}
+
+\begin{frame}{``My program is slow'': but how slow, and for what input?}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\small
+You time two programs: A takes 2 seconds, B takes 5 seconds. Is A better?
+
+\vspace{2mm}
+Not necessarily:
+\begin{itemize}\setlength\itemsep{2pt}
+\item the timings depend on \textbf{your computer}, other programs, the Python version;
+\item they say nothing about a \textbf{bigger input}. A might take 2 s for 1\,000 items but 3 hours for 100\,000.
+\end{itemize}
+\vspace{1mm}
+So computer scientists ask a different question: \key{how does the number of steps grow as the input grows?}}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{block}{After this lecture you can}
+{\small
+\begin{itemize}\setlength\itemsep{2pt}
+\item count the steps of a loop or a function;
+\item recognise $O(1)$, $O(\log n)$, $O(n)$, $O(n\log n)$, $O(n^2)$ and $O(2^n)$;
+\item simplify an expression to its Big-O form;
+\item read the complexity off a piece of code;
+\item see why the difference matters, with real timings.
+\end{itemize}}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Constant and linear: counting steps}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\pycode{constant}
+\vspace{2mm}
+\pycode{linear}
+\end{column}
+\begin{column}{0.44\textwidth}
+{\small
+\textbf{\texttt{first\_item}}: one step, no matter how long the list is. We call this \key{constant time}, $O(1)$.
+
+\vspace{3mm}
+\textbf{\texttt{total}}: the loop body runs once per item, so the work is \emph{proportional} to $n$. Double the list, double the time: \key{linear time}, $O(n)$.
+
+\vspace{3mm}
+We count the \textbf{basic operations} (an addition, a comparison, an assignment), not seconds. Whether a step is $1$ or $3$ machine instructions does not change how the \emph{growth} looks.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Nested loops: quadratic time}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\pycode{quadratic}
+\vspace{2mm}
+\pyout{pairs}
+\end{column}
+\begin{column}{0.44\textwidth}
+{\small
+The inner loop runs about $n$ times for each of the $n$ values of \texttt{i}. With no duplicate the function compares every pair once:
+\[
+\binom{n}{2}=\frac{n(n-1)}{2}=\frac{n^2}{2}-\frac{n}{2}.
+\]
+For large $n$ the $n^2$ term dominates, so this is \key{quadratic time}, $O(n^2)$.
+
+\vspace{2mm}
+\textbf{Rule of thumb:} two nested loops over the input $\Rightarrow$ $O(n^2)$; three $\Rightarrow$ $O(n^3)$.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Logarithmic time: halving}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\pycode{logarithmic}
+\vspace{2mm}
+{\small
+\texttt{halvings(1000)} $=9$, \texttt{halvings(1000000)} $=19$. How many times can you halve $n$ before reaching 1? About $\log_2 n$ times.
+
+\vspace{2mm}
+\key{Logarithmic time}, $O(\log n)$: a million items need ${\sim}20$ steps, a billion only ${\sim}30$. Binary search is the classic example; so is walking down a balanced tree.}
+\end{column}
+\begin{column}{0.5\textwidth}
+\pyout{steps}
+\vspace{2mm}
+{\small Compare the columns for $n=100\,000$: $\log_2 n$ is \textbf{16}, $n$ is 100\,000, $n\log_2 n$ is 1.6 million, and $n^2$ is \textbf{ten billion}.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The common growth rates}
+\begin{columns}[T]
+\begin{column}{0.44\textwidth}
+\renewcommand{\arraystretch}{1.28}\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Big-O & Name & Example\\\midrule
+$O(1)$ & constant & \texttt{items[i]}\\
+$O(\log n)$ & logarithmic & binary search\\
+$O(n)$ & linear & scan a list\\
+$O(n\log n)$ & linearithmic & merge sort\\
+$O(n^2)$ & quadratic & nested loops\\
+$O(2^n)$ & exponential & all subsets\\
+\bottomrule
+\end{tabular}
+\vspace{2mm}
+
+{\small Slower-growing is better: $O(1)\prec O(\log n)\prec O(n)\prec O(n\log n)\prec O(n^2)\prec O(2^n)$.}
+\end{column}
+\begin{column}{0.54\textwidth}
+\begin{sfig}[0.78]
+\begin{tikzpicture}
+\begin{axis}[width=9.4cm,height=6.6cm,xmin=0,xmax=20,ymin=0,ymax=100,xlabel={input size $n$},ylabel={steps},axis lines=left,legend pos=north west,legend style={font=\scriptsize},tick label style={font=\scriptsize},label style={font=\small},clip=true]
+  \addplot[tdGreen,very thick,domain=1:20] {1.5};
+  \addplot[tdBlue!70!tdGreen,very thick,domain=1:20,samples=60] {4*ln(x)/ln(2)/1.5};
+  \addplot[tdBlue,very thick,domain=1:20] {x*2.2};
+  \addplot[tdPurple,very thick,domain=1:20,samples=60] {x*ln(x)/ln(2)/1.55};
+  \addplot[tdAmber,very thick,domain=1:20,samples=60] {x*x/4};
+  \addplot[tdRed,very thick,domain=1:20,samples=60] {2^x/9000*3};
+  \legend{$1$,$\log n$,$n$,$n\log n$,$n^2$,$2^n$}
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+{\tiny curves rescaled to fit one picture: only the \emph{shape} matters.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Big-O: dropping what does not matter}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{block}{Informal definition}
+{\small $f(n)=O(g(n))$ means: for large enough $n$, $f$ grows \textbf{no faster than a constant times $g$}. Big-O is an \emph{upper bound} on growth.}
+\end{block}
+\vspace{2mm}
+{\small
+\textbf{Two simplification rules}
+\begin{enumerate}\setlength\itemsep{2pt}
+\item \textbf{Drop constant factors}: $5n$ and $100n$ are both $O(n)$.
+\item \textbf{Keep only the fastest-growing term}: $n^2+n$ is $O(n^2)$.
+\end{enumerate}}
+\end{column}
+\begin{column}{0.46\textwidth}
+\renewcommand{\arraystretch}{1.3}\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Steps counted & Big-O\\\midrule
+$7$ & $O(1)$\\
+$3n+5$ & $O(n)$\\
+$\tfrac12 n^2-\tfrac12 n$ & $O(n^2)$\\
+$n^2+1000n+10^6$ & $O(n^2)$\\
+$5n\log_2 n+20n$ & $O(n\log n)$\\
+$2^n+n^{10}$ & $O(2^n)$\\
+\bottomrule
+\end{tabular}
+\vspace{3mm}
+
+{\small \textbf{Why drop terms?} For $n=1000$, in $n^2+1000n$ the $n^2$ part is already 1\,000\,000 and the other part only 1\,000.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Quiz: what is the Big-O of each function?}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\pycode{quiz_a}
+\vspace{2mm}
+\pycode{quiz_b}
+\end{column}
+\begin{column}{0.48\textwidth}
+\pycode{quiz_c}
+\vspace{2mm}
+\pycode{quiz_d}
+\end{column}
+\end{columns}
+\vspace{2mm}
+{\small Think first, then turn the page. Hint: look at how many times each loop runs, and whether a loop variable is added to, or multiplied or divided.}
+\end{frame}
+
+\begin{frame}{Quiz: answers}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\pyout{quiz}
+\vspace{2mm}
+{\small Doubling $n$ from 1000 to 2000 shows the growth: $\times2$, $+1$, $\times4$, and a bit more than $\times2$.}
+\end{column}
+\begin{column}{0.46\textwidth}
+{\small
+\begin{description}\setlength\itemsep{3pt}
+\item[\texttt{mystery\_a}] $5n$ steps: the inner loop is a \emph{fixed} 5 times. $\Rightarrow O(n)$.
+\item[\texttt{mystery\_b}] \texttt{i} doubles each time, so about $\log_2 n$ rounds. $\Rightarrow O(\log n)$.
+\item[\texttt{mystery\_c}] two nested loops of $n$: $n^2$ steps. $\Rightarrow O(n^2)$.
+\item[\texttt{mystery\_d}] $n$ rounds of an inner loop that halves: $n\log_2 n$. $\Rightarrow O(n\log n)$.
+\end{description}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Exponential time: when the recursion repeats itself}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\pycode{fib_calls}
+\vspace{2mm}
+\pyout{fib_demo}
+\vspace{1mm}
+{\small Each call makes \emph{two} more calls, so the work roughly multiplies by $1.6$ for every $+1$ in $n$. That is $O(2^n)$-like growth.}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.45]
+\begin{tikzpicture}
+\begin{axis}[width=9cm,height=5.4cm,ymode=log,xlabel={$n$},ylabel={function calls},axis lines=left,tick label style={font=\scriptsize},label style={font=\small}]
+  \addplot[tdRed,very thick,mark=*,mark size=1.6pt] table[x=n,y=calls]{snippets/fib_data.out};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+{\tiny A straight line on a log axis means exponential growth.}
+\vspace{2mm}
+
+\pyout{growth}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The difference you can feel}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\footnotesize\textbf{Is $x$ in this collection?} for 100\,000 items:}
+\pyout{membership}
+\vspace{2mm}
+{\small A list scans item by item, $O(n)$. A \texttt{set} hashes the value and jumps straight to it: about $O(1)$.}
+\end{column}
+\begin{column}{0.46\textwidth}
+{\footnotesize\textbf{Building a list of $m$ numbers}, two ways:}
+\pyout{append_insert}
+\vspace{2mm}
+{\small \texttt{append} adds at the end: $O(1)$ each, so $O(m)$ in total. \texttt{insert(0, x)} must shift every existing item: $O(m)$ each, $O(m^2)$ in total. Doubling $m$ makes it about four times slower.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Best, worst, average, and memory}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{block}{Which case do we report?}
+{\small
+Take linear search:
+\begin{itemize}\setlength\itemsep{2pt}
+\item \textbf{best} case: target is first, $O(1)$;
+\item \textbf{worst} case: last or absent, $O(n)$;
+\item \textbf{average}: about $n/2$ steps, still $O(n)$.
+\end{itemize}
+Unless told otherwise, quote the \textbf{worst case}: it is a promise that holds for \emph{every} input.}
+\end{block}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{block}{Time is not the only resource}
+{\small
+\textbf{Space complexity} counts extra memory.\\
+\texttt{total(items)} uses $O(1)$ extra space; \texttt{merge\_sort} builds new lists, $O(n)$ extra space.
+
+\vspace{2mm}
+Often there is a \textbf{trade-off}: a \texttt{set} answers lookups fast, but spends memory to do it.
+
+\vspace{2mm}
+\textbf{Amortised} cost: \texttt{list.append} is usually fast and occasionally copies the list when it grows, but averaged over many appends it is $O(1)$.}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Cost of common Python operations}
+\renewcommand{\arraystretch}{1.25}\small
+\begin{tabularx}{\textwidth}{@{}>{\raggedright}p{54mm}>{\raggedright}p{30mm}X@{}}
+\toprule
+Operation & Cost & Note\\\midrule
+\texttt{len(items)},\ \texttt{items[i]} & $O(1)$ & direct access by position\\
+\texttt{items.append(x)} & $O(1)$ amortised & adds at the end\\
+\texttt{items.insert(0, x)},\ \texttt{items.pop(0)} & $O(n)$ & shifts every item\\
+\texttt{x in items} (list) & $O(n)$ & linear search\\
+\texttt{x in s}, \texttt{s.add(x)} (set, dict) & $O(1)$ on average & hashing\\
+\texttt{sorted(items)} & $O(n\log n)$ & Timsort\\
+\texttt{for x in items:} & $O(n)$ & one pass\\
+\bottomrule
+\end{tabularx}
+\vspace{3mm}
+
+{\small A nested loop \emph{hides} cost: \texttt{for x in a: if x in b:} is $O(n\cdot m)$ when \texttt{b} is a list, but only $O(n)$ when \texttt{b} is a set.}
+\end{frame}
+
+\begin{frame}{Recap and practice}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\begin{block}{Take-aways}
+{\small
+\begin{enumerate}\setlength\itemsep{3pt}
+\item Big-O describes \key{how steps grow with $n$}, not seconds.
+\item Drop constants and lower-order terms.
+\item Common classes, slow to fast growth: $2^n$, $n^2$, $n\log n$, $n$, $\log n$, $1$.
+\item One loop $O(n)$; nested loops $O(n^2)$; halving $O(\log n)$; halving inside a loop $O(n\log n)$.
+\item The choice of data structure (list vs.\ set) can change the Big-O.
+\end{enumerate}}
+\end{block}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{block}{Practice}
+{\small
+\begin{enumerate}\setlength\itemsep{3pt}
+\item State the Big-O of \texttt{sum(range(n))}, \texttt{max(items)} and \texttt{items.count(x)}.
+\item Write a function that finds a pair of numbers in a list that adds to a target: first in $O(n^2)$, then in $O(n)$ using a \texttt{set}.
+\item \texttt{for i in range(n): for j in range(i):} How many times does the body run? Is it still $O(n^2)$?
+\item Use \texttt{timeit} to check that \texttt{x in list} doubles when the list doubles.
+\item Why is $O(n^2)$ acceptable for $n=100$ but dangerous for $n=10^6$?
+\end{enumerate}}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+\end{document}

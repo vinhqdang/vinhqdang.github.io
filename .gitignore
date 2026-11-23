@@ -20,3 +20,19 @@ talks/_bis/
 talks/**/main.pdf
 talks/**/*.docx
 !talks/**/reference.docx
+
+# LaTeX build artifacts (courses/)
+courses/**/*.aux
+courses/**/*.log
+courses/**/*.fdb_latexmk
+courses/**/*.fls
+courses/**/*.nav
+courses/**/*.out
+!courses/**/snippets/*.out
+courses/**/*.snm
+courses/**/*.toc
+courses/**/*.vrb
+courses/*/src/**/main.pdf
+courses/*/*/main.pdf
+courses/**/snippets/
+__pycache__/

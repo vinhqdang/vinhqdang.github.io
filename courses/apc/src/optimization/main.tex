@@ -1,0 +1,377 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\input{../../common/preamble}
+\apcfooter{Optimization}
+\apctitle{Optimization}{Finding the best answer among too many candidates}
+
+\begin{document}
+\begin{frame}[plain]\titlepage\end{frame}
+
+\begin{frame}{What is optimization?}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\small
+Most real problems are not ``find \emph{an} answer'' but ``find the \textbf{best} answer'':
+\begin{itemize}\setlength\itemsep{3pt}
+\item the shortest delivery route;
+\item the most valuable load for a truck;
+\item the model parameters with the smallest error.
+\end{itemize}
+\vspace{1mm}
+Every optimization problem has three parts:
+\begin{enumerate}\setlength\itemsep{2pt}
+\item \textbf{decision variables}: what we choose;
+\item \textbf{constraints}: what is allowed;
+\item an \textbf{objective}: the number to maximise or minimise.
+\end{enumerate}}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{block}{After this lecture you can}
+{\small
+\begin{itemize}\setlength\itemsep{2pt}
+\item write the three parts of a problem;
+\item solve \textbf{knapsack} by brute force, greedy and DP;
+\item explain \textbf{local} versus \textbf{global} optimum;
+\item run \textbf{hill climbing} and \textbf{gradient descent};
+\item see why \textbf{TSP} is hard and why heuristics are useful.
+\end{itemize}}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The knapsack problem}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\pycode{knap_items}
+\vspace{2mm}
+{\small
+A bag holds weight $50$. Each item can be taken or left. Which items give the largest total value?
+
+\vspace{2mm}
+\begin{tabular}{@{}lccc@{}}\toprule item & weight & value & value/weight\\\midrule A & 10 & 60 & 6.0\\ B & 20 & 100 & 5.0\\ C & 30 & 120 & 4.0\\\bottomrule\end{tabular}}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+\foreach \i/\n/\w/\v/\c in {0/A/10/60/tdGreen,1/B/20/100/tdBlue,2/C/30/120/tdAmber}{
+ \node[card,fill=\c!15,minimum width=1.6cm,minimum height=0.9cm+\w*0.03cm] at (\i*2.1,0) {\textbf{\n}\\\scriptsize w=\w, v=\v};}
+\node[draw=tdInk!60,rounded corners,minimum width=5.8cm,minimum height=0.8cm] at (2.1,-2) {bag: capacity 50};
+\end{tikzpicture}
+\end{sfig}
+{\small
+With $n$ items there are $2^n$ ways to choose. Here: $2^3=8$ subsets, easy to check.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Attempt 1: brute force}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\pycode{knap_brute}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small
+Try \textbf{every} subset (\texttt{combinations}), keep the best one that fits. Always correct.
+
+\vspace{2mm}
+Result for our items:}
+\pyout{knap_demo}
+{\small
+\vspace{2mm}
+The best choice is B + C with value 220. But there are $2^n$ subsets: what happens when $n$ grows?}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Brute force does not scale}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\pyout{knap_growth}
+\vspace{2mm}
+{\small
+Each 4 extra items multiplies the subsets by 16, and the time with it. For 18 items brute force needs \textbf{0.18 s}. For 40 items it would need days. The DP column barely moves: we come to it in a few slides.}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{sfig}[0.78]
+\begin{tikzpicture}
+\begin{axis}[width=8cm,height=5.4cm,ymode=log,xlabel={items $n$},ylabel={subsets $2^n$},axis lines=left,tick label style={font=\scriptsize},label style={font=\small}]
+\addplot[tdRed,very thick,domain=1:40,samples=40] {2^x};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Attempt 2: greedy, the tempting shortcut}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\pycode{knap_greedy}
+\end{column}
+\begin{column}{0.44\textwidth}
+{\small
+Idea: take items with the best \textbf{value per kilo} first, while they fit. Fast: sorting, $O(n\log n)$.
+
+\vspace{2mm}
+Greedy takes A (ratio 6), then B (5). C no longer fits. Total $160$.}
+\pyout{knap_demo}
+{\small
+\vspace{1mm}
+\bad{Greedy is not optimal here:} B + C gives 220. Greedy never looks back, and the best bag needs a worse-ratio item.
+
+\emph{Greedy is a heuristic, not a guarantee.}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Attempt 3: dynamic programming}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\pycode{knap_dp}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small
+\texttt{best[c]} = largest value that fits in capacity \texttt{c}. For each item we ask for every \texttt{c}: ``is it better to take this item, or skip it?''
+
+\vspace{2mm}
+\texttt{max(best[c], best[c - w] + v)}
+
+\vspace{2mm}
+The loop runs backwards so each item is used at most once. Work: $O(n\times\text{capacity})$, \textbf{polynomial} in the number of items.
+
+\vspace{2mm}
+It gives 220, like brute force, in microseconds.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Three methods compared}
+\renewcommand{\arraystretch}{1.4}\small
+\begin{tabular}{@{}>{\bfseries}p{26mm}>{\raggedright}p{38mm}>{\raggedright}p{36mm}>{\raggedright\arraybackslash}p{40mm}@{}}
+\toprule & Brute force & Greedy & Dynamic programming\\\midrule
+Optimal? & \good{yes} & \bad{not always} & \good{yes}\\
+Time & $O(2^n)$ & $O(n\log n)$ & $O(n\cdot W)$\\
+Idea & try everything & best ratio first & reuse sub-answers\\
+Use when & $n$ tiny & a good-enough answer is fine & sub-problems overlap\\\bottomrule
+\end{tabular}
+
+\vspace{4mm}
+{\small $W$ is the capacity. The DP time is polynomial in the \emph{value} of $W$, not in its number of digits; this is why knapsack is still a hard problem in theory.}
+\end{frame}
+
+\begin{frame}{Continuous problems: climbing a hill}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.85]
+\begin{tikzpicture}
+\begin{axis}[width=8.4cm,height=5.8cm,xmin=0,xmax=10,ymin=-4,ymax=10,xlabel={$x$},ylabel={$f(x)=x\sin x$},axis lines=left,tick label style={font=\scriptsize},label style={font=\small},clip=false]
+\addplot[tdBlue,very thick,domain=0:10,samples=120] {x*sin(deg(x))};
+\addplot[only marks,mark=*,mark size=2.6pt,tdAmber] coordinates {(2.03,1.82)};
+\addplot[only marks,mark=*,mark size=2.6pt,tdGreen] coordinates {(7.98,7.92)};
+\node[font=\scriptsize,tdAmber!80!black,anchor=south] at (axis cs:2.03,2.3) {local peak};
+\node[font=\scriptsize,tdGreen!60!black,anchor=south] at (axis cs:7.98,8.4) {global peak};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.46\textwidth}
+{\small
+Now $x$ is a number in $[0,10]$ and we want the largest $f(x)$. We cannot try all real numbers.
+
+\vspace{2mm}
+\key{Hill climbing}: stand somewhere, look one small step left and right, move to the higher side, and stop when neither side is higher.
+
+\vspace{2mm}
+The curve has two peaks. The \textbf{global} optimum is the highest point; a \textbf{local} optimum is only higher than its neighbours.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Hill climbing in Python}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\pycode{hill}
+\end{column}
+\begin{column}{0.42\textwidth}
+\pyout{hill_demo}
+{\small
+\vspace{2mm}
+Starting at $x=1$ we climb the small hill and \bad{get stuck at a local peak} ($f=1.82$). Starting at $x=6$ we find the global peak ($f=7.92$).
+
+\vspace{2mm}
+The result depends on where we start.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Escaping local peaks: random restarts}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\pycode{restarts}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small
+Climb from many random starting points and keep the best peak found. With 10 restarts the global peak was found ($x=7.98$, $f=7.92$, see the previous slide).
+
+\vspace{2mm}
+No guarantee, but it is simple and often works. Better-known variants add controlled randomness, such as \textbf{simulated annealing} and \textbf{genetic algorithms}.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Gradient descent: use the slope}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\pycode{gradient}
+\vspace{2mm}
+\pyout{gd_demo}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small
+To \emph{minimise} $f(x)=(x-3)^2+1$ we move against the slope:
+\[x \leftarrow x - \eta\, f'(x)\]
+$\eta$ (\texttt{lr}) is the \textbf{learning rate}, the step size. This single idea trains neural networks.
+
+\vspace{2mm}
+\good{lr = 0.1:} smooth approach to $x=3$.\\
+\bad{lr = 1.0:} jumps between 10 and $-4$ forever.\\
+\bad{lr = 1.1:} each step overshoots more; the value explodes.
+
+\vspace{2mm}
+\emph{Too small is slow, too large diverges.}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The learning rate in a picture}
+\begin{columns}[T]
+\begin{column}{0.58\textwidth}
+\begin{sfig}[0.85]
+\begin{tikzpicture}
+\begin{axis}[width=9.6cm,height=6cm,xmin=0,xmax=12,ymin=-20,ymax=20,xlabel={step},ylabel={$x$},axis lines=left,legend pos=north east,legend style={font=\scriptsize},tick label style={font=\scriptsize},label style={font=\small},clip=true]
+\addplot[tdGreen,very thick,mark=*,mark size=1.4pt] table[x=step,y=lr01]{snippets/gd_data.out};
+\addplot[tdAmber,very thick,mark=*,mark size=1.4pt] table[x=step,y=lr10]{snippets/gd_data.out};
+\addplot[tdRed,very thick,mark=*,mark size=1.4pt] table[x=step,y=lr11]{snippets/gd_data.out};
+\addplot[dashed,tdInk!60] coordinates {(0,3) (12,3)};
+\legend{lr=0.1,lr=1.0,lr=1.1,minimum $x=3$}
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.4\textwidth}
+{\small
+Data from the real run (12 steps, start at $x=10$).
+
+\vspace{2mm}
+Green walks to the minimum. Amber bounces between two values. Red swings wider each time.
+
+\vspace{2mm}
+In machine learning, picking the learning rate is one of the most important settings of the training.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The travelling salesman problem (TSP)}
+\begin{columns}[T]
+\begin{column}{0.58\textwidth}
+\pycode{tsp_nn}
+\end{column}
+\begin{column}{0.4\textwidth}
+{\small
+Visit every city once and return home, with the shortest total distance.
+
+\vspace{2mm}
+\textbf{Nearest neighbour} (greedy): always go to the closest unvisited city. It is fast, $O(n^2)$, but short-sighted.
+
+\vspace{2mm}
+\texttt{tour\_length} adds the distance of each leg, including the return to the start.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{TSP: the exact answer by brute force}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\pycode{tsp_brute}
+\vspace{2mm}
+{\small
+Try all $(n-1)!$ orders (\texttt{permutations}) and keep the shortest. City 0 is fixed as the start.}
+\end{column}
+\begin{column}{0.44\textwidth}
+{\small On 8 cities:}
+\pyout{tsp_demo}
+{\small
+\vspace{2mm}
+The greedy tour is 25\% longer than the best. Is exactness worth it? It depends on how many cities we have.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Why TSP is hard}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\pyout{tsp_growth}
+\vspace{2mm}
+{\small
+Eight cities: 5\,040 tours, instant. Twenty cities: $1.2\times10^{17}$ tours. At a billion tours per second that is about \textbf{four years}.}
+\end{column}
+\begin{column}{0.46\textwidth}
+{\small
+Nearest neighbour was 25\% longer than the best tour, but it needs no search at all, so it scales to thousands of cities.
+
+\vspace{2mm}
+No one knows a fast exact algorithm for TSP; it belongs to the family of \textbf{NP-hard} problems. In practice we use:
+\begin{itemize}\setlength\itemsep{2pt}
+\item \textbf{heuristics} that are fast and usually good;
+\item \textbf{local search} that improves a tour (e.g.\ 2-opt);
+\item \textbf{approximation} with a guaranteed quality.\end{itemize}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Choosing a strategy}
+\renewcommand{\arraystretch}{1.35}\small
+\begin{tabular}{@{}>{\raggedright\bfseries}p{38mm}>{\raggedright}p{50mm}>{\raggedright\arraybackslash}p{58mm}@{}}
+\toprule Situation & Method & Warning\\\midrule
+Few candidates & brute force & $2^n$ and $n!$ explode quickly\\
+Overlapping sub-problems & dynamic programming & you must find the right state\\
+Smooth function, slope known & gradient descent & learning rate; local minima\\
+Rough landscape, no slope & hill climbing + restarts & may stop at a local peak\\
+Huge hard problem (TSP) & heuristics, local search & no guarantee of the best answer\\\bottomrule
+\end{tabular}
+
+\vspace{4mm}
+{\small Searching, sorting, graphs and DP from the earlier lectures are the building blocks: optimization is where they are used together.}
+\end{frame}
+
+\begin{frame}{Recap and practice}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\begin{block}{Take-aways}
+{\small
+\begin{enumerate}\setlength\itemsep{3pt}
+\item An optimization problem = \key{variables, constraints, objective}.
+\item \key{Brute force} is exact but exponential.
+\item \key{Greedy} is fast but may be wrong (knapsack).
+\item \key{DP} is exact and polynomial when sub-problems overlap.
+\item \key{Local search} can stop at a local optimum; restarts help.
+\item \key{Gradient descent} needs a good learning rate.
+\item \key{TSP}: we accept good heuristic answers.
+\end{enumerate}}
+\end{block}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{block}{Practice}
+{\small
+\begin{enumerate}\setlength\itemsep{3pt}
+\item Find a 3-item knapsack where greedy gives the worst possible answer.
+\item Make \texttt{knapsack\_dp} return the \emph{chosen items}, not only the value.
+\item Run \texttt{hill\_climb} from 20 different starts. How many reach the global peak?
+\item Try \texttt{lr = 0.5} and \texttt{lr = 0.9}. Which converges faster than 0.1?
+\item Implement 2-opt: reverse a part of the tour while it gets shorter. Compare with nearest neighbour.
+\end{enumerate}}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+\end{document}

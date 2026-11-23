@@ -1,0 +1,433 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\input{../../common/preamble}
+\apcfooter{Dynamic programming}
+\apctitle{Dynamic programming}{Solving a big problem by remembering the answers to small ones}
+
+\tikzset{ft/.style={circle,draw=tdInk!60,fill=white,minimum size=5.4mm,inner sep=0pt,font=\tiny\bfseries},
+  level 1/.style={sibling distance=34mm,level distance=7.5mm},level 2/.style={sibling distance=17mm,level distance=7.5mm},
+  level 3/.style={sibling distance=9mm,level distance=7.5mm},level 4/.style={sibling distance=7mm,level distance=7.5mm}}
+
+\begin{document}
+\begin{frame}[plain]\titlepage\end{frame}
+
+\begin{frame}{Don't solve the same problem twice}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\small
+Imagine adding up a long column of numbers. Someone interrupts you and asks you to add one more number at the bottom. Do you start from the top again?
+
+\vspace{2mm}
+Of course not: you \textbf{remember} the total so far. \key{Dynamic programming (DP)} is exactly this habit, applied to harder problems:
+\begin{enumerate}\setlength\itemsep{2pt}
+\item break the problem into \textbf{smaller sub-problems};
+\item solve each sub-problem \textbf{once} and store the answer;
+\item build the final answer from the stored ones.
+\end{enumerate}}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{block}{After this lecture you can}
+{\small
+\begin{itemize}\setlength\itemsep{2pt}
+\item see when a recursive solution repeats work;
+\item fix it with \textbf{memoisation} (\texttt{@cache}) or a \textbf{table};
+\item follow the DP recipe: state, recurrence, base case, order;
+\item solve \textbf{coin change} and \textbf{longest common subsequence};
+\item explain why DP turns an exponential algorithm into a polynomial one.
+\end{itemize}}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Fibonacci: a clean recursion with a hidden problem}
+\begin{columns}[T]
+\begin{column}{0.53\textwidth}
+\pycode{fib_naive}
+\vspace{2mm}
+{\small $F(0)=0,\ F(1)=1,\ F(n)=F(n-1)+F(n-2)$. The code is a direct translation of the definition. It is correct, and beautiful. How fast is it?}
+\end{column}
+\begin{column}{0.43\textwidth}
+\pyout{fib_calls}
+\vspace{2mm}
+{\small
+$F(30)$ takes \textbf{2.7 million} calls to compute a number that needs only 30 additions. Adding 10 to $n$ multiplies the work by more than 100. This is exponential growth, roughly $O(1.6^n)$.
+
+\vspace{2mm}
+\emph{Where does the waste come from?}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The recursion tree of \texttt{fib(5)}: the same work again and again}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\begin{sfig}[0.72]
+\begin{tikzpicture}[ft]
+  \node[ft] {5}
+    child{node[ft,fill=tdBlue!12]{4}
+      child{node[ft,fill=tdAmber!40]{3}
+        child{node[ft,fill=tdPurple!25]{2} child{node[ft,fill=tdRed!15]{1}} child{node[ft]{0}}}
+        child{node[ft,fill=tdRed!15]{1}}}
+      child{node[ft,fill=tdPurple!25]{2} child{node[ft,fill=tdRed!15]{1}} child{node[ft]{0}}}}
+    child{node[ft,fill=tdAmber!40]{3}
+      child{node[ft,fill=tdPurple!25]{2} child{node[ft,fill=tdRed!15]{1}} child{node[ft]{0}}}
+      child{node[ft,fill=tdRed!15]{1}}};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.42\textwidth}
+{\small
+\textbf{15 calls} for $n=5$. Count the repeats:
+\begin{itemize}\setlength\itemsep{2pt}
+\item \colorbox{tdAmber!40}{\texttt{fib(3)}} is computed \textbf{2} times,
+\item \colorbox{tdPurple!25}{\texttt{fib(2)}} \textbf{3} times,
+\item \colorbox{tdRed!15}{\texttt{fib(1)}} \textbf{5} times.
+\end{itemize}
+Each repeat re-does an entire subtree. For $n=30$ the tree has millions of nodes but only \textbf{31 different} sub-problems.
+
+\vspace{2mm}
+\key{Overlapping sub-problems}: the same small problem appears many times. That is the signal that DP will help.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Fix 1: memoisation, or ``write it down''}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\pycode{fib_memo}
+\vspace{2mm}
+\pyout{memo_demo}
+\end{column}
+\begin{column}{0.46\textwidth}
+{\small
+Same recursion, plus one line: \texttt{@cache} (from \texttt{functools}) stores every result. The second time \texttt{fib\_memo(k)} is called with the same \texttt{k}, the answer is looked up instead of recomputed.
+
+\vspace{2mm}
+\texttt{cache\_info()} confirms it: only \textbf{31 misses} (the 31 sub-problems $F(0)\ldots F(30)$ really computed) and 28 hits (answers reused).
+
+\vspace{2mm}
+This is the \key{top-down} way: start from the big problem, recurse, and remember. Work: $O(n)$.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Fix 2: tabulation, or ``build from the bottom''}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\pycode{fib_table}
+\vspace{2mm}
+\pyout{table_demo}
+\vspace{2mm}
+{\small No recursion at all: start with the base cases and fill a table from small to large. This is the \key{bottom-up} way.}
+\end{column}
+\begin{column}{0.5\textwidth}
+\pyout{fib_timing}
+\vspace{2mm}
+{\small
+Memoisation and tabulation give the \emph{same} savings: the exponential tree collapses to $n$ steps. The naive version takes 150 ms for $n=32$; the table takes about one microsecond.
+
+\vspace{2mm}
+\begin{block}{Top-down or bottom-up?}
+{\small Top-down is easier to write (add \texttt{@cache}). Bottom-up avoids recursion limits and is slightly faster.}
+\end{block}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The DP recipe}
+\renewcommand{\arraystretch}{1.35}\small
+\begin{tabular}{@{}>{\raggedright\bfseries}p{42mm}>{\raggedright}p{50mm}>{\raggedright\arraybackslash}p{50mm}@{}}
+\toprule
+Step & Fibonacci & Coin change (next)\\\midrule
+1. \textbf{State}: what does one table entry mean? & \texttt{F[i]} = the $i$-th Fibonacci number & \texttt{best[a]} = fewest coins to make amount $a$\\
+2. \textbf{Recurrence}: how does a state use smaller ones? & $F[i]=F[i-1]+F[i-2]$ & $\mathrm{best}[a]=1+\min_c \mathrm{best}[a-c]$\\
+3. \textbf{Base case}: where does it start? & $F[0]=0,\ F[1]=1$ & $\mathrm{best}[0]=0$\\
+4. \textbf{Order}: which entries first? & small $i$ before large $i$ & small amounts first\\
+5. \textbf{Answer}: which entry do we want? & \texttt{F[n]} & \texttt{best[amount]}\\
+\bottomrule
+\end{tabular}
+\vspace{4mm}
+
+{\small \textbf{Two conditions} for DP to work: \key{overlapping sub-problems} (we reuse answers) and \key{optimal substructure} (an optimal answer is built from optimal answers to smaller pieces).}
+\end{frame}
+
+\begin{frame}{Coin change: greedy looks right and can be wrong}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\small
+\textbf{Problem.} Given coin values and an amount, use the \emph{fewest coins}.
+
+\vspace{2mm}
+\textbf{Greedy idea:} always take the largest coin that fits.
+}
+\vspace{1mm}
+\pycode{greedy}
+\end{column}
+\begin{column}{0.46\textwidth}
+\pyout{coin_greedy}
+\vspace{2mm}
+{\small
+With coins $\{1,3,4\}$ and amount $6$, greedy takes $4+1+1$ (3 coins), but $3+3$ uses only \textbf{2}.
+
+\vspace{2mm}
+Greedy fails because its first choice can block a better combination. For ordinary currencies (1, 2, 5, 10, \ldots) greedy happens to work, but you cannot rely on it in general.
+
+\vspace{2mm}
+DP never commits too early: it tries every coin for every amount.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Coin change with DP: the table}
+\begin{sfig}[0.3]
+\begin{tikzpicture}
+  \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.6,0) {best[a]};
+  \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.6,-0.55) {amount a};
+  \node[cell,minimum width=8mm,fill=tdBlue!10] at (0.0,0) {0};
+  \node[font=\tiny,text=tdMuted] at (0.0,-0.55) {0};
+  \node[cell,minimum width=8mm,fill=tdBlue!10] at (0.9,0) {1};
+  \node[font=\tiny,text=tdMuted] at (0.9,-0.55) {1};
+  \node[cell,minimum width=8mm,fill=tdBlue!10] at (1.8,0) {1};
+  \node[font=\tiny,text=tdMuted] at (1.8,-0.55) {2};
+  \node[cell,minimum width=8mm,fill=tdBlue!10] at (2.7,0) {2};
+  \node[font=\tiny,text=tdMuted] at (2.7,-0.55) {3};
+  \node[cell,minimum width=8mm,fill=tdBlue!10] at (3.6,0) {2};
+  \node[font=\tiny,text=tdMuted] at (3.6,-0.55) {4};
+  \node[cell,minimum width=8mm,fill=tdBlue!10] at (4.5,0) {1};
+  \node[font=\tiny,text=tdMuted] at (4.5,-0.55) {5};
+  \node[cell,minimum width=8mm,fill=tdBlue!10] at (5.4,0) {2};
+  \node[font=\tiny,text=tdMuted] at (5.4,-0.55) {6};
+  \node[cell,minimum width=8mm,fill=tdBlue!10] at (6.3,0) {2};
+  \node[font=\tiny,text=tdMuted] at (6.3,-0.55) {7};
+  \node[cell,minimum width=8mm,fill=tdBlue!10] at (7.2,0) {3};
+  \node[font=\tiny,text=tdMuted] at (7.2,-0.55) {8};
+  \node[cell,minimum width=8mm,fill=tdBlue!10] at (8.1,0) {3};
+  \node[font=\tiny,text=tdMuted] at (8.1,-0.55) {9};
+  \node[cell,minimum width=8mm,fill=tdBlue!10] at (9.0,0) {2};
+  \node[font=\tiny,text=tdMuted] at (9.0,-0.55) {10};
+  \node[cell,minimum width=8mm,fill=tdGreen!35] at (9.9,0) {3};
+  \node[font=\tiny,text=tdMuted] at (9.9,-0.55) {11};
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\small
+Coins $\{1,2,5\}$, amount $11$. To make amount $a$, the last coin is some $c$; the rest is the best way to make $a-c$:
+\[\mathrm{best}[a]=1+\min_{c\le a}\mathrm{best}[a-c],\qquad \mathrm{best}[0]=0.\]}
+\end{column}
+\begin{column}{0.46\textwidth}
+{\small
+Example: $\mathrm{best}[11]=1+\min(\mathrm{best}[10],\mathrm{best}[9],\mathrm{best}[6])=1+\min(2,3,2)=3$.
+
+\vspace{1mm}
+Each of the $A$ amounts tries $k$ coins: $O(A\cdot k)$. Brute force would try all combinations: exponential.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Coin change in Python}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\pycode{coins}
+\vspace{2mm}
+\pycode{coin_path}
+\end{column}
+\begin{column}{0.46\textwidth}
+\pyout{coin_demo}
+\vspace{2mm}
+{\small
+\texttt{best[a]} is the table; \texttt{choice[a]} remembers \emph{which coin} gave the best answer. To list the coins, start at the target amount and repeatedly subtract the stored choice: $11\to6\to1\to0$ uses $5,5,1$.
+
+\vspace{2mm}
+\textbf{Tip:} always store a \emph{choice} (or parent) next to the value, so you can rebuild the solution, not just its size.
+
+\vspace{2mm}
+\texttt{INF} marks amounts that cannot be made at all.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Longest common subsequence (LCS)}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\small
+A \textbf{subsequence} keeps the order but may skip letters. The LCS of two strings is the longest sequence that is a subsequence of both.
+
+\vspace{2mm}
+\texttt{A\,\textcolor{tdBlue}{B}\,\textcolor{tdBlue}{C}\,\textcolor{tdBlue}{B}\,D\,\textcolor{tdBlue}{A}\,B}\ and \texttt{\textcolor{tdBlue}{B}\,D\,\textcolor{tdBlue}{C}\,A\,\textcolor{tdBlue}{B}\,\textcolor{tdBlue}{A}}\ share \textbf{BCBA}, length 4.
+
+\vspace{2mm}
+\textbf{Where is it used?} \texttt{diff} and \texttt{git diff} (which lines did not change?), comparing DNA sequences, plagiarism checks, spell correction.}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{block}{The recurrence}
+{\small Let $t[i][j]$ = LCS length of the first $i$ letters of $a$ and the first $j$ letters of $b$.
+\[
+t[i][j]=\begin{cases}
+t[i-1][j-1]+1 & a_i=b_j\\[2pt]
+\max(t[i-1][j],\,t[i][j-1]) & \text{otherwise}
+\end{cases}\]
+with $t[0][j]=t[i][0]=0$.}
+\end{block}
+\vspace{1mm}
+{\small Letters match: extend the best answer for both shorter strings. They differ: drop the last letter of one string or the other and keep the better.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The LCS table, and how to read the answer back}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\begin{sfig}[0.78]
+\begin{tikzpicture}
+  \node[font=\scriptsize,text=tdMuted,anchor=east] at (-1.3,0.55) {$b\to$};
+  \node[font=\scriptsize,text=tdMuted,anchor=east] at (-1.3,-0.5) {$a\downarrow$};
+  \node[font=\scriptsize\bfseries,text=tdBlue] at (0.00,0.55) {};
+  \node[font=\scriptsize\bfseries,text=tdBlue] at (0.68,0.55) {B};
+  \node[font=\scriptsize\bfseries,text=tdBlue] at (1.36,0.55) {D};
+  \node[font=\scriptsize\bfseries,text=tdBlue] at (2.04,0.55) {C};
+  \node[font=\scriptsize\bfseries,text=tdBlue] at (2.72,0.55) {A};
+  \node[font=\scriptsize\bfseries,text=tdBlue] at (3.40,0.55) {B};
+  \node[font=\scriptsize\bfseries,text=tdBlue] at (4.08,0.55) {A};
+  \node[font=\scriptsize\bfseries,text=tdBlue] at (-0.7,0.00) {};
+  \node[font=\scriptsize\bfseries,text=tdBlue] at (-0.7,-0.58) {A};
+  \node[font=\scriptsize\bfseries,text=tdBlue] at (-0.7,-1.16) {B};
+  \node[font=\scriptsize\bfseries,text=tdBlue] at (-0.7,-1.74) {C};
+  \node[font=\scriptsize\bfseries,text=tdBlue] at (-0.7,-2.32) {B};
+  \node[font=\scriptsize\bfseries,text=tdBlue] at (-0.7,-2.90) {D};
+  \node[font=\scriptsize\bfseries,text=tdBlue] at (-0.7,-3.48) {A};
+  \node[font=\scriptsize\bfseries,text=tdBlue] at (-0.7,-4.06) {B};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.00,0.00) {\scriptsize 0};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.68,0.00) {\scriptsize 0};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (1.36,0.00) {\scriptsize 0};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.04,0.00) {\scriptsize 0};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.72,0.00) {\scriptsize 0};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (3.40,0.00) {\scriptsize 0};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (4.08,0.00) {\scriptsize 0};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdAmber!28] at (0.00,-0.58) {\scriptsize 0};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.68,-0.58) {\scriptsize 0};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (1.36,-0.58) {\scriptsize 0};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.04,-0.58) {\scriptsize 0};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.72,-0.58) {\scriptsize 1};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (3.40,-0.58) {\scriptsize 1};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (4.08,-0.58) {\scriptsize 1};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.00,-1.16) {\scriptsize 0};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdGreen!40] at (0.68,-1.16) {\scriptsize 1};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdAmber!28] at (1.36,-1.16) {\scriptsize 1};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.04,-1.16) {\scriptsize 1};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.72,-1.16) {\scriptsize 1};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (3.40,-1.16) {\scriptsize 2};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (4.08,-1.16) {\scriptsize 2};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.00,-1.74) {\scriptsize 0};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.68,-1.74) {\scriptsize 1};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (1.36,-1.74) {\scriptsize 1};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdGreen!40] at (2.04,-1.74) {\scriptsize 2};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdAmber!28] at (2.72,-1.74) {\scriptsize 2};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (3.40,-1.74) {\scriptsize 2};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (4.08,-1.74) {\scriptsize 2};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.00,-2.32) {\scriptsize 0};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.68,-2.32) {\scriptsize 1};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (1.36,-2.32) {\scriptsize 1};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.04,-2.32) {\scriptsize 2};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.72,-2.32) {\scriptsize 2};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdGreen!40] at (3.40,-2.32) {\scriptsize 3};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (4.08,-2.32) {\scriptsize 3};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.00,-2.90) {\scriptsize 0};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.68,-2.90) {\scriptsize 1};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (1.36,-2.90) {\scriptsize 2};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.04,-2.90) {\scriptsize 2};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.72,-2.90) {\scriptsize 2};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdAmber!28] at (3.40,-2.90) {\scriptsize 3};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (4.08,-2.90) {\scriptsize 3};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.00,-3.48) {\scriptsize 0};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.68,-3.48) {\scriptsize 1};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (1.36,-3.48) {\scriptsize 2};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.04,-3.48) {\scriptsize 2};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.72,-3.48) {\scriptsize 3};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (3.40,-3.48) {\scriptsize 3};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdGreen!40] at (4.08,-3.48) {\scriptsize 4};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.00,-4.06) {\scriptsize 0};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (0.68,-4.06) {\scriptsize 1};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (1.36,-4.06) {\scriptsize 2};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.04,-4.06) {\scriptsize 2};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (2.72,-4.06) {\scriptsize 3};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=white] at (3.40,-4.06) {\scriptsize 4};
+  \node[cell,minimum width=6.4mm,minimum height=5.4mm,fill=tdAmber!28] at (4.08,-4.06) {\scriptsize 4};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.44\textwidth}
+{\small
+Fill row by row; each cell needs only its three neighbours above and to the left, so we get $O(n\cdot m)$ steps for strings of length $n$ and $m$.
+
+\vspace{2mm}
+\textbf{Traceback} (amber path, from the bottom-right corner): at a \colorbox{tdGreen!40}{green} cell the letters matched, so that letter is in the LCS and we move diagonally; otherwise we move up or left towards the larger neighbour.
+
+\vspace{2mm}
+Reading the green cells bottom to top gives \textbf{B, C, B, A}.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{LCS in Python}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\pycode{lcs}
+\end{column}
+\begin{column}{0.44\textwidth}
+\pycode{lcs_trace}
+\vspace{2mm}
+\pyout{lcs_demo}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{When to use dynamic programming}
+\renewcommand{\arraystretch}{1.3}\footnotesize
+\begin{tabular}{@{}>{\raggedright\bfseries}p{40mm}>{\raggedright}p{52mm}>{\raggedright\arraybackslash}p{44mm}@{}}
+\toprule
+Problem & State & Cost\\\midrule
+Fibonacci & \texttt{F[i]} & $O(n)$ instead of exponential\\
+Coin change & \texttt{best[amount]} & $O(\text{amount}\times\text{coins})$\\
+Longest common subsequence & \texttt{t[i][j]} (prefix of $a$, prefix of $b$) & $O(n\cdot m)$\\
+0/1 knapsack (next lecture) & \texttt{best[item][capacity]} & $O(n\cdot W)$\\
+Edit distance (spell checkers) & \texttt{d[i][j]} & $O(n\cdot m)$\\
+Shortest paths with negative edges (Bellman--Ford) & \texttt{dist[v][steps]} & $O(V\cdot E)$\\
+\bottomrule
+\end{tabular}
+\vspace{4mm}
+
+{\small \textbf{Not a fit:} problems with no repeated sub-problems (then plain recursion is already fine), or where the state is too large to store. DP trades \textbf{memory for time}.}
+\end{frame}
+
+\begin{frame}{Recap and practice}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\begin{block}{Take-aways}
+{\small
+\begin{enumerate}\setlength\itemsep{3pt}
+\item DP = \key{solve each sub-problem once} and reuse the answer.
+\item Look for \key{overlapping sub-problems} in a recursion tree.
+\item \key{Top-down}: recursion + \texttt{@cache}. \key{Bottom-up}: fill a table in the right order.
+\item Recipe: \textbf{state}, \textbf{recurrence}, \textbf{base case}, \textbf{order}, \textbf{answer}.
+\item Greedy can fail where DP succeeds (coin change with $\{1,3,4\}$).
+\item Store the \textbf{choice} too, to rebuild the solution.
+\end{enumerate}}
+\end{block}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{block}{Practice}
+{\small
+\begin{enumerate}\setlength\itemsep{3pt}
+\item Stair climbing: you can climb 1 or 2 steps at a time. In how many ways can you reach step $n$? Write it with \texttt{@cache}. What famous sequence appears?
+\item Change \texttt{min\_coins} to count the \emph{number of ways} to make an amount.
+\item Compute the LCS of \texttt{"AGGTAB"} and \texttt{"GXTXAYB"} by hand, then check with the code.
+\item Write \texttt{edit\_distance(a, b)} (insert, delete, replace). Start from the LCS table.
+\item Measure the time of \texttt{fib\_naive(35)} and of \texttt{fib\_memo(35)}.
+\end{enumerate}}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+\end{document}

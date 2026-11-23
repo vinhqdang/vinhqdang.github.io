@@ -1,0 +1,337 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\input{../../common/preamble}
+\apcfooter{Graphs}
+\apctitle{Graphs}{Modelling connections: BFS, DFS and shortest paths}
+
+\tikzset{gn/.style={rounded corners=3pt,draw=tdInk!70,minimum width=11mm,minimum height=6.5mm,inner sep=2pt,font=\scriptsize\bfseries,fill=white},
+         wl/.style={midway,fill=tdPaper,inner sep=1pt,font=\tiny\bfseries,text=tdMuted}}
+\newcommand{\gA}{white}\newcommand{\gB}{white}\newcommand{\gC}{white}\newcommand{\gD}{white}\newcommand{\gE}{white}\newcommand{\gF}{white}
+% campus graph; #1 = 1 shows the walking minutes on the edges
+\newcommand{\campus}[1]{%
+  \coordinate (pg) at (0,0); \coordinate (pl) at (2.6,1.5); \coordinate (pc) at (2.6,-1.5);
+  \coordinate (pb) at (5.6,1.5); \coordinate (pd) at (5.6,-1.5); \coordinate (py) at (8.2,0);
+  \ifnum#1=1
+    \draw[tdInk!60] (pg) -- node[wl] {4} (pl); \draw[tdInk!60] (pg) -- node[wl] {2} (pc);
+    \draw[tdInk!60] (pl) -- node[wl] {5} (pb); \draw[tdInk!60] (pl) -- node[wl,pos=0.3] {6} (pd);
+    \draw[tdInk!60] (pc) -- node[wl] {3} (pd); \draw[tdInk!60] (pb) -- node[wl] {6} (py); \draw[tdInk!60] (pd) -- node[wl] {2} (py);
+  \else
+    \foreach \u/\v in {pg/pl,pg/pc,pl/pb,pl/pd,pc/pd,pb/py,pd/py}{\draw[tdInk!60] (\u) -- (\v);}
+  \fi
+  \node[gn,fill=\gA] (gate) at (pg) {Gate}; \node[gn,fill=\gB] (lib) at (pl) {Lib}; \node[gn,fill=\gC] (cafe) at (pc) {Cafe};
+  \node[gn,fill=\gD] (lab) at (pb) {Lab}; \node[gn,fill=\gE] (dorm) at (pd) {Dorm}; \node[gn,fill=\gF] (gym) at (py) {Gym};}
+\newcommand{\badge}[3]{\node[pill=#3,inner sep=2pt,font=\tiny\bfseries] at ($(#1)+(0.5,0.42)$) {#2};}
+
+\begin{document}
+\begin{frame}[plain]\titlepage\end{frame}
+
+\begin{frame}{Graphs model connections}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\small
+A \key{graph} is a set of things (\textbf{nodes}) and the links between them (\textbf{edges}). It is the most flexible structure in computing:
+\begin{itemize}\setlength\itemsep{3pt}
+\item \textbf{maps}: places and roads (Google Maps);
+\item \textbf{social networks}: people and friendships;
+\item \textbf{the web}: pages and hyperlinks;
+\item \textbf{dependencies}: which course needs which;
+\item \textbf{networks}: routers and cables.
+\end{itemize}
+Lists and trees are special cases of graphs.}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{block}{After this lecture you can}
+{\small
+\begin{itemize}\setlength\itemsep{2pt}
+\item represent a graph with a dictionary (adjacency list) or a matrix;
+\item explore it with \textbf{BFS} and \textbf{DFS};
+\item find the \textbf{fewest-hops} route and the \textbf{cheapest} route (Dijkstra);
+\item find \textbf{connected components};
+\item say what each costs: $O(V+E)$, $O((V+E)\log V)$.
+\end{itemize}}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Our running example: a small campus}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\begin{sfig}[0.6]
+\begin{tikzpicture}
+  \campus{0}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.38\textwidth}
+{\small
+\begin{description}\setlength\itemsep{2pt}
+\item[vertex / node] a place: Gate, Lib, \ldots
+\item[edge] a footpath between two places.
+\item[neighbours] nodes joined by an edge: Lib's neighbours are Gate, Lab, Dorm.
+\item[degree] number of neighbours: Dorm has 3.
+\item[path] a walk along edges.
+\item[cycle] a path back to its start.
+\item[connected] every node can reach every other.
+\end{description}}
+\end{column}
+\end{columns}
+\vspace{1mm}
+{\small This graph is \textbf{undirected} (paths work both ways) and, later, \textbf{weighted} (each path takes some minutes). One-way streets would make it \textbf{directed}.}
+\end{frame}
+
+\begin{frame}{Two ways to store a graph}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\pycode{representation}
+\vspace{2mm}
+\pyout{representation_demo}
+\vspace{1mm}
+{\small \textbf{Adjacency list}: a dict from each node to the list of its neighbours.}
+\end{column}
+\begin{column}{0.48\textwidth}
+\pyout{matrix_demo}
+\vspace{1mm}
+{\small \textbf{Adjacency matrix}: a table with 1 where an edge exists (built by the code below).}
+\vspace{1mm}
+\pycode{matrix}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Which representation?}
+\renewcommand{\arraystretch}{1.35}\small
+\begin{tabular}{@{}>{\raggedright\bfseries}p{50mm}>{\raggedright}p{45mm}>{\raggedright\arraybackslash}p{45mm}@{}}
+\toprule
+ & Adjacency list & Adjacency matrix\\\midrule
+Memory & $O(V+E)$ & $O(V^2)$\\
+Is there an edge $u\!-\!v$? & scan $u$'s list: $O(\text{degree})$ & one lookup: $O(1)$\\
+List all neighbours of $u$ & $O(\text{degree})$ & scan a row: $O(V)$\\
+Best for & \textbf{sparse} graphs (most real ones) & \textbf{dense} graphs, quick edge tests\\
+\bottomrule
+\end{tabular}
+\vspace{4mm}
+
+{\small A social network with a billion people where each knows a few hundred others has $E\approx 10^{11}$ but $V^2=10^{18}$ cells. The matrix would not fit in any computer, so real systems use adjacency lists. We use them from now on.}
+\end{frame}
+
+\begin{frame}{Breadth-first search (BFS): explore in layers}
+\begin{columns}[T]
+\begin{column}{0.58\textwidth}
+\begin{sfig}[0.55]
+\begin{tikzpicture}
+  \renewcommand{\gA}{tdAmber!40}\renewcommand{\gB}{tdBlue!22}\renewcommand{\gC}{tdBlue!22}\renewcommand{\gD}{tdGreen!24}\renewcommand{\gE}{tdGreen!24}\renewcommand{\gF}{tdPurple!22}
+  \campus{0}
+  \node[font=\tiny,text=tdAmber!70!black,anchor=south] at (0,0.5) {0 hops};
+  \node[font=\tiny,text=tdBlue,anchor=south] at (2.6,2.0) {1 hop}; \node[font=\tiny,text=tdBlue,anchor=north] at (2.6,-2.0) {1 hop};
+  \node[font=\tiny,text=tdGreen!70!black,anchor=south] at (5.6,2.0) {2 hops}; \node[font=\tiny,text=tdGreen!70!black,anchor=north] at (5.6,-2.0) {2 hops};
+  \node[font=\tiny,text=tdPurple,anchor=south] at (8.2,0.5) {3 hops};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.4\textwidth}
+{\small
+Start at the Gate. Visit everything \textbf{1 hop} away, then everything \textbf{2 hops} away, and so on: the search spreads like a ripple.
+
+\vspace{2mm}
+To do this we keep a \textbf{queue} (first in, first out): neighbours are added at the back, and we always take the node at the front.
+
+\vspace{2mm}
+\textbf{Bonus:} the first time BFS reaches a node, it has used the \textbf{fewest possible edges}. So BFS finds shortest paths in an \emph{unweighted} graph.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{BFS in Python}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\pycode{bfs}
+\vspace{2mm}
+{\small
+\texttt{parent} does two jobs: it remembers which nodes we have already seen (so none is queued twice), and it records \emph{how we got there}.}
+\end{column}
+\begin{column}{0.47\textwidth}
+\pycode{path}
+\vspace{2mm}
+\pyout{bfs_demo}
+\vspace{2mm}
+{\small
+Following \texttt{parent} backwards from Gym gives the route. Every node enters the queue once and every edge is looked at once: $O(V+E)$.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Depth-first search (DFS): go deep, then backtrack}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.5]
+\begin{tikzpicture}
+  \campus{0}
+  \badge{pg}{1}{tdAmber}\badge{pl}{2}{tdAmber}\badge{pb}{3}{tdAmber}\badge{py}{4}{tdAmber}\badge{pd}{5}{tdAmber}\badge{pc}{6}{tdAmber}
+  \draw[->,very thick,tdAmber!80!black] (pg) -- (pl); \draw[->,very thick,tdAmber!80!black] (pl) -- (pb);
+  \draw[->,very thick,tdAmber!80!black] (pb) -- (py); \draw[->,very thick,tdAmber!80!black] (py) -- (pd); \draw[->,very thick,tdAmber!80!black] (pd) -- (pc);
+\end{tikzpicture}
+\end{sfig}
+{\small Follow one path as far as it goes; when you hit a dead end (or a place already visited), \textbf{backtrack} to the last choice and try the next neighbour.}
+\end{column}
+\begin{column}{0.48\textwidth}
+\pycode{dfs}
+\vspace{2mm}
+\pyout{dfs_demo}
+\vspace{2mm}
+{\small
+Recursion \emph{is} the stack: each call remembers where to continue. Also $O(V+E)$. DFS does not find shortest paths, but it is ideal for ``can I get there?'', cycles, mazes and ordering tasks.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Connected components: separate islands}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\pycode{components}
+\vspace{2mm}
+\pyout{components_demo}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{sfig}[0.4]
+\begin{tikzpicture}
+  \node[gn,fill=tdBlue!22] (a) at (0,0.5) {A}; \node[gn,fill=tdBlue!22] (b) at (1.6,0.5) {B}; \node[gn,fill=tdBlue!22] (c) at (3.2,0.5) {C};
+  \node[gn,fill=tdGreen!24] (d) at (0,-0.9) {D}; \node[gn,fill=tdGreen!24] (e) at (1.6,-0.9) {E}; \node[gn,fill=tdAmber!35] (f) at (3.2,-0.9) {F};
+  \draw[tdInk!60] (a) -- (b) -- (c); \draw[tdInk!60] (d) -- (e);
+\end{tikzpicture}
+\end{sfig}
+{\small
+A \textbf{component} is a group of nodes that can all reach each other. Start a DFS from any unseen node: everything it reaches is one component; repeat until all nodes are seen.
+
+\vspace{2mm}
+Uses: ``are these two accounts connected?'', finding islands in an image, checking that a network is not split in two.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Fewest hops is not the same as quickest}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\begin{sfig}[0.52]
+\begin{tikzpicture}
+  \campus{1}
+  \foreach \u/\v in {pg/pl,pl/pb,pb/py}{\draw[very thick,tdRed!80,opacity=0.75] (\u) -- (\v);}
+  \foreach \u/\v in {pg/pc,pc/pd,pd/py}{\draw[very thick,tdGreen!80!black,opacity=0.75] (\u) -- (\v);}
+  \campus{1}
+\end{tikzpicture}
+\end{sfig}
+{\small
+Both routes from Gate to Gym have \textbf{3 edges}, so BFS cannot tell them apart. It returned Gate--Lib--Lab--Gym:
+\textcolor{tdRed}{\textbf{red}} $4+5+6=\textbf{15}$ min, but \textcolor{tdGreen!70!black}{\textbf{green}} takes $2+3+2=\textbf{7}$ min.}
+\end{column}
+\begin{column}{0.43\textwidth}
+{\small The weighted graph in Python: a dict of dicts (neighbour $\to$ minutes to walk).}
+\vspace{1mm}
+\pycode[\fontsize{7.8}{9.4}\selectfont]{weighted}
+\vspace{2mm}
+{\small
+When edges have different costs we need an algorithm that adds up the \emph{weights}: \key{Dijkstra's algorithm}.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Dijkstra's algorithm: settle the closest node first}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\begin{sfig}[0.5]
+\begin{tikzpicture}
+  \renewcommand{\gA}{tdAmber!40}\renewcommand{\gB}{tdBlue!15}\renewcommand{\gC}{tdBlue!15}\renewcommand{\gD}{tdBlue!15}\renewcommand{\gE}{tdBlue!15}\renewcommand{\gF}{tdBlue!15}
+  \campus{1}
+  \node[font=\tiny\bfseries,text=tdGreen!70!black,anchor=south] at (0,0.45) {0};
+  \node[font=\tiny\bfseries,text=tdGreen!70!black,anchor=south] at (2.6,1.95) {4};  \node[font=\tiny\bfseries,text=tdGreen!70!black,anchor=north] at (2.6,-1.95) {2};
+  \node[font=\tiny\bfseries,text=tdGreen!70!black,anchor=south] at (5.6,1.95) {9};  \node[font=\tiny\bfseries,text=tdGreen!70!black,anchor=north] at (5.6,-1.95) {5};
+  \node[font=\tiny\bfseries,text=tdGreen!70!black,anchor=south] at (8.2,0.45) {7};
+\end{tikzpicture}
+\end{sfig}
+{\small Green numbers = final shortest time from Gate.}
+\vspace{2mm}
+
+\pyout{dijkstra_trace}
+\end{column}
+\begin{column}{0.5\textwidth}
+{\small
+\begin{enumerate}\setlength\itemsep{3pt}
+\item Give every node a distance: 0 for the start, $\infty$ for the rest.
+\item Take the \textbf{unsettled node with the smallest distance}. Its distance is now final.
+\item \textbf{Relax} its edges: if going through it makes a neighbour closer, update that neighbour.
+\item Repeat until everything is settled.
+\end{enumerate}
+\vspace{1mm}
+A \textbf{heap} (priority queue, last lecture!) gives ``the closest node'' in $O(\log n)$. Why is it correct? All weights are $\ge 0$, so a longer walk can never become shorter.
+
+\vspace{1mm}
+\textbf{Negative weights} break this argument: use Bellman--Ford.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Dijkstra in Python}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\pycode{dijkstra}
+\end{column}
+\begin{column}{0.47\textwidth}
+\pyout{dijkstra_demo}
+\vspace{2mm}
+{\small
+\texttt{dist[v]} is the best time found so far to reach \texttt{v}; \texttt{parent} lets us rebuild the route, exactly as in BFS.
+
+\vspace{2mm}
+\texttt{if d > dist[u]: continue} skips \emph{stale} heap entries: a node may be pushed several times with different distances, and only the smallest one matters.
+
+\vspace{2mm}
+Cost: each edge may push once, each push or pop is $O(\log)$: $O((V+E)\log V)$.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Which graph algorithm?}
+\renewcommand{\arraystretch}{1.32}\footnotesize
+\begin{tabular}{@{}>{\raggedright\bfseries}p{26mm}>{\raggedright}p{50mm}>{\raggedright}p{30mm}>{\raggedright\arraybackslash}p{36mm}@{}}
+\toprule
+Algorithm & Use it to \ldots & Cost & Data structure\\\midrule
+BFS & fewest-edge path, layers, ``how far?'' & $O(V+E)$ & queue (\texttt{deque})\\
+DFS & reachability, components, cycles, mazes & $O(V+E)$ & recursion / stack\\
+Dijkstra & cheapest path, weights $\ge 0$ & $O((V+E)\log V)$ & heap (\texttt{heapq})\\
+Bellman--Ford & cheapest path with negative weights & $O(V\cdot E)$ & arrays\\
+A* & cheapest path to \emph{one} target, using a guess of the remaining distance & often much faster than Dijkstra & heap\\
+\bottomrule
+\end{tabular}
+\vspace{4mm}
+
+{\small Navigation apps run Dijkstra-like searches over road graphs with hundreds of millions of edges, with many extra tricks to answer in milliseconds.}
+\end{frame}
+
+\begin{frame}{Recap and practice}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\begin{block}{Take-aways}
+{\small
+\begin{enumerate}\setlength\itemsep{3pt}
+\item A graph is nodes plus edges; store it as an \key{adjacency list} (a dict of lists).
+\item \key{BFS} explores in layers with a queue and finds the fewest-hop path.
+\item \key{DFS} dives deep with recursion; use it for reachability and components.
+\item With edge costs, use \key{Dijkstra}: settle the closest node first, using a heap.
+\item BFS and DFS cost $O(V+E)$; Dijkstra $O((V+E)\log V)$.
+\end{enumerate}}
+\end{block}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{block}{Practice}
+{\small
+\begin{enumerate}\setlength\itemsep{3pt}
+\item Add a node \texttt{Pool} connected to \texttt{Gym}. What changes in the BFS output?
+\item Write \texttt{has\_path(graph, a, b)} using BFS or DFS.
+\item Make Dijkstra return the distance to \emph{one} target and stop early.
+\item Does Dijkstra still work if you change one road to 0 minutes? To $-1$? Why?
+\item Course prerequisites form a directed graph. Write a function that lists a valid order to take the courses (topological sort).
+\end{enumerate}}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+\end{document}

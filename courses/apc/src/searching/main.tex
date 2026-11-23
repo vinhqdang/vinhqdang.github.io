@@ -1,0 +1,295 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\input{../../common/preamble}
+\apcfooter{Searching}
+\apctitle{Searching}{Linear search, binary search, and why sorted data is powerful}
+
+% one row of the 16-element array used in the binary search trace:  y, lo, hi, mid
+\newcommand{\arrayrow}[4]{%
+  \foreach \v [count=\i from 0] in {3,8,12,15,19,23,27,31,36,42,47,53,58,64,71,79}{%
+    \ifnum\i<#2 \def\fc{tdLine!55}\else\ifnum\i>#3 \def\fc{tdLine!55}\else\def\fc{white}\fi\fi
+    \ifnum\i=#4 \def\fc{tdAmber!45}\fi
+    \node[cell,fill=\fc] at (\i*0.76,#1) {\scriptsize\v};}%
+  \node[font=\tiny,text=tdBlue] at (#2*0.76,#1-0.55) {lo};
+  \node[font=\tiny,text=tdBlue] at (#3*0.76,#1-0.55) {hi};
+  \node[font=\tiny\bfseries,text=tdAmber!70!black] at (#4*0.76,#1+0.55) {mid};}
+
+\begin{document}
+\begin{frame}[plain]\titlepage\end{frame}
+
+\begin{frame}{Searching is everywhere}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+{\small
+Every time you
+\begin{itemize}\setlength\itemsep{2pt}
+\item type a name into your phone's contacts,
+\item look a student ID up in a database,
+\item press Ctrl+F in a document,
+\item check whether a username is already taken,
+\end{itemize}
+a program \key{searches}. Because it happens billions of times a day, \emph{how} it searches decides whether an app feels instant or frozen.}
+\end{column}
+\begin{column}{0.44\textwidth}
+\begin{block}{After this lecture you can}
+{\small
+\begin{itemize}\setlength\itemsep{2pt}
+\item write \textbf{linear search} and \textbf{binary search} in Python;
+\item explain \emph{why} binary search needs sorted data;
+\item count the steps each one takes;
+\item use \texttt{bisect} instead of writing your own;
+\item choose the right search for a problem.
+\end{itemize}}
+\end{block}
+\end{column}
+\end{columns}
+\vspace{2mm}
+{\footnotesize All code in these slides runs on \textbf{Python 3.14}: \texttt{python3.14 searching.py} (the full file is on the course page).}
+\end{frame}
+
+\begin{frame}{Linear search: look at every item until you find it}
+\begin{columns}[T]
+\begin{column}{0.53\textwidth}
+\pycode{linear}
+\vspace{2mm}
+\pyout{linear_demo}
+\end{column}
+\begin{column}{0.43\textwidth}
+{\small
+\textbf{Idea.} Start at the first item, compare, move on. Stop when you find the target or run out of items.
+
+\vspace{2mm}
+\textbf{Works on any list}: sorted or not. It makes no assumptions.
+
+\vspace{2mm}
+\textbf{Returns} the index, or $-1$ as a ``not found'' signal (a common convention, because $-1$ is never a valid index).
+
+\vspace{2mm}
+Python's \texttt{x in items} and \texttt{items.index(x)} do exactly this under the hood.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{How many steps does linear search take?}
+\begin{sfig}[0.45]
+\begin{tikzpicture}
+  \foreach \v [count=\i from 0] in {Mai,Nam,Lan,Binh,Hoa,Tuan,Ha,An}{
+    \node[cell,minimum width=11mm,fill=\ifnum\i<2 tdLine!55\else white\fi] at (\i*1.15,0) {\scriptsize\v};
+    \node[font=\tiny,text=tdMuted] at (\i*1.15,-0.65) {\i};}
+  \draw[->,thick,tdAmber] (2*1.15,1.0) -- (2*1.15,0.5); \node[font=\scriptsize,text=tdAmber!70!black] at (2.3,1.25) {looking at \texttt{Lan}};
+  \draw[decorate,decoration={brace,amplitude=4pt,mirror},tdMuted] (-0.5,-0.9) -- (1.65,-0.9) node[midway,below=4pt,font=\tiny] {already checked};
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+\begin{columns}[T]
+\column{0.3\textwidth}\centering{\Large\bfseries\color{tdGreen!70!black}1}\\[-1pt]{\footnotesize \textbf{best case}: it is the first item}
+\column{0.3\textwidth}\centering{\Large\bfseries\color{tdAmber!70!black}$n/2$}\\[-1pt]{\footnotesize \textbf{average}: about half the list}
+\column{0.3\textwidth}\centering{\Large\bfseries\color{tdRed}$n$}\\[-1pt]{\footnotesize \textbf{worst case}: last item, or absent}
+\end{columns}
+\vspace{2mm}
+{\small Double the list, double the work. For a million items, a failed search makes a million comparisons. Can we do better?}
+\end{frame}
+
+\begin{frame}{The guessing game: halving the problem}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+{\small
+``I am thinking of a number between 1 and 100. After each guess I say \emph{higher} or \emph{lower}.''
+
+\vspace{2mm}
+Best strategy: always guess the \textbf{middle}. Each answer throws away half of what is left, so you need at most $\lceil\log_2 100\rceil = 7$ guesses.
+
+\vspace{2mm}
+\key{Key requirement:} ``higher/lower'' only helps because the numbers are \emph{in order}. In a shuffled list, a comparison would tell you nothing about where to go next.}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.6]
+\begin{tikzpicture}[x=0.075cm]
+  \foreach \w/\y/\t in {100/0/{100 candidates},50/-0.9/{50},25/-1.8/{25},13/-2.7/{13},7/-3.6/{7},4/-4.5/{4},2/-5.4/{2},1/-6.3/{1}}{
+    \fill[tdBlue!\ifnum\w>60 25\else\ifnum\w>20 40\else\ifnum\w>3 60\else 85\fi\fi\fi] (0,\y) rectangle (\w,\y-0.6);
+    \node[font=\scriptsize,anchor=west] at (104,\y-0.3) {\t};}
+  \node[font=\scriptsize,text=tdMuted,anchor=west] at (0,-7.2) {after 7 guesses only one number is left};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Binary search on a sorted array: target = 47}
+\begin{sfig}[0.62]
+\begin{tikzpicture}
+  \arrayrow{0}{0}{15}{7}
+  \arrayrow{-1.7}{8}{15}{11}
+  \arrayrow{-3.4}{8}{10}{9}
+  \arrayrow{-5.1}{10}{10}{10}
+  \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.5,0) {step 1};
+  \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.5,-1.7) {step 2};
+  \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.5,-3.4) {step 3};
+  \node[font=\scriptsize,anchor=east,text=tdMuted] at (-0.5,-5.1) {step 4};
+  \node[font=\tiny,anchor=west,text=tdMuted] at (11.9,0) {$31<47$: go right};
+  \node[font=\tiny,anchor=west,text=tdMuted] at (11.9,-1.7) {$53>47$: go left};
+  \node[font=\tiny,anchor=west,text=tdMuted] at (11.9,-3.4) {$42<47$: go right};
+  \node[font=\tiny,anchor=west,text=tdGreen!70!black] at (11.9,-5.1) {$47=47$: found!};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small 16 items, only \textbf{4} comparisons. Grey cells are never looked at again: the window \texttt{[lo, hi]} shrinks by about half each time.}
+\end{frame}
+
+\begin{frame}{Binary search in Python}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\pycode{binary}
+\vspace{2mm}
+\pyout{binary_demo}
+\end{column}
+\begin{column}{0.44\textwidth}
+{\small Running an instrumented copy (\texttt{binary\_trace} in the course file) on the array from the previous slide:}
+\vspace{1mm}
+\pyout{trace_demo}
+\vspace{2mm}
+
+{\small Each line is one pass of the loop. \texttt{lo} and \texttt{hi} close in on the target; the loop ends when the middle item is the target (or the window is empty).}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Getting binary search right}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\begin{block}{The invariant}
+{\small \emph{If the target is in the list at all, it is somewhere in \texttt{items[lo..hi]}.}\\[3pt]
+It is true at the start (\texttt{lo=0}, \texttt{hi=n-1}). Each step keeps it true, and the window gets smaller. When the window is empty (\texttt{lo > hi}), the target cannot be there.}
+\end{block}
+{\small\vspace{2mm}
+\textbf{Why \texttt{mid + 1} and \texttt{mid - 1}?} We already looked at \texttt{items[mid]}, so it must leave the window. Writing \texttt{lo = mid} can loop forever.}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{alertblock}{Classic bugs}
+{\small
+\begin{itemize}\setlength\itemsep{2pt}
+\item \texttt{while lo < hi}: skips the case of one remaining item.
+\item \texttt{lo + hi // 2}: operator precedence! Use \texttt{(lo + hi) // 2}.
+\item \texttt{lo = mid} (no \texttt{+1}): infinite loop.
+\item Searching an \textbf{unsorted} list: it may return $-1$ for an item that is there.
+\end{itemize}}
+\end{alertblock}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Counting the steps: $n$ versus $\log_2 n$}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\pyout{counting_demo}
+\vspace{2mm}
+{\small A million items: \bad{1,000,000} comparisons for linear search in the worst case, only \good{20} for binary search. Eight billion items need just 33.}
+\vspace{1mm}
+
+{\footnotesize Worst-case steps for binary search $=\lfloor\log_2 n\rfloor+1$, which is \texttt{n.bit\_length()} in Python.}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+\begin{axis}[width=9cm,height=6.2cm,xmode=log,ymode=log,log basis x=2,log basis y=2,xlabel={list size $n$},ylabel={worst-case comparisons},axis lines=left,legend pos=north west,legend style={font=\scriptsize},tick label style={font=\scriptsize},label style={font=\small}]
+  \addplot[tdRed,very thick,mark=*,mark size=1.5pt] table[x=n,y=linear]{snippets/counting_data.out};
+  \addplot[tdGreen,very thick,mark=square*,mark size=1.5pt] table[x=n,y=binary]{snippets/counting_data.out};
+  \legend{linear search,binary search}
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+{\tiny measured by running the code: both axes are logarithmic.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Don't write it yourself: the \texttt{bisect} module}
+\begin{columns}[T]
+\begin{column}{0.53\textwidth}
+\pycode{bisect_demo}
+\vspace{2mm}
+\pyout{bisect_demo}
+\end{column}
+\begin{column}{0.43\textwidth}
+{\small
+\texttt{bisect\_left(a, x)} returns the position where \texttt{x} would go to keep \texttt{a} sorted: the index of the first element $\geq x$.
+
+\vspace{2mm}
+This gives you more than ``found or not'':
+\begin{itemize}\setlength\itemsep{2pt}
+\item \textbf{insertion point} for a new value;
+\item \textbf{how many} copies: \texttt{bisect\_right - bisect\_left};
+\item \textbf{how many are smaller}: \texttt{bisect\_left} itself.
+\end{itemize}
+It is written in C, so it is also faster than a Python loop.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Real timings, one million sorted numbers}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\pyout{timing}
+\vspace{2mm}
+{\footnotesize Timings come from running \texttt{searching.py} on the machine that built these slides. Yours will differ, but the \emph{ratio} will not.}
+\end{column}
+\begin{column}{0.5\textwidth}
+{\small
+Binary search is thousands of times faster here, but it needs \emph{sorted} data, and sorting costs time too.
+
+\vspace{2mm}
+\begin{block}{Sort first?}
+{\small Sort once, then every query is cheap. If you search \textbf{many times}, sorting wins quickly (see the break-even above). If you search \textbf{once}, just scan.}
+\end{block}
+\vspace{1mm}
+\textbf{Data changes often?} Keeping a list sorted costs work on every insert. A \texttt{set} or \texttt{dict} (hashing) answers ``is it there?'' in about constant time, no order needed.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Choosing a search}
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\bfseries}p{42mm}XX@{}}
+\toprule
+Situation & Use & Cost\\
+\midrule
+Small list, or searching once & \texttt{x in items} (linear search) & $O(n)$\\
+Unsorted data, one-off & linear search, or sort then search if you will query again & $O(n)$\\
+Sorted data, many queries & binary search / \texttt{bisect} & $O(\log n)$ per query\\
+Need ``is it there?'' fast, order irrelevant & \texttt{set} or \texttt{dict} & about $O(1)$\\
+Need insertion point, counts, ranges & \texttt{bisect\_left}, \texttt{bisect\_right} & $O(\log n)$\\
+\bottomrule
+\end{tabularx}
+\vspace{3mm}
+
+{\small $O(\cdot)$ is Big-O notation: a way to say how the cost \emph{grows} with $n$. We make it precise in the Big-O lecture.}
+\end{frame}
+
+\begin{frame}{Recap and practice}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\begin{block}{Take-aways}
+{\small
+\begin{enumerate}\setlength\itemsep{3pt}
+\item \key{Linear search}: any list, $n$ steps in the worst case.
+\item \key{Binary search}: sorted list, about $\log_2 n$ steps, because every comparison halves the window.
+\item The \textbf{invariant} (``the target is in \texttt{[lo, hi]}'') is how you get the loop right.
+\item Use \texttt{bisect} in real code.
+\item Sorting has a cost: it pays off when you search often.
+\end{enumerate}}
+\end{block}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{block}{Practice}
+{\small
+\begin{enumerate}\setlength\itemsep{3pt}
+\item Modify \texttt{binary\_search} to return the index of the \emph{first} occurrence when there are duplicates. (Hint: do not stop at the first match.)
+\item Trace \texttt{binary\_search} by hand on \texttt{[2,4,6,8,10,12]} for target \texttt{5}. What are \texttt{lo, hi, mid} at each step?
+\item How many comparisons does binary search need for one billion items? Check with \texttt{n.bit\_length()}.
+\item Use \texttt{bisect} to find how many scores in a list are below 50.
+\end{enumerate}}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+\end{document}
