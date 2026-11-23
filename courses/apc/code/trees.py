@@ -54,7 +54,7 @@ def build(keys):
 # <<< build
 
 
-# >>> traversals
+# >>> trav_dfs
 def preorder(n):
     if n is None:
         return []
@@ -71,8 +71,10 @@ def postorder(n):
     if n is None:
         return []
     return [*postorder(n.left), *postorder(n.right), n.key]
+# <<< trav_dfs
 
 
+# >>> trav_bfs
 def level_order(root):
     out, queue = [], deque([root])
     while queue:
@@ -82,7 +84,214 @@ def level_order(root):
             queue.append(n.left)
             queue.append(n.right)
     return out
-# <<< traversals
+# <<< trav_bfs
+
+
+# >>> dfs
+def dfs(root):
+    """Depth-first with an explicit stack."""
+    order, stack = [], [root]
+    while stack:
+        n = stack.pop()
+        if n is not None:
+            order.append(n.key)
+            stack.append(n.right)
+            stack.append(n.left)
+    return order
+# <<< dfs
+
+
+# >>> bfs
+def bfs(root):
+    """Breadth-first with a queue."""
+    order, queue = [], deque([root])
+    while queue:
+        n = queue.popleft()
+        if n is not None:
+            order.append(n.key)
+            queue.append(n.left)
+            queue.append(n.right)
+    return order
+# <<< bfs
+
+
+# >>> dfs_trace
+def dfs_trace(root):
+    stack = [root]
+    while stack:
+        n = stack.pop()
+        if n is None:
+            continue
+        print(f"visit {n.key:2}  stack after:", end=" ")
+        stack.append(n.right)
+        stack.append(n.left)
+        print([m.key for m in reversed(stack) if m])
+# <<< dfs_trace
+
+
+# >>> bfs_trace
+def bfs_trace(root):
+    queue = deque([root])
+    while queue:
+        n = queue.popleft()
+        if n is None:
+            continue
+        print(f"visit {n.key:2}  queue after:", end=" ")
+        queue.append(n.left)
+        queue.append(n.right)
+        print([m.key for m in queue if m])
+# <<< bfs_trace
+
+
+# >>> rec_size
+def size(n):
+    if n is None:
+        return 0
+    return 1 + size(n.left) + size(n.right)
+# <<< rec_size
+
+
+# >>> rec_total
+def total(n):
+    if n is None:
+        return 0
+    return n.key + total(n.left) + total(n.right)
+# <<< rec_total
+
+
+# >>> rec_leaves
+def leaves(n):
+    if n is None:
+        return 0
+    if n.left is None and n.right is None:
+        return 1
+    return leaves(n.left) + leaves(n.right)
+# <<< rec_leaves
+
+
+# >>> rec_mirror
+def mirror(n):
+    if n is None:
+        return None
+    return Node(n.key, mirror(n.right), mirror(n.left))
+# <<< rec_mirror
+
+
+# >>> rec_path
+def has_path_sum(n, target):
+    """Is there a root-to-leaf path adding up to target?"""
+    if n is None:
+        return False
+    target -= n.key
+    if n.left is None and n.right is None:
+        return target == 0
+    return (has_path_sum(n.left, target)
+            or has_path_sum(n.right, target))
+# <<< rec_path
+
+
+# >>> rec_all
+def all_paths(n, path=()):
+    if n is None:
+        return
+    path = (*path, n.key)
+    if n.left is None and n.right is None:
+        yield path
+    yield from all_paths(n.left, path)
+    yield from all_paths(n.right, path)
+# <<< rec_all
+
+
+# >>> bst_wrong
+def is_bst_wrong(n):
+    """Only compares a node with its children."""
+    if n is None:
+        return True
+    if n.left and n.left.key >= n.key:
+        return False
+    if n.right and n.right.key <= n.key:
+        return False
+    return is_bst_wrong(n.left) and is_bst_wrong(n.right)
+# <<< bst_wrong
+
+
+# >>> bst_ok
+def is_bst(n, lo=None, hi=None):
+    """Every key must stay inside (lo, hi)."""
+    if n is None:
+        return True
+    if lo is not None and n.key <= lo:
+        return False
+    if hi is not None and n.key >= hi:
+        return False
+    return (is_bst(n.left, lo, n.key)
+            and is_bst(n.right, n.key, hi))
+# <<< bst_ok
+
+
+# >>> is_bst2
+def is_bst_inorder(root):
+    keys = inorder(root)
+    return all(a < b for a, b in zip(keys, keys[1:]))
+# <<< is_bst2
+
+
+# >>> h_diam
+def diameter(root):
+    """Edges on the longest path between two nodes."""
+    best = 0
+
+    def depth(n):
+        nonlocal best
+        if n is None:
+            return 0
+        left, right = depth(n.left), depth(n.right)
+        best = max(best, left + right)
+        return 1 + max(left, right)
+
+    depth(root)
+    return best
+# <<< h_diam
+
+
+# >>> h_lca
+def lca(root, p, q):
+    """Lowest common ancestor in a BST."""
+    while root:
+        if p < root.key and q < root.key:
+            root = root.left
+        elif p > root.key and q > root.key:
+            root = root.right
+        else:
+            return root.key
+# <<< h_lca
+
+
+# >>> h_kth
+def kth_smallest(root, k):
+    stack = []
+    while stack or root:
+        while root:
+            stack.append(root)
+            root = root.left
+        root = stack.pop()
+        k -= 1
+        if k == 0:
+            return root.key
+        root = root.right
+# <<< h_kth
+
+
+# >>> h_levels
+def levels(root):
+    """Keys grouped by depth."""
+    out, row = [], [root]
+    while row:
+        out.append([n.key for n in row])
+        row = [c for n in row
+               for c in (n.left, n.right) if c]
+    return out
+# <<< h_levels
 
 
 # >>> height
@@ -141,6 +350,45 @@ def main() -> None:
     print("inorder   ", inorder(balanced))
     print("postorder ", postorder(balanced))
     print("level     ", level_order(balanced))
+
+    section("dfs_bfs_demo")
+    wide = build([50, 30, 70, 20, 40, 60, 80, 35, 45])
+    print("dfs", dfs(wide))
+    print("bfs", bfs(wide))
+
+    section("dfs_trace_demo")
+    small = build([50, 30, 70, 20, 40])
+    dfs_trace(small)
+
+    section("bfs_trace_demo")
+    bfs_trace(small)
+
+    section("rec_demo")
+    print("size   ", size(balanced))
+    print("total  ", total(balanced))
+    print("leaves ", leaves(balanced))
+    print("mirror ", inorder(mirror(balanced)))
+    print("path 130?", has_path_sum(balanced, 130))
+    print("path 100?", has_path_sum(balanced, 100))
+    for path in all_paths(small):
+        print(path)
+
+    section("is_bst_demo")
+    fake = Node(50, Node(30, Node(20), Node(60)),
+                Node(70))
+    print("wrong check says:", is_bst_wrong(fake))
+    print("bounds check says:", is_bst(fake))
+    print("inorder check says:", is_bst_inorder(fake))
+    print("real BST:", is_bst(balanced),
+          is_bst_inorder(balanced))
+
+    section("hard_demo")
+    print("diameter    ", diameter(wide))
+    print("lca(35, 45) ", lca(wide, 35, 45))
+    print("lca(20, 45) ", lca(wide, 20, 45))
+    print("lca(20, 80) ", lca(wide, 20, 80))
+    print("3rd smallest", kth_smallest(wide, 3))
+    print("levels      ", levels(wide))
 
     section("height_demo")
     chain = build([10, 20, 30, 40, 50, 60, 70])

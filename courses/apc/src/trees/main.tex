@@ -14,6 +14,15 @@
   \foreach \p/\q in {a/b,a/c,b/d,b/e,c/f,c/g}{\draw[tdInk!60] (\p) -- (\q);}}
 \newcommand{\drawnodes}[7]{\foreach \nm/\lab in {a/#1,b/#2,c/#3,d/#4,e/#5,f/#6,g/#7}{\node[tn,fill=white] at (\nm) {\lab};}}
 
+\newcommand{\wideshape}[9]{%
+  \node[tn,fill=\fA] (a) at (0,0) {#1};
+  \node[tn,fill=\fB] (b) at (-2.6,-1.1) {#2};  \node[tn,fill=\fC] (c) at (2.6,-1.1) {#3};
+  \node[tn,fill=\fD] (d) at (-3.9,-2.2) {#4};  \node[tn,fill=\fE] (e) at (-1.3,-2.2) {#5};
+  \node[tn,fill=\fF] (f) at (1.3,-2.2) {#6};   \node[tn,fill=\fG] (g) at (3.9,-2.2) {#7};
+  \node[tn,fill=\fH] (h) at (-2.2,-3.3) {#8};  \node[tn,fill=\fI] (i) at (-0.4,-3.3) {#9};
+  \foreach \p/\q in {a/b,a/c,b/d,b/e,c/f,c/g,e/h,e/i}{\draw[tdInk!60] (\p) -- (\q);}}
+\newcommand{\fH}{white}\newcommand{\fI}{white}
+
 \begin{document}
 \begin{frame}[plain]\titlepage\end{frame}
 
@@ -166,23 +175,241 @@ Searching for 60: compare with the root (50), go right; compare with 70, go left
 {\footnotesize The numbers show the \textbf{order of visit} on the tree with keys $50,30,70,20,40,60,80$. The first three are \emph{depth-first} (recursion); level order is \emph{breadth-first} (a queue).}
 \end{frame}
 
-\begin{frame}{Traversals in Python}
-\begin{columns}[T]
-\begin{column}{0.58\textwidth}
-\pycode[\fontsize{7.5}{9}\selectfont]{traversals}
-\end{column}
-\begin{column}{0.4\textwidth}
+\begin{frame}[allowframebreaks]{Traversals in Python}
+\pycode{trav_dfs}
+\framebreak
+\pycode{trav_bfs}
+\vspace{2mm}
 \pyout{traversal_demo}
 \vspace{2mm}
 {\small
-\begin{itemize}\setlength\itemsep{2pt}
-\item \textbf{inorder} of a BST gives the keys \textbf{sorted}: a free sort!
-\item \textbf{preorder} copies a tree.
-\item \textbf{postorder} visits children first: deleting a tree, evaluating an expression.
-\item \textbf{level order} uses a \texttt{deque} as a queue.
-\end{itemize}}
+\textbf{inorder} of a BST gives the keys \textbf{sorted}: a free sort! \textbf{preorder} copies a tree. \textbf{postorder} visits children first (deleting a tree, evaluating an expression). \textbf{level order} uses a \texttt{deque} as a queue.}
+\end{frame}
+
+\begin{frame}{DFS and BFS: two ways to explore a tree}
+\begin{columns}[T]
+\begin{column}{0.58\textwidth}
+\begin{sfig}[0.78]
+\begin{tikzpicture}[scale=0.82,transform shape]
+  \node[font=\bfseries] at (0,0.8) {DFS: go deep first (stack)};
+  \wideshape{1}{2}{7}{3}{4}{8}{9}{5}{6}
+  \begin{scope}[yshift=-5cm]
+  \node[font=\bfseries] at (0,0.8) {BFS: level by level (queue)};
+  \wideshape{1}{2}{3}{4}{5}{6}{7}{8}{9}
+  \end{scope}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.4\textwidth}
+{\small
+Tree with keys $50,30,70,20,40,60,80,35,45$. Numbers show the \textbf{order of visit}.
+
+\vspace{2mm}
+\key{DFS} follows one branch to the bottom, then backs up and tries the next. Keep the \emph{to-do} nodes on a \textbf{stack} (last in, first out).
+
+\vspace{2mm}
+\key{BFS} visits all nodes at distance 1, then distance 2, and so on. Keep the to-do nodes in a \textbf{queue} (first in, first out).
+
+\vspace{2mm}
+The two algorithms are \emph{identical} except for the data structure that holds the to-do list. The same idea works on graphs (next lecture).}
 \end{column}
 \end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{DFS and BFS in Python}
+\pycode{dfs}
+\vspace{2mm}
+{\small
+\texttt{dfs}: pop a node, record it, push the \textbf{right} child and then the \textbf{left} child, so the left one is popped first. It gives exactly the same order as the recursive \texttt{preorder}, but with an explicit stack it cannot hit the recursion limit on a very deep tree.}
+\framebreak
+\pycode{bfs}
+\vspace{2mm}
+\pyout{dfs_bfs_demo}
+\vspace{2mm}
+{\small
+\texttt{bfs} is identical except for \texttt{popleft} (queue) instead of \texttt{pop} (stack).
+\textbf{BFS} finds the \emph{shallowest} node first; \textbf{DFS} needs memory proportional to the height, BFS to the widest level.}
+\end{frame}
+
+\begin{frame}{Watching the stack and the queue}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+{\small \textbf{DFS} on the tree $50,30,70,20,40$ (top of the stack first):}
+\pyout{dfs_trace_demo}
+\vspace{2mm}
+{\small The stack remembers where to come back to: after visiting 30, node 70 waits at the bottom until the whole left subtree (20, 40) is done.}
+\end{column}
+\begin{column}{0.48\textwidth}
+{\small \textbf{BFS} on the same tree (front of the queue first):}
+\pyout{bfs_trace_demo}
+\vspace{2mm}
+{\small The queue keeps nodes in the order they were discovered: 70 is served before 20 and 40, because it is closer to the root.}
+\end{column}
+\end{columns}
+\vspace{2mm}
+{\small \emph{Try it:} the two functions are \texttt{dfs\_trace} and \texttt{bfs\_trace} in \texttt{trees.py}. Draw the stack on paper for a bigger tree and compare.}
+\end{frame}
+
+\begin{frame}{Thinking recursively about trees}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+  \node[tn,fill=tdBlue!15] (r) at (0,0) {$n$};
+  \node[draw=tdAmber,rounded corners,fill=tdAmber!12,minimum width=2.4cm,minimum height=1.5cm] (l) at (-2,-2) {left subtree};
+  \node[draw=tdGreen,rounded corners,fill=tdGreen!12,minimum width=2.4cm,minimum height=1.5cm] (rr) at (2,-2) {right subtree};
+  \draw[tdInk!60] (r) -- (l); \draw[tdInk!60] (r) -- (rr);
+  \node[font=\scriptsize,text=tdAmber!70!black] at (-2,-3.2) {a smaller tree};
+  \node[font=\scriptsize,text=tdGreen!60!black] at (2,-3.2) {a smaller tree};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.46\textwidth}
+{\small
+A tree is either \textbf{empty} or a \textbf{node with two smaller trees}. That definition is itself recursive, and so are the algorithms:
+\begin{enumerate}\setlength\itemsep{3pt}
+\item \textbf{Base case}: the empty tree (\texttt{None}). What is the answer? ($0$, \texttt{True}, \texttt{[]}\ldots)
+\item \textbf{Trust} the recursion on the left and the right subtree.
+\item \textbf{Combine}: use those two answers and the current node.
+\end{enumerate}
+\vspace{1mm}
+You never need to follow the whole recursion in your head: check the base case and the combine step.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Recursion on trees: size, sum, leaves, mirror}
+\pycode[\fontsize{7.4}{8.8}\selectfont]{rec_size}
+\vspace{1mm}
+\pycode[\fontsize{7.4}{8.8}\selectfont]{rec_total}
+\vspace{1mm}
+\pycode[\fontsize{7.4}{8.8}\selectfont]{rec_leaves}
+\vspace{1mm}
+\pycode[\fontsize{7.4}{8.8}\selectfont]{rec_mirror}
+\vspace{2mm}
+{\small \textbf{Recipe}: base case \texttt{None}, then combine the node with the answers for the two subtrees.}
+\framebreak
+\pyout{rec_demo}
+\vspace{2mm}
+{\small
+\textbf{Recipe in each function:} the base case \texttt{None} gives $0$ (or \texttt{None} for \texttt{mirror}); the answer is the node's own contribution plus the answers for the two subtrees. A \textbf{leaf} has no children, so it needs its own base case.
+
+\vspace{2mm}
+On the tree $50,30,70,20,40,60,80$: 7 nodes, keys add up to 350, 4 leaves. \texttt{mirror} swaps left and right everywhere, so the inorder walk of the mirrored BST is in \textbf{descending} order.}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Recursion with a parameter: root-to-leaf paths}
+\begin{sfig}[0.38]
+\begin{tikzpicture}
+  \renewcommand{\fA}{tdGreen!30}\renewcommand{\fB}{tdGreen!30}\renewcommand{\fD}{tdGreen!30}
+  \bsttree{50}{30}{70}{20}{40}{60}{80}
+  \draw[tdGreen!70!black,very thick] (a) -- (b); \draw[tdGreen!70!black,very thick] (b) -- (d);
+  \node[font=\small,text=tdGreen!60!black,anchor=west] at (3.6,0) {$50+30+20=100$ \checkmark};
+\end{tikzpicture}
+\end{sfig}
+\pycode{rec_path}
+\framebreak
+\pycode{rec_all}
+\vspace{2mm}
+{\small
+\texttt{has\_path\_sum} \textbf{passes information down}: each call subtracts its key from \texttt{target}. At a leaf, the path works if nothing is left over. The \texttt{or} stops at the first success.
+
+\vspace{2mm}
+\texttt{all\_paths} is a \textbf{generator}: it \texttt{yield}s each root-to-leaf path as a tuple, and \texttt{yield from} delegates to the subtrees. This is DFS in disguise. Output: see the previous slide (\texttt{rec\_demo}), \texttt{has\_path\_sum(root, 100)} is \texttt{True}, 130 is \texttt{False}.}
+\end{frame}
+
+\begin{frame}{Is this tree a BST? The tempting wrong answer}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\begin{sfig}[0.6]
+\begin{tikzpicture}
+  \node[tn] (a) at (0,0) {50};
+  \node[tn] (b) at (-2,-1.2) {30}; \node[tn] (c) at (2,-1.2) {70};
+  \node[tn,fill=tdGreen!25] (d) at (-3,-2.4) {20}; \node[tn,fill=tdRed!30] (e) at (-1,-2.4) {60};
+  \foreach \p/\q in {a/b,a/c,b/d,b/e}{\draw[tdInk!60] (\p) -- (\q);}
+  \node[font=\scriptsize,text=tdRed!80!black,anchor=north] at (-1,-2.8) {$60>50$ but in the left subtree!};
+  \node[font=\scriptsize,text=tdMuted,anchor=west] at (0.5,-0.15) {$30<50<70$ \checkmark};
+  \node[font=\scriptsize,text=tdMuted,anchor=west] at (-4.4,-1.6) {$20<30<60$ \checkmark};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.5\textwidth}
+{\small
+Every parent is bigger than its left child and smaller than its right child, so it \emph{looks} fine. But 60 sits in the left subtree of 50, so searching for 60 would go right from the root and \bad{never find it}.
+
+\vspace{2mm}
+\textbf{The BST rule is about the whole subtree, not only the children.}
+
+\vspace{2mm}
+Two correct ways to check:
+\begin{enumerate}\setlength\itemsep{2pt}
+\item pass down an allowed \textbf{range} $(lo, hi)$ that shrinks;
+\item take the \textbf{inorder} walk and test that it is strictly increasing.\end{enumerate}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Checking a BST in Python}
+\pycode{bst_wrong}
+\framebreak
+\pycode{bst_ok}
+\framebreak
+\pycode{is_bst2}
+\vspace{2mm}
+\pyout{is_bst_demo}
+\vspace{2mm}
+{\small
+\texttt{is\_bst\_wrong} says \texttt{True} for the fake tree: it only looks one level down. \texttt{is\_bst} carries the bounds: going left, the current key becomes the new upper bound; going right, the new lower bound. The inorder test is shorter, but builds a whole list: $O(n)$ extra memory.}
+\end{frame}
+
+\begin{frame}{Harder tree problems: pictures first}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.42]
+\begin{tikzpicture}
+  \renewcommand{\fH}{tdBlue!25}\renewcommand{\fE}{tdBlue!25}\renewcommand{\fB}{tdBlue!25}\renewcommand{\fA}{tdBlue!25}\renewcommand{\fC}{tdBlue!25}\renewcommand{\fF}{tdBlue!25}
+  \wideshape{50}{30}{70}{20}{40}{60}{80}{35}{45}
+  \foreach \p/\q in {h/e,e/b,b/a,a/c,c/f}{\draw[tdBlue,very thick] (\p) -- (\q);}
+  \node[font=\small,text=tdBlue,anchor=west] at (2.2,-3.3) {\textbf{diameter} = 5 edges};
+\end{tikzpicture}
+\end{sfig}
+{\small \textbf{Diameter}: the longest path between any two nodes. It does not have to pass through the root.}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.42]
+\begin{tikzpicture}
+  \renewcommand{\fB}{tdAmber!40}\renewcommand{\fD}{tdPurple!25}\renewcommand{\fH}{tdPurple!25}
+  \wideshape{50}{30}{70}{20}{40}{60}{80}{35}{45}
+  \node[font=\small,text=tdAmber!70!black,anchor=west] at (0.3,0.55) {LCA(20, 35) = 30};
+  \draw[tdPurple,very thick] (d) -- (b); \draw[tdPurple,very thick] (h) -- (e); \draw[tdPurple,very thick] (e) -- (b);
+\end{tikzpicture}
+\end{sfig}
+{\small \textbf{Lowest common ancestor}: the deepest node that has both $p$ and $q$ below it. In a BST: walk down while both keys are on the same side.}
+\end{column}
+\end{columns}
+\vspace{2mm}
+{\small \textbf{k-th smallest}: inorder walk, stop after $k$ nodes. \textbf{Levels}: BFS that returns one list per depth.}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Harder tree problems: solutions}
+\pycode{h_diam}
+\vspace{1mm}
+\pycode{h_lca}
+\framebreak
+\pycode[\fontsize{7.4}{8.8}\selectfont]{h_kth}
+\vspace{1mm}
+\pycode[\fontsize{7.4}{8.8}\selectfont]{h_levels}
+\framebreak
+\pyout{hard_demo}
+\vspace{2mm}
+{\small
+\textbf{Diameter}: at every node the best path \emph{through it} is the left depth plus the right depth; the helper returns the depth while updating \texttt{best}.
+
+\vspace{1mm}
+\textbf{LCA}: while $p,q$ are both smaller (larger) than the root, step left (right); the first node that splits them is the answer, $O(h)$.
+
+\vspace{1mm}
+\textbf{k-th smallest}: iterative inorder with a stack, stopping early. \textbf{Levels}: each round replaces the row by all the children of the row.}
 \end{frame}
 
 \begin{frame}{Height decides the speed}
@@ -291,11 +518,13 @@ Hash table (\texttt{set}, \texttt{dict}) & $O(1)$ average & $O(1)$ average & no 
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
 \begin{block}{Take-aways}
-{\small
-\begin{enumerate}\setlength\itemsep{3pt}
+{\footnotesize
+\begin{enumerate}\setlength\itemsep{2pt}
 \item A tree is a \key{recursive} structure: a node plus subtrees.
-\item In a \key{BST}, left $<$ node $<$ right, so search and insert follow one path.
-\item \key{Inorder} traversal of a BST lists the keys in sorted order.
+\item \key{DFS} uses a stack, \key{BFS} a queue: same loop, different to-do list.
+\item Tree recursion: \key{base case}, trust the subtrees, combine.
+\item Check a BST with \key{bounds} or an increasing inorder walk, never only with the children.
+\item In a \key{BST}, inorder gives sorted keys; search follows one path.
 \item Speed depends on the \textbf{height}: $\log n$ if balanced, $n$ if it degenerates.
 \item A \key{heap} gives the minimum in $O(1)$ and push/pop in $O(\log n)$.
 \end{enumerate}}
@@ -303,16 +532,27 @@ Hash table (\texttt{set}, \texttt{dict}) & $O(1)$ average & $O(1)$ average & no 
 \end{column}
 \begin{column}{0.48\textwidth}
 \begin{block}{Practice}
-{\small
-\begin{enumerate}\setlength\itemsep{3pt}
+{\footnotesize
+\begin{enumerate}\setlength\itemsep{2pt}
 \item Draw the BST obtained by inserting \texttt{[8, 3, 10, 1, 6, 14]} and write its four traversals.
 \item Write \texttt{minimum(root)} and \texttt{maximum(root)} for a BST.
-\item Write \texttt{count\_leaves(root)} with recursion.
+\item Write \texttt{count\_leaves(root)} with recursion, then \texttt{is\_balanced(root)} (heights of the two subtrees differ by at most 1 everywhere).
 \item Add a \texttt{"/"} case to \texttt{evaluate} and print \texttt{("/", 20, ("+", 1, 4))}.
 \item Use \texttt{heapq} to get the 3 largest items of a list (hint: \texttt{heapq.nlargest}). How does its speed compare to sorting?
 \end{enumerate}}
 \end{block}
 \end{column}
 \end{columns}
+\end{frame}
+
+\begin{frame}{Challenge problems}
+\begin{enumerate}\setlength\itemsep{6pt}
+\item \textbf{is\_balanced}: a tree is balanced if, at every node, the heights of the two subtrees differ by at most 1. Can you do it in a single pass, $O(n)$?
+\item \textbf{Right-side view}: the keys you see when you look at the tree from the right (one per level). Use BFS.
+\item \textbf{Maximum path sum} between any two nodes (the diameter pattern, but adding keys; keys may be negative).
+\item \textbf{Serialise}: write \texttt{serialize(root)} to a string and \texttt{deserialize(text)} to rebuild the same tree. Test that the round trip works for a tree with missing children.
+\item \textbf{Delete} a key from a BST (three cases: leaf, one child, two children).
+\item \textbf{Validate} your \texttt{delete} and \texttt{insert} by calling \texttt{is\_bst} after every operation on random data.
+\end{enumerate}
 \end{frame}
 \end{document}
