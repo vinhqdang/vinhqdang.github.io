@@ -1,0 +1,179 @@
+%% ================= PART 9: WORLD MODELS AND JEPA =================
+\partfooter{9}
+\divider{9}{World models and JEPA}{tdAmber}{An alternative to next-token prediction, and what the evidence says so far}
+
+\begin{frame}{Two ways to predict what happens next}
+\begin{sfig}[0.7]
+\begin{tikzpicture}[font=\footnotesize,node distance=6mm]
+  \node[card=tdBlue,text width=28mm,minimum height=18mm] (x) {\textbf{what we see now}\\{\scriptsize video frames of a ball in flight}};
+  \node[card=tdRed,text width=40mm,minimum height=18mm,above right=1mm and 16mm of x] (g) {\textbf{Generative:} predict every pixel of the next frame\\{\scriptsize wastes effort on leaves, noise, texture}};
+  \node[card=tdGreen,text width=40mm,minimum height=18mm,below right=1mm and 16mm of x] (j) {\textbf{Joint-embedding:} predict a compact \emph{representation} of the next frame\\{\scriptsize keeps what matters: where the ball goes}};
+  \draw[arr] (x) -- (g); \draw[arr] (x) -- (j);
+  \node[font=\scriptsize,text=tdMuted,align=center,right=6mm of g] {hard: many futures\\ look different at pixel level};
+  \node[font=\scriptsize,text=tdMuted,align=center,right=6mm of j] {easier: unpredictable detail\\ is simply dropped};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small This is the central idea of \key{JEPA}, the Joint Embedding Predictive Architecture proposed by Yann LeCun: predict in \emph{representation space}, not in pixel or token space.}
+\srcline{LeCun, ``A Path Towards Autonomous Machine Intelligence'', position paper, OpenReview, 2022.}
+\end{frame}
+
+\begin{frame}{Autoregressive LLM versus JEPA}
+\begin{sfig}[0.76]
+\begin{tabular}{@{}L{31mm}L{52mm}L{52mm}@{}}
+\toprule
+ & \textbf{Autoregressive LLM} & \textbf{JEPA-style world model}\\\midrule
+\textbf{Predicts} & the next token, from a finite vocabulary & the representation of a missing or future part of the input\\
+\textbf{Loss measured in} & token probabilities & embedding space (distance between representations)\\
+\textbf{Output} & text (or images, tokens) sampled step by step & no raw output needed; representations are used by other modules\\
+\textbf{Strength} & fluent, flexible, huge text corpora & learning from video; ignoring unpredictable detail\\
+\textbf{Claimed weakness} & errors compound over long outputs; limited grounding in the physical world & training can \emph{collapse} without care; no generator, so less directly usable\\
+\textbf{Status} & deployed at global scale & research systems; early products\\\bottomrule
+\end{tabular}
+\end{sfig}
+\vspace{1mm}
+{\small The first four rows follow LeCun's published framing (position paper and I-JEPA / V-JEPA papers). The last row is our summary of the situation in Nov 2026.}
+\end{frame}
+
+\begin{frame}{The JEPA recipe, drawn}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[font=\footnotesize]
+  \node[card=tdBlue,text width=26mm] (x) at (0,1.2) {\textbf{context} $x$\\{\scriptsize visible part}};
+  \node[card=tdAmber,text width=26mm] (y) at (0,-1.4) {\textbf{target} $y$\\{\scriptsize hidden or future part}};
+  \node[card=tdBlue,text width=24mm] (ex) at (4.6,1.2) {encoder};
+  \node[card=tdAmber,text width=24mm] (ey) at (4.6,-1.4) {target encoder};
+  \node[card=tdPurple,text width=30mm] (p) at (9.4,1.2) {\textbf{predictor}\\{\scriptsize guess $s_y$ from $s_x$}};
+  \node[card=tdRed,text width=34mm] (l) at (13.8,-0.1) {\textbf{loss}: distance between predicted and actual $s_y$};
+  \draw[arr] (x) -- (ex); \draw[arr] (y) -- (ey);
+  \draw[arr] (ex) -- node[above,lbl]{$s_x$} (p);
+  \draw[arr] (p) -- (l); \draw[arr] (ey) -- node[above,lbl]{$s_y$} (l);
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}\small \bad{Collapse risk.} If both encoders output a constant, the loss is zero and nothing is learned. JEPAs add safeguards (slowly updated target encoder, stop-gradients, regularisers) to prevent it.\end{column}
+\begin{column}{0.5\textwidth}\small \key{Why representations?} The target encoder can drop unpredictable detail, so the predictor only forecasts the \emph{predictable} structure of the world.\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{I-JEPA (2023): predict image blocks in representation space}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdBlue,text width=64mm,align=left] (a) {\textbf{Idea.} From one block of an image, predict the \emph{representations} of several other blocks of the same image. No hand-made augmentations, no pixel reconstruction.};
+  \node[card=tdGreen,text width=64mm,align=left,below=of a] (b) {\textbf{Findings (Assran et al.).} The masking strategy matters most: targets must be large enough to be semantic, and the context informative and spread out. A ViT-Huge/14 trained on ImageNet in under three days on 16 A100 GPUs performed strongly on classification, counting and depth tasks.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.42\textwidth}
+\begin{sfig}[0.55]
+\begin{tikzpicture}[x=5mm,y=5mm]
+  \foreach \i in {0,...,5}{\foreach \j in {0,...,5}{\draw[tdLine,fill=white] (\i,\j) rectangle ++(1,1);}}
+  \fill[tdBlue!40] (0,1) rectangle (4,5); \node[font=\scriptsize] at (2,3) {context};
+  \fill[tdAmber!70] (4,3) rectangle (6,5); \node[font=\scriptsize] at (5,4) {target};
+  \fill[tdAmber!70] (3,0) rectangle (5,2); \node[font=\scriptsize] at (4,1) {target};
+  \node[lbl] at (3,-0.8) {schematic of block masking};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\end{columns}
+\srcline{Assran, Duval, Misra, Bojanowski, Vincent, Rabbat, LeCun, Ballas, ``Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture'', arXiv:2301.08243 (Jan 2023).}
+\end{frame}
+
+\begin{frame}{V-JEPA (2024) and V-JEPA 2 (2025): from video to robots}
+\begin{columns}[c]
+\begin{column}{0.46\textwidth}
+\begin{tikzpicture}
+\begin{axis}[xbar,width=\linewidth,height=44mm,xmin=0,xmax=100,symbolic y coords={ImageNet-1K,Something-Something v2,Kinetics-400},ytick=data,bar width=7pt,nodes near coords,every node near coord/.append style={font=\tiny},tick label style={font=\tiny},xlabel={accuracy (\%), frozen backbone},title={V-JEPA, ViT-H/16 (authors' numbers)},title style={font=\scriptsize}]
+\addplot[fill=tdBlue!60] coordinates {(77.9,ImageNet-1K) (72.2,Something-Something v2) (81.9,Kinetics-400)};
+\end{axis}
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.52\textwidth}
+\begin{tikzpicture}[node distance=2.4mm]
+  \node[card=tdBlue,text width=60mm,align=left,font=\footnotesize] (a) {\textbf{V-JEPA} (Bardes et al., Feb 2024): feature prediction as the \emph{only} objective, on 2 million public videos; no text, no negatives, no reconstruction.};
+  \node[card=tdGreen,text width=60mm,align=left,below=of a,font=\footnotesize] (b) {\textbf{V-JEPA 2} (Assran et al., Jun 2025): over 1 million hours of video and images; 77.3\% top-1 on Something-Something v2; 39.7 recall@5 on Epic-Kitchens-100.};
+  \node[card=tdAmber,text width=60mm,align=left,below=of b,font=\footnotesize] (c) {\textbf{V-JEPA 2-AC:} post-trained on under 62 hours of robot video; used \emph{zero-shot} for pick-and-place on Franka arms in two labs.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\vspace{1mm}
+{\small \bad{Reading these numbers:} they come from the authors' papers. Whether JEPA beats alternatives overall is what the debate is about.}
+\srcline{Bardes et al., arXiv:2404.08471 (2024); Assran et al., ``V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning'', arXiv:2506.09985 (11 Jun 2025).}
+\end{frame}
+
+\begin{frame}{Timeline: the JEPA line of work (all dates from the papers and reports cited)}
+\begin{sfig}[0.7]
+\begin{tikzpicture}[x=1mm,y=1mm,font=\scriptsize]
+  \draw[thick,tdMuted] (0,0) -- (156,0);
+  \foreach \x/\d/\t/\c/\an/\dy in {4/{Jun 2022}/{LeCun position paper: JEPA proposed}/tdBlue/south/6,
+      22/{Jan 2023}/{I-JEPA (images)}/tdGreen/north/-6,
+      40/{Feb 2024}/{V-JEPA (video)}/tdAmber/south/6,
+      60/{Jun 2025}/{V-JEPA 2: robot planning, zero-shot}/tdPurple/north/-6,
+      80/{Nov 2025}/{LeJEPA; LeCun leaves Meta (reported)}/tdBlue/south/6,
+      100/{15 Dec 2025}/{AMI Labs founded, Paris}/tdGreen/north/-6,
+      120/{Mar 2026}/{\$1.03B seed round (reported)}/tdAmber/south/6,
+      143/{29 Oct 2026}/{Balestriero and LeCun: platonic representation paper}/tdRed/north/-6}{
+    \fill[\c] (\x,0) circle (1.6mm);
+    \node[anchor=\an,align=center,text width=24mm] at (\x,\dy) {{\bfseries\color{\c}\d}\\ \t};}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small Research papers (blue-green) are the evidence; company news is context. Preprints marked 2026 have not yet been independently replicated, as far as we could find.}
+\srcline{arXiv:2301.08243, 2404.08471, 2506.09985, 2511.08544, 2610.39302; Wikipedia, AMI Labs (citing NYT, WSJ, Wired, 10 Mar 2026).}
+\end{frame}
+
+
+\begin{frame}{Newer theory: LeJEPA and the ``platonic'' paper}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdPurple,text width=60mm,align=left] (a) {\textbf{LeJEPA} (Balestriero and LeCun, Nov 2025): a theory of JEPAs and a training objective, SIGReg, that pushes embeddings toward an isotropic Gaussian. One main hyperparameter; about 50 lines of code; 79\% ImageNet-1k linear accuracy with a frozen ViT-H/14, over 60 architectures tried.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdBlue,text width=58mm,align=left,font=\footnotesize] (a) {\textbf{``Proving and Improving the Platonic Representation Hypothesis with JEPAs''} (Balestriero and LeCun, 29 Oct 2026): proves that JEPAs trained on different modalities end up with equivalent representations up to a rotation; reports that a 109M-parameter text JEPA aligned with image encoders better than language models up to 72B parameters.};
+  \node[card=tdAmber,text width=58mm,align=left,below=of a,font=\footnotesize] (b) {\textbf{Status:} one arXiv preprint (steps 1--2 of the Part 7 ladder). Results are the authors' own; no independent replication known to us.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\srcline{Balestriero and LeCun, ``LeJEPA'', arXiv:2511.08544 (Nov 2025). Balestriero and LeCun, arXiv:2610.39302 (29 Oct 2026). We read the arXiv abstracts; not the full papers.}
+\end{frame}
+
+\begin{frame}{LeCun's critique of LLMs and his new lab}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdRed,text width=62mm,align=left] (a) {\textbf{The critique (as reported).} LeCun left Meta in November 2025, arguing that the leading AI companies were heading toward a dead end by focusing mainly on large language models. His alternative: world models that understand the physical world, keep memory, reason and plan.};
+  \node[card=tdBlue,text width=62mm,align=left,below=of a] (b) {\textbf{Counter-view.} Many labs report strong results from scaling LLMs with reasoning and tools (Part 8). Whether LLMs alone reach general intelligence is an open empirical question.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.44\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdGreen,text width=52mm,align=left] (a) {\textbf{AMI Labs} (Advanced Machine Intelligence): Paris-based, founded 15 Dec 2025. Executive chairman: LeCun; CEO Alexandre LeBrun; Chief Science Officer Saining Xie.};
+  \node[card=tdAmber,text width=52mm,align=left,below=of a] (b) {\textbf{Funding (reported):} a \$1.03 billion seed round in March 2026. Stated focus: manufacturing, biomedicine, robotics. No products listed; none expected for about five years.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\srcline{Wikipedia, ``Advanced Machine Intelligence Labs'' (last edited 19 Nov 2026), citing NYT, WSJ, Le Figaro and Wired of 10 Mar 2026 and company records; several citations on that page are broken, so treat funding details as reported, not confirmed.}
+\end{frame}
+
+\begin{frame}{Other world-model efforts, and a fair summary}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdPurple,text width=60mm,align=left] (a) {\textbf{Other approaches.} \emph{Dreamer} (Hafner et al., \emph{Nature} 2025) learns a world model in latent space and plans inside it, mastering many control tasks with one setup. Reports list further players working on world models, including World Labs, Google DeepMind, OpenAI and Meta.};
+  \node[card=tdAmber,text width=60mm,align=left,below=of a] (b) {\textbf{What we cannot say.} We did not find peer-reviewed evidence, by Nov 2026, that JEPA-based systems outperform the best LLM-based systems at general reasoning or at deployed products.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdGreen,text width=54mm,align=left] (a) {\textbf{What is clear.} Predicting in representation space is an active, productive research line with open code and papers; V-JEPA 2 shows robot planning from a small amount of robot data.};
+  \node[card=tdBlue,text width=54mm,align=left,below=of a] (b) {\textbf{Limits still apply.} Planning inside a world model is a \emph{search} problem: in general NP-hard or worse. A world model does not repeal Parts 3--5. It may give better heuristics.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\srcline{Hafner et al., ``Mastering diverse control tasks through world models'', Nature 640, 2025 (DreamerV3). Competitor list: Wikipedia, AMI Labs page (cites Maddyness, Mar 2026). Not used: blog posts and aggregator pages about further 2026 JEPA releases that we could not trace to a paper.}
+\end{frame}
+
+

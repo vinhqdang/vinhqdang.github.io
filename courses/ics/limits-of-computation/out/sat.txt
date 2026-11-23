@@ -1,0 +1,14 @@
+tiny example: {1: True, 3: True, 2: False}
+n   m/n  sat?  DPLL calls   2^n
+20  3.0  yes          6   1e+06
+20  4.3  yes         19   1e+06
+20  6.0  no          27   1e+06
+40  3.0  yes         15   1e+12
+40  4.3  yes        129   1e+12
+40  6.0  no          47   1e+12
+60  3.0  yes         17   1e+18
+60  4.3  yes        198   1e+18
+60  6.0  no         283   1e+18
+80  3.0  yes         41   1e+24
+80  4.3  yes        489   1e+24
+80  6.0  no         409   1e+24

@@ -1,0 +1,2 @@
+says halts=True , truth=False -> WRONG
+says halts=False, truth=True  -> WRONG

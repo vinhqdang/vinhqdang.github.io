@@ -1,0 +1,160 @@
+%% ================= PART 6: BEYOND =================
+\partfooter{6}
+\divider{6}{Beyond: quantum, randomness, cryptography}{tdBlue}{What new kinds of machines change, and what they do not}
+
+\begin{frame}{Quantum computing: interference, not ``all answers at once''}
+\begin{columns}[c]
+\begin{column}{0.56\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}[font=\footnotesize]
+  \node[card=tdBlue,text width=18mm] (s) at (0,0) {start};
+  \node[card=tdGreen,text width=24mm] (a) at (4.2,1.1) {path A\\ amplitude $+\tfrac12$};
+  \node[card=tdAmber,text width=24mm] (b) at (4.2,-1.1) {path B\\ amplitude $+\tfrac12$};
+  \node[card=tdRed,text width=24mm] (w) at (8.6,1.1) {wrong answer:\\ $+\tfrac12-\tfrac12=0$\\ \textbf{cancels}};
+  \node[card=tdGreen,text width=24mm] (r) at (8.6,-1.1) {right answer:\\ $+\tfrac12+\tfrac12=1$\\ \textbf{adds up}};
+  \draw[arr] (s) -- (a); \draw[arr] (s) -- (b);
+  \draw[arr] (a) -- (w); \draw[arr] (b) -- node[pos=0.25,above,sloped,font=\tiny,text=tdRed]{sign flips} (w);
+  \draw[arr] (a) -- (r); \draw[arr] (b) -- (r);
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small A qubit holds \emph{amplitudes} (positive or negative) for 0 and 1. An algorithm arranges the paths so wrong answers cancel and the right one adds up.}
+\end{column}
+\begin{column}{0.4\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdRed,text width=50mm,align=left] (a) {\textbf{Myth:} ``it tries every answer at once and picks the best.'' Measuring gives \emph{one} random outcome.};
+  \node[card=tdAmber,text width=50mm,align=left,below=of a] (b) {\textbf{Reality:} only problems with special structure get a speed-up.};
+  \node[card=tdPurple,text width=50mm,align=left,below=of b] (c) {\textbf{And:} it computes nothing a Turing machine cannot. Computability is untouched; only speed may change.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{What quantum computers change, and what they do not}
+\begin{columns}[c]
+\begin{column}{0.56\textwidth}
+\small
+\begin{tabular}{@{}L{22mm}L{26mm}L{30mm}@{}}
+\toprule
+\textbf{Algorithm} & \textbf{Task} & \textbf{Speed-up}\\\midrule
+Shor 1994 & factoring, discrete log & exponential (to polynomial)\\
+Grover 1996 & unstructured search of $N$ items & square root: $N\to\sqrt N$\\
+BBBV 1997 & brute-force search for NP-complete problems & no better than square root, in the black-box model\\\bottomrule
+\end{tabular}
+\vspace{2mm}
+
+\footnotesize Grover on SAT: $2^n\to2^{n/2}$. Still \bad{exponential}.
+\end{column}
+\begin{column}{0.42\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[font=\footnotesize]
+  \draw[rounded corners=12pt,fill=tdPurple!8,draw=tdPurple!70] (0,0) rectangle (7.6,4.6);
+  \node[anchor=north east,font=\scriptsize\bfseries,text=tdPurple] at (7.4,4.5) {NP};
+  \draw[rounded corners=12pt,fill=tdBlue!10,draw=tdBlue!70] (0.3,0.3) rectangle (5.2,3.2);
+  \node[anchor=north west,font=\scriptsize\bfseries,text=tdBlue] at (0.5,3.1) {BQP (quantum)};
+  \draw[rounded corners=12pt,fill=tdGreen!12,draw=tdGreen!70] (0.6,0.6) rectangle (3.4,2.1);
+  \node[font=\scriptsize\bfseries,text=tdGreen!70!black] at (2,1.3) {P};
+  \node[card=tdBlue,font=\tiny] at (4.3,1.1) {factoring?};
+  \node[card=tdRed,font=\tiny,text width=14mm] at (6.2,3.0) {NP-complete};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\scriptsize Widely believed: NP-complete problems lie outside BQP. Factoring is in BQP but is \emph{not} known to be NP-complete. Unproven.}
+\end{column}
+\end{columns}
+\srcline{Shor, SIAM J.\ Comput.\ 26, 1997 (FOCS 1994). Grover, STOC 1996. Bennett, Bernstein, Brassard, Vazirani, SIAM J.\ Comput.\ 26, 1997.}
+\end{frame}
+
+\begin{frame}{Where quantum hardware stands (reported milestones)}
+\begin{columns}[c]
+\begin{column}{0.48\textwidth}
+\begin{tikzpicture}
+\begin{axis}[width=\linewidth,height=50mm,xlabel={code distance},ylabel={relative logical error},ymode=log,xtick={3,5,7},xmin=2.5,xmax=7.5,grid=major,grid style={tdLine!50},title={\illus\ ``below threshold'': bigger code, fewer errors},title style={font=\scriptsize}]
+\addplot[tdGreen,very thick,mark=*] coordinates {(3,1) (5,0.467) (7,0.218)};
+\addplot[tdRed,thick,dashed,mark=square*] coordinates {(3,1) (5,1.2) (7,1.5)};
+\node[font=\tiny,text=tdGreen!70!black,anchor=west] at (axis cs:3.1,0.3) {factor 2.14 per +2};
+\node[font=\tiny,text=tdRed!80!black,anchor=west] at (axis cs:3.1,1.7) {above threshold: worse};
+\end{axis}
+\end{tikzpicture}
+{\scriptsize Green: ratios from the reported factor 2.14 (arXiv:2408.13687). Red: hypothetical contrast.}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}[node distance=2.4mm]
+  \node[card=tdBlue,text width=58mm,align=left,font=\footnotesize] (a) {\textbf{Error correction works in principle.} Google's surface-code memories: a larger code gave a \emph{lower} logical error rate (factor about 2.14 per step in distance). Nature 2025.};
+  \node[card=tdAmber,text width=58mm,align=left,below=of a,font=\footnotesize] (b) {\textbf{Still early.} Breaking real RSA needs thousands of \emph{logical} qubits, each built from many noisy physical ones.};
+  \node[card=tdGreen,text width=58mm,align=left,below=of b,font=\footnotesize] (c) {\textbf{Standards moved already.} NIST published post-quantum encryption and signature standards in Aug 2024 (FIPS 203, 204, 205): ``harvest now, decrypt later''.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\srcline{Acharya et al., ``Quantum error correction below the surface code threshold'', arXiv:2408.13687 (Nature 638, 2025). NIST, FIPS 203/204/205, 13 Aug 2024. We make no claims about hardware timelines.}
+\end{frame}
+
+\begin{frame}{Randomness: flipping coins can help}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\code[basicstyle=\ttfamily\fontsize{5.8}{6.8}\selectfont]{montecarlo.py}
+\vspace{1mm}
+\outp{montecarlo.txt}
+\vspace{1mm}\pyline
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{tikzpicture}
+\begin{axis}[width=\linewidth,height=30mm,xmode=log,ymode=log,xlabel={darts $n$},ylabel={error},grid=major,grid style={tdLine!50},title={error shrinks about like $1/\sqrt n$ (dashed)},title style={font=\scriptsize}]
+\addplot[tdRed,thick,mark=*,mark size=1.2pt] table[x=n,y=err] {out/mc.dat};
+\addplot[tdMuted,dashed,domain=10:1000000] {3/sqrt(x)};
+\end{axis}
+\end{tikzpicture}
+\vspace{1mm}
+\begin{tikzpicture}[node distance=2mm]
+  \node[card=tdGreen,text width=56mm,align=left,font=\scriptsize] (a) {\textbf{Primality:} the Miller--Rabin test answers quickly, with error below $4^{-k}$ after $k$ rounds (deterministic AKS: 2002).};
+  \node[card=tdPurple,text width=56mm,align=left,below=of a,font=\scriptsize] (b) {\textbf{Belief:} P = BPP (Impagliazzo and Wigderson 1997, under a hardness assumption). Randomness is not believed to crack NP.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\srcline{Miller, JCSS 13, 1976; Rabin, J.\ Number Theory 12, 1980; Agrawal, Kayal, Saxena, Annals of Math.\ 160, 2004; Impagliazzo and Wigderson, STOC 1997.}
+\end{frame}
+
+\begin{frame}{Cryptography is built on hard problems}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdGreen,text width=60mm,align=left] (a) {\textbf{One-way function:} easy to compute, hard to invert. Multiply two primes: easy. Factor the product: no known fast method.};
+  \node[card=tdAmber,text width=60mm,align=left,below=of a] (b) {\textbf{RSA} (1977) relies on factoring. Your browser's HTTPS lock relies on such assumptions.};
+  \node[card=tdRed,text width=60mm,align=left,below=of b] (c) {\textbf{Caution:} factoring is not known to be NP-complete, and crypto needs hardness on \emph{typical} instances, a stronger demand than worst-case.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.48\textwidth}
+\outp{factor.txt}
+\vspace{1mm}\pyline
+\vspace{1mm}
+
+\code[lastline=9]{factor.py}
+\vspace{1mm}
+
+{\scriptsize Trial division: going from 15 to 17 digits multiplies the time by about 9. Real RSA keys have 600+ digits and attackers use far better algorithms, yet the gap stays astronomical.}
+\end{column}
+\end{columns}
+\srcline{Rivest, Shamir, Adleman, Commun.\ ACM 21(2), 1978.}
+\end{frame}
+
+
+
+\begin{frame}{The complexity zoo, as a map}
+\begin{sfig}[0.7]
+\begin{tikzpicture}[font=\footnotesize]
+  \foreach \w/\h/\c/\t/\y in {13.4/7.4/tdRed/{EXP}/0, 11.0/6.0/tdAmber/{PSPACE: polynomial memory}/0.3, 8.6/4.6/tdPurple/{NP}/0.6, 4.6/3.0/tdGreen/{P}/0.2}{
+    \draw[rounded corners=14pt,fill=\c!9,draw=\c!70] (0,\y) rectangle (\w,\y+\h);}
+  \node[font=\scriptsize\bfseries,text=tdRed!80!black,anchor=north east] at (13.2,7.2) {EXP: exponential time};
+  \node[font=\scriptsize\bfseries,text=tdAmber!80!black,anchor=north east] at (10.8,6.1) {PSPACE: polynomial memory};
+  \node[font=\scriptsize\bfseries,text=tdPurple,anchor=north east] at (8.4,5.0) {NP: quick to check};
+  \node[font=\scriptsize\bfseries,text=tdGreen!70!black] at (2.3,2.0) {P};
+  \node[font=\tiny,text=tdMuted,align=center] at (2.3,1.15) {sorting, shortest\\ path, primality};
+  \node[card=tdPurple,font=\tiny,text width=22mm] at (6.3,2.2) {SAT, TSP, Sudoku\\ (NP-complete)};
+  \node[card=tdBlue,font=\tiny,text width=20mm] at (5.0,3.7) {factoring (suspected between)};
+  \node[card=tdAmber,font=\tiny,text width=20mm] at (9.8,3.4) {generalised\\ games};
+  \node[card=tdRed,font=\tiny,text width=22mm] at (9.2,6.6) {$n\times n$ chess};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small Known: P $\subseteq$ NP $\subseteq$ PSPACE $\subseteq$ EXP and \key{P $\neq$ EXP}. Unknown: which of the inclusions in between are strict (most believed). Outside the whole picture: the undecidable.}
+\end{frame}

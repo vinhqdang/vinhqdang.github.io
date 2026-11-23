@@ -1,0 +1,243 @@
+%% ================= PART 4: COMPLEXITY =================
+\partfooter{4}
+\divider{4}{Decidable, but how fast?}{tdAmber}{Big-O revisited, polynomial versus exponential, and why it matters}
+
+\begin{frame}{Solvable in principle is not solvable in practice}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}\node[card=tdAmber,text width=62mm,align=left,inner sep=7pt]{\textbf{Guess a password} made of lowercase letters, by trying every one.\\[2mm] The program is trivial, and it \emph{always} finishes. Decidable. So what is the problem?};\end{tikzpicture}
+\vspace{3mm}
+
+{\small Assume $10^9$ guesses per second (a fast GPU rig).}
+\end{column}
+\begin{column}{0.48\textwidth}
+\small
+\begin{tabular}{@{}rrr@{}}
+\toprule
+length & guesses $26^n$ & time\\\midrule
+8 & $2.1\times10^{11}$ & 3.5 minutes\\
+12 & $9.5\times10^{16}$ & 3 years\\
+16 & $4.4\times10^{22}$ & 1.4 million years\\
+20 & $2.0\times10^{28}$ & $6\times10^{11}$ years\\\bottomrule
+\end{tabular}
+\vspace{2mm}
+
+\footnotesize Age of the universe: about $1.4\times10^{10}$ years. Each extra letter multiplies the work by 26. That is \bad{exponential growth}.
+\end{column}
+\end{columns}
+\end{frame}
+
+
+
+\begin{frame}{Big-O refresher: read the loops}
+\begin{columns}[T]
+\begin{column}{0.33\textwidth}
+\begin{tikzpicture}\node[card=tdGreen,text width=44mm,align=left,minimum height=40mm]{\textbf{\Oh{n}}\\[1mm]{\ttfamily\scriptsize for x in data:\\\ \ total += x}\\[2mm]{\scriptsize one pass; double the data, double the time.}};\end{tikzpicture}
+\end{column}
+\begin{column}{0.33\textwidth}
+\begin{tikzpicture}\node[card=tdAmber,text width=44mm,align=left,minimum height=40mm]{\textbf{\Oh{n^2}}\\[1mm]{\ttfamily\scriptsize for a in data:\\\ \ for b in data:\\\ \ \ \ compare(a, b)}\\[2mm]{\scriptsize double the data, 4$\times$ the time.}};\end{tikzpicture}
+\end{column}
+\begin{column}{0.33\textwidth}
+\begin{tikzpicture}\node[card=tdRed,text width=44mm,align=left,minimum height=40mm]{\textbf{\Oh{2^n}}\\[1mm]{\ttfamily\scriptsize for subset in all\_subsets:\\\ \ check(subset)}\\[2mm]{\scriptsize add \emph{one} item, double the time.}};\end{tikzpicture}
+\end{column}
+\end{columns}
+\vspace{3mm}
+{\small Also on the ladder: \Oh{\log n} (binary search), \Oh{n\log n} (good sorting), \Oh{n^3} (naive matrix multiplication), \Oh{n!} (all orderings).}
+\end{frame}
+
+\begin{frame}{Growth rates, drawn (computed by code, log scale)}
+\begin{columns}[c]
+\begin{column}{0.62\textwidth}
+\begin{tikzpicture}
+\begin{axis}[width=\linewidth,height=60mm,xlabel={input size $n$},ylabel={steps},ymode=log,ymax=1e10,legend pos=south east,legend columns=1,grid=major,grid style={tdLine!50},restrict x to domain=2:30]
+\addplot[tdGreen,thick] table[x=n,y=lin] {out/growth.dat}; \addlegendentry{$n$}
+\addplot[tdBlue,thick] table[x=n,y=nlogn] {out/growth.dat}; \addlegendentry{$n\log n$}
+\addplot[tdAmber,thick] table[x=n,y=sq] {out/growth.dat}; \addlegendentry{$n^2$}
+\addplot[tdPurple,thick] table[x=n,y=cube] {out/growth.dat}; \addlegendentry{$n^3$}
+\addplot[tdRed,very thick] table[x=n,y=exp] {out/growth.dat}; \addlegendentry{$2^n$}
+\end{axis}
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.36\textwidth}
+\small On a log axis a polynomial bends \emph{down} (it is a power of $n$) while an exponential stays a \bad{straight, steep line}: constant multiplier per step.
+
+\vspace{2mm}
+\footnotesize Data file \texttt{out/growth.dat} is written by \texttt{code/growth.py}.
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{How long would it take? (real output, $10^9$ operations per second)}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\outp{growth.txt}
+\vspace{1mm}\pyline
+\vspace{2mm}
+
+\code[lastline=9]{growth.py}
+\end{column}
+\begin{column}{0.42\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdGreen,text width=52mm,align=left] (a) {\textbf{Polynomial}: 70 items is no problem, even $n^3$ takes a third of a millisecond.};
+  \node[card=tdRed,text width=52mm,align=left,below=of a] (b) {\textbf{Exponential}: at $n=50$, thirteen \emph{days}; at $n=70$, 37,500 \emph{years}.};
+  \node[card=tdPurple,text width=52mm,align=left,below=of b] (c) {\textbf{Factorial} is worse: 20 items already take 77 years. This is the cost of ``try every ordering''.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Does a faster computer rescue us?}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\begin{tikzpicture}\node[card=tdBlue,text width=66mm,align=left,inner sep=7pt]{\textbf{Question.} Today you can solve size $n$ in one hour. You buy a computer \emph{1000 times faster}. What size can you solve in one hour?};\end{tikzpicture}
+\vspace{3mm}
+
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+cost & new size & change\\\midrule
+$n$ & $1000\,n$ & thousand times bigger\\
+$n^2$ & $31.6\,n$ & 32 times bigger\\
+$n^3$ & $10\,n$ & 10 times bigger\\
+$2^n$ & $n+10$ & \bad{ten more items}\\\bottomrule
+\end{tabular}
+\end{column}
+\begin{column}{0.43\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdRed,text width=50mm,align=left] (a) {$2^{n'}=1000\cdot 2^n \Rightarrow n'=n+\log_2 1000\approx n+10$.};
+  \node[card=tdAmber,text width=50mm,align=left,below=of a] (b) {\textbf{Moore's law cannot fix exponential cost.} Hardware gains are multipliers; exponential growth eats multipliers for breakfast.};
+  \node[card=tdGreen,text width=50mm,align=left,below=of b] (c) {Better \emph{algorithms} change the curve itself. That is where the big wins in computing have come from.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The class P: efficiently solvable}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}\node[card=tdGreen,text width=62mm,align=left,inner sep=7pt]{\textbf{P} = decision problems solvable in time $\Oh{n^k}$ for some fixed $k$ (\emph{polynomial time}), on a Turing machine or any reasonable computer.};\end{tikzpicture}
+\vspace{2mm}
+
+\small Why polynomials? They are \key{closed} under composition: using a polynomial routine polynomially many times is still polynomial. And the class does not depend on the machine model (for ordinary computers).
+\end{column}
+\begin{column}{0.46\textwidth}
+\small
+\begin{tabular}{@{}L{26mm}L{28mm}@{}}
+\toprule
+\textbf{Problem} & \textbf{in P because}\\\midrule
+Sorting & $\Oh{n\log n}$\\
+Shortest path & Dijkstra\\
+Is $n$ prime? & AKS (2002)\\
+Matching & Edmonds 1965\\
+Linear programming & Khachiyan 1979\\
+2-SAT, 2-colouring & linear time\\\bottomrule
+\end{tabular}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+
+\begin{frame}{EXP: provably needs exponential time}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdRed,text width=60mm,align=left] (a) {\textbf{EXP} = problems solvable in time $2^{n^k}$.};
+  \node[card=tdBlue,text width=60mm,align=left,below=of a] (b) {\textbf{Generalised games.} Who wins from a given position on an $n\times n$ chess board? EXP-complete (Fraenkel and Lichtenstein 1981). Same for generalised Go with Japanese ko rules (Robson 1983).};
+  \node[card=tdPurple,text width=60mm,align=left,below=of b] (c) {\textbf{Time hierarchy theorem} (Hartmanis and Stearns 1965): more time lets you solve strictly more problems. Hence \key{P $\subsetneq$ EXP}: some problems have \emph{no} fast algorithm. This is proved.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[font=\footnotesize]
+  \draw[rounded corners=10pt,fill=tdRed!10,draw=tdRed!70] (0,0) rectangle (7.2,5);
+  \node[anchor=north east,font=\scriptsize\bfseries,text=tdRed!80!black] at (7.1,4.9) {EXP};
+  \draw[rounded corners=10pt,fill=tdGreen!12,draw=tdGreen!70] (0.5,0.5) rectangle (4.4,3.2);
+  \node[font=\scriptsize\bfseries,text=tdGreen!70!black] at (2.45,2.7) {P};
+  \node[font=\tiny,align=center] at (2.45,1.5) {sorting\\ shortest path};
+  \node[card=tdRed,font=\tiny] at (5.6,1.8) {chess $n\times n$};
+  \node[font=\tiny,align=center,text=tdMuted] at (3.5,4.2) {proved: the outer set is strictly larger};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\end{columns}
+\srcline{Fraenkel and Lichtenstein, J.\ Combin.\ Theory A 31, 1981. Robson, Proc.\ ICALP 1983. Hartmanis and Stearns, Trans.\ AMS 117, 1965.}
+\end{frame}
+
+\begin{frame}{Look-alike problems: one easy, one (apparently) hard}
+\begin{sfig}[0.62]
+\begin{tabular}{@{}L{43mm}L{43mm}L{58mm}@{}}
+\toprule
+\good{Easy (in P)} & \bad{Seems hard (NP-complete)} & \textbf{What changed}\\\midrule
+Shortest path between two cities & Longest simple path & a ``min'' became a ``max''\\
+Visit every \emph{street} once (Euler tour) & Visit every \emph{junction} once (Hamilton tour) & edges become vertices\\
+2-colour a map & 3-colour a map & 2 becomes 3\\
+2-SAT: clauses with 2 literals & 3-SAT: clauses with 3 literals & 2 becomes 3\\
+Split items into two piles of equal count & Split items into two piles of equal \emph{weight} (partition) & count becomes weight\\
+Minimum spanning tree & Travelling salesman & ``connect'' becomes ``tour''\\\bottomrule
+\end{tabular}
+\end{sfig}
+\vspace{2mm}
+{\small Tiny changes in a problem can move it across the line. No one has a simple rule that tells which side a new problem is on.}
+\end{frame}
+
+\begin{frame}{Demo: brute force, timed (real measurements)}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\code[firstline=4,lastline=7]{brute.py}
+\vspace{1mm}
+\code[firstline=21,lastline=26]{brute.py}
+\vspace{2mm}
+
+\outp{brute.txt}
+\vspace{1mm}\pyline
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdBlue,text width=56mm,align=left] (a) {\textbf{Subset sum}: do some of these numbers add up to a target? Try all subsets: $2^n$.};
+  \node[card=tdAmber,text width=56mm,align=left,below=of a] (b) {\textbf{SAT}: is there a true/false assignment making a formula true? Here a formula that is \emph{unsatisfiable}, so every one of the $2^n$ assignments must be tried.};
+  \node[card=tdPurple,text width=56mm,align=left,below=of b] (c) {\textbf{TSP}: shortest tour through $m$ cities by trying all $(m-1)!$ orders.};
+  \node[card=tdRed,text width=56mm,align=left,below=of c] (d) {Look at the columns: every $+2$ items multiplies the time by about 4. That is $2^n$ in action.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The same data as a plot (log scale)}
+\begin{columns}[c]
+\begin{column}{0.62\textwidth}
+\begin{tikzpicture}
+\begin{axis}[width=\linewidth,height=60mm,xlabel={problem size ($n$ items, or $m$ cities)},ylabel={seconds (measured)},ymode=log,legend pos=south east,grid=major,grid style={tdLine!50}]
+\addplot[tdBlue,thick,mark=*,mark size=1.3pt] table[x=n,y=t] {out/ss.dat}; \addlegendentry{subset sum}
+\addplot[tdAmber,thick,mark=square*,mark size=1.3pt] table[x=n,y=t] {out/sat.dat}; \addlegendentry{SAT (unsat.)}
+\addplot[tdRed,thick,mark=triangle*,mark size=1.6pt] table[x=n,y=t] {out/tsp.dat}; \addlegendentry{TSP ($m$ cities)}
+\end{axis}
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.36\textwidth}
+\small Near-straight lines on a log axis: \key{exponential} (or factorial) growth. TSP climbs the steepest: from 9 to 10 cities the time grows tenfold.
+
+\vspace{2mm}
+\footnotesize Extrapolate: SAT at $n=40$ would take about $2^{20}\times0.45$ s $\approx$ 5 days in this naive Python; at $n=60$, about 16,000 years.
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Where does $2^n$ come from?}
+\begin{sfig}[0.6]
+\begin{tikzpicture}[level distance=11mm,sibling distance=48mm,font=\scriptsize,
+  level 2/.style={sibling distance=24mm},level 3/.style={sibling distance=12mm},
+  every node/.style={circle,draw=tdBlue!70,fill=tdBlue!10,inner sep=1.5pt,minimum size=4mm}]
+  \node {} child {node {} child {node {} child {node {}} child {node {}}} child {node {} child {node {}} child {node {}}}}
+           child {node {} child {node {} child {node {}} child {node {}}} child {node {} child {node {}} child {node {}}}};
+  \node[draw=none,fill=none,anchor=west] at (4.3,-0.0) {\textbf{item 1}: in or out?};
+  \node[draw=none,fill=none,anchor=west] at (4.3,-1.1) {\textbf{item 2}: in or out?};
+  \node[draw=none,fill=none,anchor=west] at (4.3,-2.2) {\textbf{item 3}: in or out?};
+  \node[draw=none,fill=none,anchor=west,text=tdRed!80!black] at (4.3,-3.3) {$2\times2\times2=8$ complete choices};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+\small Each yes/no decision doubles the number of candidate answers. With $n$ decisions: $2^n$. Brute force walks every leaf. The hope behind clever algorithms is to \key{prune} whole branches without visiting them.
+\end{frame}
+
+

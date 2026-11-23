@@ -1,0 +1,279 @@
+%% ================= PART 2: TURING MACHINES =================
+% tape row helper: \tapeat{y}{symbols}{head index}{label}
+\newcommand{\tapeat}[4]{%
+  \foreach \s [count=\i from 0] in {#2}{%
+    \node[draw=tdInk!60,fill=white,minimum size=6.2mm,inner sep=0,font=\ttfamily\small] at (\i*6.2mm,#1) {\s};
+    \ifnum\i=#3 \node[fill=tdBlue,draw=none,minimum size=6.2mm,inner sep=0,font=\ttfamily\small\bfseries,text=white,opacity=0.95,text opacity=1] at (\i*6.2mm,#1) {\s};\fi}%
+  \node[font=\scriptsize,anchor=west,text=tdMuted] at (11.6*6.2mm,#1) {#4};}
+\partfooter{2}
+\divider{2}{Turing machines}{tdGreen}{The simplest computer that can still compute everything}
+
+\begin{frame}{1936: the question behind every computer}
+\begin{sfig}[0.7]
+\begin{tikzpicture}[x=1mm,y=1mm,font=\scriptsize]
+  \draw[thick,tdMuted] (0,0) -- (150,0);
+  \foreach \x/\yr/\t/\c/\an/\dy in {10/1928/{Hilbert: is there a mechanical method to decide any mathematical statement?}/tdBlue/south/6,
+      45/1931/{G\"odel: any rich, consistent system has true statements it cannot prove}/tdPurple/north/-6,
+      85/1936/{Church and Turing independently show: no such method exists}/tdRed/south/6,
+      125/1945/{Stored-program computers are built (von Neumann report)}/tdGreen/north/-6}{
+    \fill[\c] (\x,0) circle (1.6mm);
+    \node[anchor=\an,align=center,text width=34mm] at (\x,\dy) {{\bfseries\color{\c}\yr}\\ \t};}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small In 1936 the word \emph{computer} meant a \key{person} doing calculations with pencil and paper. Turing asked: what is such a person really doing, and what can they never do?}
+\srcline{Turing, ``On Computable Numbers, with an Application to the Entscheidungsproblem'', Proc.\ London Math.\ Soc., 1936. Church, Amer.\ J.\ Math., 1936.}
+\end{frame}
+
+
+
+\begin{frame}{Anatomy of a Turing machine}
+\begin{sfig}[0.78]
+\begin{tikzpicture}[font=\footnotesize]
+  \foreach \s [count=\i from 0] in {\_,\_,1,0,1,1,\_,\_,\_}{
+    \node[draw=tdInk!60,fill=white,minimum size=9mm,inner sep=0,font=\ttfamily\large] (t\i) at (\i*9mm,0) {\s};}
+  \node[font=\large,text=tdMuted] at (-9mm,0) {$\cdots$};
+  \node[font=\large,text=tdMuted] at (9*9mm,0) {$\cdots$};
+  \fill[tdBlue] (4*9mm,-6mm) -- ++(-3mm,-6mm) -- ++(6mm,0) -- cycle;
+  \node[card=tdBlue,text width=22mm,below=14mm of t4] (h) {read/write \textbf{head}};
+  \node[card=tdGreen,text width=30mm,right=14mm of h,minimum height=14mm] (s) {\textbf{state} $q_1$\\ {\scriptsize finite memory}};
+  \node[card=tdAmber,text width=44mm,left=14mm of h,minimum height=20mm] (r) {\textbf{rule table}\\ {\scriptsize (state, symbol) $\to$ (write, move, next state)}};
+  \draw[arr] (s) -- (h); \draw[arr] (r) -- (h);
+  \node[card=tdInk,anchor=south,text width=60mm] at (4*9mm,12mm) {\textbf{tape}: unbounded, one symbol per cell, starts with the input};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small Each step: read the cell under the head, \key{write} a symbol, \key{move} left or right, switch to a \key{new state}. Halt when the state is \texttt{halt}.}
+\end{frame}
+
+
+
+\begin{frame}{Example 1: add one in binary, as a state diagram}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[font=\footnotesize,state/.style={circle,draw=tdBlue!70!black,fill=tdBlue!10,minimum size=14mm,thick,align=center}]
+  \node[state] (q0) at (0,0) {$q_0$\\{\tiny scan right}};
+  \node[state] (q1) at (6.5,0) {$q_1$\\{\tiny carry left}};
+  \node[state,fill=tdGreen!15,draw=tdGreen!70!black,double] (h) at (12,0) {halt};
+  \path[->,thick,draw=tdMuted] (q0) edge[loop above] node[above,font=\scriptsize] {0/0,R \ \ 1/1,R} (q0);
+  \path[->,thick,draw=tdMuted] (q0) edge node[above,font=\scriptsize] {\_/\_,L} (q1);
+  \path[->,thick,draw=tdMuted] (q1) edge[loop above] node[above,font=\scriptsize] {1/0,L} (q1);
+  \path[->,thick,draw=tdMuted] (q1) edge node[above,font=\scriptsize] {0/1,L \ or \ \_/1,L} (h);
+  \draw[->,thick,draw=tdMuted] (-1.8,0) -- (q0);
+  \node[lbl] at (-2.2,0.5) {start};
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+\begin{center}\small Arrow label \texttt{read/write,move}. Idea: run to the right end, then turn every trailing \texttt{1} into \texttt{0} until you find a \texttt{0} (or blank) to turn into \texttt{1}.\end{center}
+\end{frame}
+
+\begin{frame}{Example 1 in motion: 1011 + 1 = 1100}
+\begin{sfig}[0.78]
+\begin{tikzpicture}[font=\footnotesize]
+  \tapeat{0}{1,0,1,1,\_}{0}{step 0: $q_0$, input 11}
+  \tapeat{-8mm}{1,0,1,1,\_}{4}{step 4: $q_0$ has reached the blank}
+  \tapeat{-16mm}{1,0,1,1,\_}{3}{step 5: $q_1$ turns around}
+  \tapeat{-24mm}{1,0,1,0,\_}{2}{step 6: 1+1 = 0, carry}
+  \tapeat{-32mm}{1,0,0,0,\_}{1}{step 7: 1+1 = 0, carry}
+  \tapeat{-40mm}{1,1,0,0,\_}{0}{step 8: 0 becomes 1, \textbf{halt}: 12}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}{\small Blue cell = head. Eight steps for four bits. These are the real first and last states of the simulator on the next slide.}
+\end{frame}
+
+\begin{frame}[fragile]{A Turing machine simulator in 16 lines of Python}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\code[lastline=16]{tm.py}
+\end{column}
+\begin{column}{0.42\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdBlue,text width=52mm,align=left] (a) {\textbf{The tape} is a dictionary: position $\to$ symbol. Unlimited, blank by default.};
+  \node[card=tdGreen,text width=52mm,align=left,below=of a] (b) {\textbf{The rules} are a dictionary too: \texttt{(state, symbol)} $\to$ \texttt{(write, move, next)}.};
+  \node[card=tdAmber,text width=52mm,align=left,below=of b] (c) {\textbf{The loop} is the whole machine: look up, write, move, switch state. Nothing else.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Run it: binary increment, real output}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\code[firstline=18,lastline=25]{tm.py}
+\end{column}
+\begin{column}{0.48\textwidth}
+\outp[lastline=13]{tm.txt}
+\vspace{1mm}\pyline
+\end{column}
+\end{columns}
+\vspace{1mm}
+{\small The simulator prints the tape after each step (without the head marker). It matches the hand trace on the previous slide: 1011 $\to$ 1100.
+\bad{Warning}: the machine never ``knows'' it is adding. It only follows rules.}
+\end{frame}
+
+\begin{frame}{Example 2: is this word a palindrome?}
+\begin{sfig}[0.75]
+\begin{tikzpicture}[font=\footnotesize]
+  \tapeat{0}{a,b,b,a,\_}{0}{abba: remember the first letter, erase it}
+  \tapeat{-8mm}{\_,b,b,a,\_}{3}{run to the right end, step back}
+  \tapeat{-16mm}{\_,b,b,a,\_}{3}{last letter equals the remembered one? erase it}
+  \tapeat{-24mm}{\_,b,b,\_,\_}{1}{run back to the left end}
+  \tapeat{-32mm}{\_,\_,b,\_,\_}{2}{repeat on the shorter word: b, b}
+  \tapeat{-40mm}{\_,\_,\_,\_,\_}{3}{empty tape: \textbf{halt, accept}}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small The \key{state} is the machine's memory: ``I erased an \texttt{a}'' or ``I erased a \texttt{b}''. Mismatch means \bad{reject}. A finite number of states handles words of any length.}
+\end{frame}
+
+\begin{frame}{Palindrome machine: the state diagram}
+\begin{sfig}[0.72]
+\begin{tikzpicture}[font=\footnotesize,state/.style={circle,draw=tdBlue!70!black,fill=tdBlue!10,minimum size=11mm,thick,inner sep=1pt}]
+  \node[state] (q0) at (0,0) {$q_0$};
+  \node[state] (qa) at (4,1.8) {$q_a$};
+  \node[state] (qb) at (4,-1.8) {$q_b$};
+  \node[state] (ca) at (8,1.8) {$c_a$};
+  \node[state] (cb) at (8,-1.8) {$c_b$};
+  \node[state] (bk) at (12,0) {back};
+  \node[state,fill=tdGreen!15,draw=tdGreen!70!black,double] (h) at (0,-3.8) {halt};
+  \node[state,fill=tdRed!12,draw=tdRed!70!black,double] (rj) at (12,-3.8) {reject};
+  \path[->,thick,draw=tdMuted,font=\tiny]
+    (q0) edge node[above,sloped] {a/\_,R} (qa)
+    (q0) edge node[below,sloped] {b/\_,R} (qb)
+    (qa) edge[loop above] node {a,b: R} (qa)
+    (qb) edge[loop below] node {a,b: R} (qb)
+    (qa) edge node[above] {\_/\_,L} (ca)
+    (qb) edge node[below] {\_/\_,L} (cb)
+    (ca) edge node[above,sloped] {a/\_,L} (bk)
+    (cb) edge node[below,sloped] {b/\_,L} (bk)
+    (bk) edge[loop right] node {a,b: L} (bk)
+    (bk) edge[bend right=30] node[above,sloped] {\_/\_,R} (q0)
+    (q0) edge node[left] {\_: R} (h)
+    (ca) edge[bend left=8] node[right,pos=0.3] {\_: halt} (h)
+    (ca) edge[dashed] node[right] {b: mismatch} (rj)
+    (cb) edge[dashed] node[left,pos=0.3] {a: mismatch} (rj);
+\end{tikzpicture}
+\end{sfig}
+\end{frame}
+
+\begin{frame}{Palindrome machine: run it}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\code[firstline=27,lastline=34]{tm.py}
+\vspace{1mm}{\scriptsize\color{tdMuted}... 18 rules in all, in \texttt{code/tm.py}}
+\vspace{2mm}
+\outp[firstline=14,lastline=17]{tm.txt}
+\vspace{1mm}\pyline
+\end{column}
+\begin{column}{0.43\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdGreen,text width=52mm,align=left] (a) {\textbf{abba}: accepted in 15 steps.\\ \textbf{aba}: accepted in 10.};
+  \node[card=tdRed,text width=52mm,align=left,below=of a] (b) {\textbf{abab}: rejected after 6 steps. The first mismatch ends it.};
+  \node[card=tdBlue,text width=52mm,align=left,below=of b] (c) {An \textbf{empty word} is a palindrome: halt in 1 step.};
+\end{tikzpicture}
+\vspace{2mm}
+
+{\footnotesize Yes, a laptop does this in one line: \texttt{w == w[::-1]}. Turing machines are not fast. They are \emph{simple enough to reason about}.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Counting steps: the first look at cost}
+\begin{columns}[c]
+\begin{column}{0.58\textwidth}
+\begin{tikzpicture}
+\begin{axis}[width=\linewidth,height=52mm,xlabel={input length $n$},ylabel={Turing-machine steps},legend pos=north west,grid=major,grid style={tdLine!50}]
+\addplot[tdRed,thick,mark=*,mark size=1pt] table[x=n,y=pal] {out/tmcost.dat};
+\addlegendentry{palindrome}
+\addplot[tdGreen,thick,mark=square*,mark size=1pt] table[x=n,y=inc] {out/tmcost.dat};
+\addlegendentry{increment (worst case)}
+\end{axis}
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.4\textwidth}
+\outp{tmcost.txt}
+\vspace{2mm}
+
+{\footnotesize Doubling $n$ doubles the increment cost (linear) but roughly \key{quadruples} the palindrome cost: 153 to 496 steps when $n$ goes 16 to 30. The head runs back and forth, about $n^2/2$ steps. Same task, different machine, different cost.}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+
+\begin{frame}{The Church--Turing thesis}
+\begin{columns}[c]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}
+  \node[card=tdBlue,text width=60mm,align=left,inner sep=7pt] {\textbf{Thesis.} Anything that can be computed by a step-by-step mechanical procedure can be computed by a Turing machine.};
+\end{tikzpicture}
+\vspace{2mm}
+
+\small
+\begin{itemize}\setlength\itemsep{1.5mm}
+\item A \key{thesis}, not a theorem: ``mechanical procedure'' is informal.
+\item Every serious formalisation turned out equivalent; no counter-example in 90 years.
+\item \bad{Careful:} it concerns \emph{what} is computable, not \emph{how fast}. The \emph{extended} thesis (polynomial equivalence) is a stronger claim, which quantum computing challenges (Part 6).
+\end{itemize}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}[font=\footnotesize]
+  \node[card=tdGreen,text width=26mm,minimum height=14mm] (t) {\textbf{Turing machine}\\ 1936};
+  \foreach \n/\a/\tx/\c in {l/150/{Lambda calculus (Church)}/tdBlue, r/90/{Random-access machine}/tdPurple, p/30/{Python, C, Java}/tdAmber, g/-30/{GPUs, neural networks}/tdRed, q/-90/{Game of Life}/tdBlue, d/-150/{Recursive functions}/tdPurple}{
+    \node[card=\c,text width=26mm,font=\scriptsize] (\n) at (\a:40mm) {\tx};
+    \draw[<->,thick,draw=tdMuted] (t) -- (\n);}
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize Each model can simulate the others: all compute the same functions.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The universal machine: programs are data}
+\begin{sfig}[0.72]
+\begin{tikzpicture}[font=\footnotesize,node distance=6mm]
+  \node[card=tdAmber,text width=34mm] (d) {description of machine $M$\\{\scriptsize e.g.\ the rule table of ``add one''}};
+  \node[card=tdBlue,text width=34mm,below=of d] (x) {input $x$\\{\scriptsize e.g.\ 1011}};
+  \node[card=tdGreen,text width=36mm,minimum height=26mm,right=22mm of $(d)!0.5!(x)$] (u) {{\Large\faMicrochip}\\ \textbf{Universal machine} $U$\\{\scriptsize reads $M$, then imitates $M$ on $x$}};
+  \node[card=tdPurple,text width=34mm,right=22mm of u] (o) {what $M$ would output\\{\scriptsize 1100}};
+  \draw[arr] (d) -- (u); \draw[arr] (x) -- (u); \draw[arr] (u) -- (o);
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\small One fixed machine runs \emph{any} program given as input. That is the idea of the \key{stored-program computer}: your laptop is a universal machine, an app is its input.
+\end{column}
+\begin{column}{0.5\textwidth}
+\small And the trick that will break things next: a \bad{program can be fed to a program}, including itself. A simulator like \texttt{run(rules, tape)} on the slide before is exactly this.
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Check yourself: trace a machine}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{state} & \textbf{sees} & \textbf{write, move} & \textbf{next}\\\midrule
+\texttt{s} & \texttt{1} & 0, R & \texttt{s}\\
+\texttt{s} & \texttt{0} & 1, R & \texttt{s}\\
+\texttt{s} & \texttt{\_} & \texttt{\_}, R & \texttt{halt}\\\bottomrule
+\end{tabular}
+\vspace{3mm}
+
+\begin{enumerate}\setlength\itemsep{1mm}\small
+\item Start in \texttt{s} on the left of \texttt{1101}. What is on the tape at \texttt{halt}?
+\item What does this machine do in one phrase?
+\item How many steps for an input of length $n$?
+\item Change one rule so that it never halts. What did you create?
+\end{enumerate}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{tikzpicture}\node[card=tdGreen,text width=56mm,align=left]{\textbf{Hint for question 4.}\\ Make the machine move right forever on blanks:\\[1mm]\texttt{(s, \_) -> (\_, R, s)}\\[1mm]This is the smallest possible \bad{infinite loop}, and the star of the next part.};\end{tikzpicture}
+\vspace{2mm}
+
+{\footnotesize Try it: edit the \texttt{inc} table in \texttt{code/tm.py} and run \texttt{python3.14 tm.py}. Answers: 0010, flip every bit, $n+1$.}
+\end{column}
+\end{columns}
+\end{frame}

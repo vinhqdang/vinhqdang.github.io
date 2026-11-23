@@ -1,0 +1,107 @@
+% Preamble for the ICS lecture decks (Beamer, Metropolis). Trimmed from talks/common/preamble.tex
+\usetheme[progressbar=frametitle,numbering=fraction,background=light,block=fill,sectionpage=none]{metropolis}
+\usepackage[T1]{fontenc}
+\usepackage{FiraSans}
+\usepackage[scaled=.85]{FiraMono}
+\usepackage{amsmath,amssymb}
+\usefonttheme[onlymath]{serif}
+\usepackage{booktabs,array,tabularx,multirow}
+\usepackage{tikz,pgfplots}
+\usepackage{fontawesome5}
+\usepackage{xcolor}
+\hyphenpenalty=10000\exhyphenpenalty=10000
+\usepackage{ragged2e}
+\usepackage{adjustbox}
+\usepackage{multicol}
+\usepackage{listings}
+\newenvironment{sfig}[1][0.80]{\begin{adjustbox}{width=\linewidth,max totalheight=#1\textheight,center}}{\end{adjustbox}}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,shapes.misc,fit,calc,backgrounds,decorations.pathreplacing,patterns,matrix,chains}
+\usepgfplotslibrary{fillbetween}
+\pgfplotsset{compat=1.17}
+
+% ---- palette (matches vinhqdang.github.io) ----
+\definecolor{tdInk}{HTML}{1D2330}
+\definecolor{tdMuted}{HTML}{5D6678}
+\definecolor{tdLine}{HTML}{D9D5CA}
+\definecolor{tdPaper}{HTML}{FBFAF7}
+\definecolor{tdBlue}{HTML}{2457D6}
+\definecolor{tdGreen}{HTML}{17855A}
+\definecolor{tdAmber}{HTML}{B7791F}
+\definecolor{tdRed}{HTML}{C8362F}
+\definecolor{tdPurple}{HTML}{7A4FD1}
+\setbeamercolor{normal text}{fg=tdInk,bg=tdPaper}
+\setbeamercolor{alerted text}{fg=tdRed}
+\setbeamercolor{example text}{fg=tdGreen}
+\setbeamercolor{frametitle}{bg=tdInk,fg=white}
+\setbeamercolor{progress bar}{fg=tdBlue,bg=tdLine}
+\setbeamercolor{title separator}{fg=tdBlue}
+\setbeamercolor{block title}{bg=tdBlue!12,fg=tdInk}
+\setbeamercolor{block body}{bg=tdBlue!5,fg=tdInk}
+\setbeamercolor{block title alerted}{bg=tdRed!12,fg=tdRed!80!black}
+\setbeamercolor{block body alerted}{bg=tdRed!5,fg=tdInk}
+\setbeamercolor{block title example}{bg=tdGreen!14,fg=tdGreen!70!black}
+\setbeamercolor{block body example}{bg=tdGreen!6,fg=tdInk}
+\setbeamerfont{frametitle}{size=\large,series=\bfseries}
+\setbeamerfont{footnote}{size=\tiny}
+\makeatletter\setlength{\metropolis@frametitle@padding}{1.15ex}\makeatother
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footnote}{\hangindent=0.8em\hangafter=1\insertfootnotetext\par}
+
+% ---- tikz styles ----
+\tikzset{>={Stealth[length=2.2mm]},
+  card/.style={rounded corners=4pt,draw=#1!70!black,fill=#1!10,align=center,inner sep=5pt,font=\small},
+  card/.default=tdBlue,
+  pill/.style={rounded corners=7pt,draw=none,fill=#1,text=white,inner sep=3pt,font=\scriptsize\bfseries,align=center},
+  pill/.default=tdBlue,
+  soft/.style={rounded corners=4pt,draw=tdLine,fill=white,align=center,inner sep=4pt,font=\small},
+  lbl/.style={font=\scriptsize,text=tdMuted,align=center},
+  arr/.style={->,thick,draw=tdMuted},
+}
+\pgfplotsset{every axis/.append style={tick label style={font=\scriptsize},label style={font=\scriptsize},legend style={font=\scriptsize,draw=none,fill=none}}}
+
+% small helpers
+\newcommand{\illus}{{\tiny\color{tdMuted}\itshape illustrative}}
+\newcommand{\key}[1]{\textcolor{tdBlue}{\bfseries #1}}
+\newcommand{\bad}[1]{\textcolor{tdRed}{\bfseries #1}}
+\newcommand{\good}[1]{\textcolor{tdGreen}{\bfseries #1}}
+\newcommand{\claim}[1]{\textcolor{tdAmber}{\bfseries #1}}
+\newcommand{\Oh}[1]{\ensuremath{\mathcal{O}(#1)}}
+\newcommand{\srcline}[1]{\par\vfill{\fontsize{5.6}{6.6}\selectfont\color{tdMuted}#1}}
+\setlength{\columnsep}{6pt}
+
+% ---- code listings (real code and real output, read from files) ----
+\lstdefinestyle{py}{language=Python,basicstyle=\ttfamily\fontsize{7}{8.2}\selectfont,
+  keywordstyle=\color{tdBlue}\bfseries,commentstyle=\color{tdMuted}\itshape,
+  stringstyle=\color{tdGreen},showstringspaces=false,columns=fixed,keepspaces=true,
+  frame=single,rulecolor=\color{tdLine},backgroundcolor=\color{white},
+  xleftmargin=2pt,xrightmargin=2pt,aboveskip=0pt,belowskip=0pt,breaklines=false}
+\lstdefinestyle{out}{basicstyle=\ttfamily\fontsize{7}{8.2}\selectfont\color{tdInk},
+  frame=single,rulecolor=\color{tdGreen!60},backgroundcolor=\color{tdGreen!5},
+  columns=fixed,keepspaces=true,xleftmargin=2pt,xrightmargin=2pt,aboveskip=0pt,belowskip=0pt}
+\newcommand{\code}[2][]{\lstinputlisting[style=py,#1]{code/#2}}
+\newcommand{\outp}[2][]{\lstinputlisting[style=out,#1]{out/#2}}
+\newcommand{\pyline}{{\tiny\color{tdMuted}real output, \input{out/pyversion.txt}\unskip}}
+
+% ---- part progress strip in the footline ----
+\newcommand{\partlabels}{1/Why/tdBlue,2/Turing/tdGreen,3/Halting/tdRed,4/Cost/tdAmber,5/P vs NP/tdPurple,6/Beyond/tdBlue,7/Now/tdGreen,8/AI/tdRed,9/World/tdAmber,10/Next/tdPurple}
+\newcommand{\stripe}[1]{\begin{tikzpicture}[remember picture,overlay]
+  \foreach \ci/\cl/\cc in \partlabels{%
+    \ifnum\ci=#1\relax\def\cfill{\cc}\def\ctext{white}\else\def\cfill{white}\def\ctext{\cc}\fi
+    \node[rounded corners=3pt,fill=\cfill,draw=\cc,text=\ctext,font=\tiny\bfseries,minimum width=11mm,minimum height=2.9mm,inner sep=0.6pt,anchor=south west]
+      at ([xshift={2mm+(\ci-1)*11.8mm},yshift=0.6mm]current page.south west) {\cl};}
+\end{tikzpicture}}
+\newcommand{\partfooter}[1]{\setbeamertemplate{footline}{\hfill\tiny\color{tdMuted}Limits of Computation \,|\, BUV ICS\hspace{1em}\insertframenumber/\inserttotalframenumber\hspace{0.8em}\vspace{4pt}\stripe{#1}}}
+\newcommand{\divider}[4]{\begin{frame}[plain]\partfooter{#1}
+ \begin{tikzpicture}[remember picture,overlay]
+  \fill[tdInk] (current page.south west) rectangle (current page.north east);
+  \node[anchor=west,text=white,align=left,text width=0.82\paperwidth] at ([xshift=14mm,yshift=4mm]current page.west)
+   {{\color{#3}\Large\bfseries Part #1}\\[2mm]{\fontsize{26}{30}\selectfont\bfseries #2}\\[3mm]{\large\color{white!75!tdInk}#4}};
+  \fill[#3] ([xshift=10mm,yshift=-14mm]current page.west) rectangle ++(1.4mm,28mm);
+ \end{tikzpicture}\end{frame}}
+\newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+% evidence ladder strip: \ladder{k} fills the first k of six steps (Part 7)
+\newcommand{\ladder}[1]{\begin{tikzpicture}[font=\tiny\bfseries]
+  \foreach \i/\t in {1/claim,2/preprint,3/machine check,4/expert review,5/peer review,6/accepted}{
+    \ifnum\i>#1 \def\f{white}\def\tc{tdMuted}\else\def\f{tdGreen!25}\def\tc{tdInk}\fi
+    \node[draw=tdMuted,fill=\f,text=\tc,minimum width=8.2mm,minimum height=7mm,inner sep=1pt,text width=8mm,align=center,rounded corners=2pt] at ({(\i-1)*9.4mm},0) {\t};}
+\end{tikzpicture}}

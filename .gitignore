@@ -43,3 +43,16 @@ courses/ics/computational-intelligence/*.bbl
 courses/ics/computational-intelligence/*.blg
 courses/ics/computational-intelligence/*.bcf
 courses/ics/computational-intelligence/*.run.xml
+
+# LaTeX build artifacts (courses/ics/); the published PDF in courses/ics/slides/ is kept
+courses/ics/**/*.aux
+courses/ics/**/*.log
+courses/ics/**/*.nav
+courses/ics/**/*.out
+courses/ics/**/*.snm
+courses/ics/**/*.toc
+courses/ics/**/*.vrb
+courses/ics/**/*.fdb_latexmk
+courses/ics/**/*.fls
+courses/ics/**/main.pdf
+courses/ics/**/__pycache__/

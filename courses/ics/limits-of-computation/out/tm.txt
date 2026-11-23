@@ -1,0 +1,17 @@
+increment 1011 (=11):
+1 q0 1011
+2 q0 1011
+3 q0 1011
+4 q0 1011
+5 q1 1011_
+6 q1 1010_
+7 q1 1000_
+8 halt 1100_
+('1100', 8, 'halt')
+0 -> 1
+111 -> 1000
+1011 -> 1100
+'abba' halt steps 15
+'abab' reject steps 6
+'aba' halt steps 10
+'' halt steps 1

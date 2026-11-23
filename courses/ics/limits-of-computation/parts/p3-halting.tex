@@ -1,0 +1,314 @@
+%% ================= PART 3: UNDECIDABILITY =================
+\partfooter{3}
+\divider{3}{The halting problem}{tdRed}{Questions about programs that no program can answer}
+
+
+
+\begin{frame}{First hint: there are more problems than programs}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdBlue,text width=60mm,align=left] (a) {\textbf{Programs are finite strings.} List them by length: ``a'', ``b'', \ldots, ``aa'', ``ab'', \ldots. Every program appears at some position: they can be \key{counted} (countably many).};
+  \node[card=tdRed,text width=60mm,align=left,below=of a] (b) {\textbf{Yes/no problems on numbers} are infinite 0/1 sequences, one answer per number. Cantor (1891): such sequences \emph{cannot} be listed. There are \key{uncountably many}.};
+  \node[card=tdPurple,text width=60mm,align=left,below=of b] (c) {\textbf{So most problems have no program.} Undecidable problems are not rare curiosities. They are the \emph{typical} case.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{sfig}[0.6]
+\begin{tikzpicture}[x=6mm,y=6mm,font=\scriptsize]
+  \node[anchor=east] at (-0.3,0) {problem 1};
+  \node[anchor=east] at (-0.3,-1) {problem 2};
+  \node[anchor=east] at (-0.3,-2) {problem 3};
+  \node[anchor=east] at (-0.3,-3) {problem 4};
+  \foreach \r/\row in {0/{0,1,1,0,1},-1/{1,1,0,0,0},-2/{0,0,1,1,1},-3/{1,0,1,0,1}}{
+    \foreach \v [count=\c from 0] in \row{\node[draw=tdLine,minimum size=6mm,fill=white,inner sep=0] at (\c,\r) {\v};}}
+  \foreach \k/\v in {0/1,1/0,2/0,3/1}{\node[draw=tdRed!70!black,fill=tdRed!15,minimum size=6mm,inner sep=0] at (\k,-4.4) {\v};}
+  \node[anchor=east,text=tdRed!80!black] at (-0.3,-4.4) {flipped diagonal};
+  \node[lbl] at (2,0.9) {answers for numbers 1, 2, 3, \ldots};
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize The flipped diagonal differs from problem $k$ at position $k$, so it is on \emph{no} row of the list. This same trick will return in a moment.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The halting problem}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}
+  \node[card=tdRed,text width=62mm,align=left,inner sep=7pt]{\textbf{HALT.}\\ Input: a program $P$ and an input $x$.\\ Question: does $P$ eventually stop when run on $x$?};
+\end{tikzpicture}
+
+\vspace{3mm}
+{\small Three programs, three situations:}
+\vspace{1mm}
+
+\begin{tabular}{@{}ll@{}}
+\ttfamily\small print("hi") & \good{stops}\\
+\ttfamily\small while True: pass & \bad{loops}\\
+\ttfamily\small collatz(n) & \claim{nobody knows}
+\end{tabular}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdBlue,text width=54mm,align=left] (a) {\textbf{Why it is natural.} Every bug hunter wants it: ``will my program freeze on this input?''};
+  \node[card=tdAmber,text width=54mm,align=left,below=of a] (b) {\textbf{Why it is hard.} To run $P$ and see is not enough: after one hour you cannot tell \emph{slow} from \emph{never}.};
+  \node[card=tdRed,text width=54mm,align=left,below=of b] (c) {\textbf{Turing's theorem (1936).} No program decides HALT for all $(P,x)$.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+
+\begin{frame}{The proof, step 1: suppose someone built a perfect checker}
+\begin{sfig}[0.6]
+\begin{tikzpicture}[font=\footnotesize,node distance=9mm]
+  \node[card=tdAmber,text width=32mm] (p) {program $P$\\ (as text)};
+  \node[card=tdBlue,text width=32mm,below=4mm of p] (x) {input $x$};
+  \node[card=tdGreen,text width=34mm,minimum height=24mm,right=16mm of $(p)!0.5!(x)$] (h) {\textbf{H}\\ the claimed perfect checker\\{\scriptsize always stops, never wrong}};
+  \node[pill=tdGreen,right=14mm of h,yshift=5mm] (y) {``P halts on x''};
+  \node[pill=tdRed,right=14mm of h,yshift=-5mm] (n) {``P loops on x''};
+  \draw[arr] (p) -- (h); \draw[arr] (x) -- (h); \draw[arr] (h) -- (y); \draw[arr] (h) -- (n);
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+\begin{center}\small This is a \key{proof by contradiction}. We do not claim H exists. We assume it for a moment and show that the assumption destroys itself.\end{center}
+\end{frame}
+
+\begin{frame}{Step 2: build a mischievous program D from H}
+\begin{columns}[c]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}[font=\footnotesize,node distance=4mm]
+  \node[card=tdAmber,text width=58mm,align=left] (a) {\textbf{D(P):}};
+  \node[card=tdBlue,text width=58mm,align=left,below=of a] (b) {1. Ask H: ``does $P$ halt when given \emph{its own text} as input?''};
+  \node[card=tdRed,text width=58mm,align=left,below=of b] (c) {2. If H says \textbf{halts}: loop forever.\\ If H says \textbf{loops}: stop immediately.};
+  \draw[arr] (a) -- (b); \draw[arr] (b) -- (c);
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdPurple,text width=54mm,align=left] (a) {\textbf{D does the opposite of what H predicts} about $P$ run on $P$.};
+  \node[card=tdGreen,text width=54mm,align=left,below=of a] (b) {D is a perfectly ordinary program: a call to H, an \texttt{if}, and a loop. If H exists, D exists.};
+  \node[card=tdAmber,text width=54mm,align=left,below=of b] (c) {Feeding a program its own text is legal: programs are strings (the universal machine slide).};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Step 3: run D on itself}
+\begin{sfig}[0.7]
+\begin{tikzpicture}[font=\footnotesize]
+  \node[card=tdAmber,minimum width=40mm,minimum height=14mm] (d) at (0,0) {\textbf{D(D)}\\{\scriptsize does D halt on its own text?}};
+  \node[card=tdGreen,text width=46mm,minimum height=22mm] (a) at (-5.5,-3.8) {\textbf{Case A:} H says ``D(D) halts''\\[1mm]{\scriptsize then by its code D loops forever.\\ H was \bad{wrong}.}};
+  \node[card=tdRed,text width=46mm,minimum height=22mm] (b) at (5.5,-3.8) {\textbf{Case B:} H says ``D(D) loops''\\[1mm]{\scriptsize then by its code D stops at once.\\ H was \bad{wrong}.}};
+  \draw[arr] (d) -- (a); \draw[arr] (d) -- (b);
+  \node[card=tdInk,text width=60mm,anchor=north] at (0,-6.6) {Either answer is wrong, so \textbf{H cannot exist}.};
+\end{tikzpicture}
+\end{sfig}
+\end{frame}
+
+\begin{frame}{The same proof as a table: the diagonal}
+\begin{columns}[c]
+\begin{column}{0.58\textwidth}
+\begin{sfig}[0.72]
+\begin{tikzpicture}[x=9mm,y=7.5mm,font=\scriptsize]
+  \foreach \c in {1,...,5}{\node[text=tdMuted] at (\c,0.8) {$x_\c$};}
+  \node[lbl] at (3,1.55) {run program $P_i$ on input $x_j$ (inputs are programs too)};
+  \foreach \r/\row in {1/{H,L,H,H,L},2/{L,L,H,L,H},3/{H,H,H,L,L},4/{L,H,L,H,H},5/{H,L,L,L,H}}{
+    \node[anchor=east,text=tdMuted] at (0.4,-\r+1) {$P_\r$};
+    \foreach \v [count=\c] in \row{
+      \ifnum\r=\c \node[draw=tdBlue,fill=tdBlue!15,minimum size=7mm,inner sep=0,font=\scriptsize\bfseries] at (\c,-\r+1) {\v};
+      \else \node[draw=tdLine,fill=white,minimum size=7mm,inner sep=0] at (\c,-\r+1) {\v};\fi}}
+  \node[anchor=east,text=tdRed!80!black] at (0.4,-5.2) {$D$};
+  \foreach \v [count=\c] in {L,H,L,L,L}{\node[draw=tdRed!70!black,fill=tdRed!15,minimum size=7mm,inner sep=0,font=\scriptsize\bfseries] at (\c,-5.2) {\v};}
+  \node[lbl,anchor=west] at (5.7,0.2) {H = halts, L = loops};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.4\textwidth}
+\small
+\begin{itemize}\setlength\itemsep{2mm}
+\item Each row is a program, each column an input; a cell says what really happens.
+\item \textbf{D} is the \bad{flipped diagonal}: it does the opposite of $P_i$ on $x_i$.
+\item So D differs from \emph{every} row $P_i$ at column $i$. D is therefore not in the list, yet the list was supposed to contain \emph{all} programs.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The thought experiment in code}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\code{halting.py}
+\end{column}
+\begin{column}{0.43\textwidth}
+\outp{halting.txt}
+\vspace{1mm}\pyline
+\vspace{2mm}
+
+{\footnotesize We cannot code the perfect \texttt{halts}. We \emph{can} show that every candidate fails: whatever \texttt{halts(para, para)} answers, \texttt{para} does the opposite, so the checker is wrong. The same construction defeats \emph{any} candidate, however sophisticated, including an AI model.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Natural objections, and why they fail}
+\begin{sfig}[0.78]
+\begin{tikzpicture}[font=\footnotesize,node distance=3mm]
+  \node[card=tdBlue,text width=46mm,minimum height=24mm,align=left] (a) {\textbf{``Just wait longer.''}\\[1mm]{\scriptsize No finite wait is enough: a program may stop at step $10^{100}$, or never.}};
+  \node[card=tdGreen,text width=46mm,minimum height=24mm,align=left,right=3mm of a] (b) {\textbf{``Use a timeout.''}\\[1mm]{\scriptsize Fine, but that answers ``halts within $T$ steps'', a different, decidable question.}};
+  \node[card=tdAmber,text width=46mm,minimum height=24mm,align=left,right=3mm of b] (c) {\textbf{``Use a bigger machine.''}\\[1mm]{\scriptsize The proof never used speed or memory. Any computer, any future, same result.}};
+  \node[card=tdPurple,text width=46mm,minimum height=24mm,align=left,below=3mm of a] (d) {\textbf{``Train an AI on millions of programs.''}\\[1mm]{\scriptsize It will often be right. It is still a program, so D can be built against it.}};
+  \node[card=tdRed,text width=46mm,minimum height=24mm,align=left,right=3mm of d] (e) {\textbf{``D is a silly program.''}\\[1mm]{\scriptsize Silly but legal. The theorem says \emph{every} checker fails somewhere, not that useful ones do not exist.}};
+  \node[card=tdInk,text width=46mm,minimum height=24mm,align=left,right=3mm of e] (f) {\textbf{``Then maths is broken.''}\\[1mm]{\scriptsize No: it is a precise \emph{map of limits}, proved with the same rigour as anything else.}};
+\end{tikzpicture}
+\end{sfig}
+\end{frame}
+
+\begin{frame}{What the theorem does \emph{not} say}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdGreen,text width=60mm,align=left] (a) {\textbf{Many specific programs can be analysed.} A program with no loops always stops. A program with one clear \texttt{for} over a list stops.};
+  \node[card=tdBlue,text width=60mm,align=left,below=of a] (b) {\textbf{Specific proofs are possible.} We prove that quicksort stops. We cannot do it with \emph{one method for all programs}.};
+  \node[card=tdAmber,text width=60mm,align=left,below=of b] (c) {\textbf{Real machines are finite.} With only $k$ bits of memory, a program has at most $2^k$ states, so HALT is decidable in principle, though not within the age of the universe.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{tikzpicture}\node[card=tdRed,text width=58mm,align=left,inner sep=7pt]{\textbf{The theorem says}\\[2mm] There is no \emph{single} algorithm that, for \emph{all} programs and inputs, always halts with the correct yes/no.\\[3mm]\textbf{Any tool must therefore} (a) sometimes say ``don't know'', (b) sometimes be wrong, or (c) sometimes run forever.};\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Consequence 1: no perfect bug detector, no perfect antivirus}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[font=\footnotesize,node distance=8mm]
+  \node[card=tdAmber,text width=32mm] (p) {a program};
+  \node[card=tdGreen,text width=44mm,minimum height=18mm,right=14mm of p] (t) {\textbf{perfect analyser}\\{\scriptsize ``contains a bug / is a virus?''}};
+  \node[pill=tdGreen,right=12mm of t,yshift=4mm] (y) {no bug};
+  \node[pill=tdRed,right=12mm of t,yshift=-4mm] (n) {bug found};
+  \draw[arr] (p) -- (t); \draw[arr] (t) -- (y); \draw[arr] (t) -- (n);
+  \node[font=\scriptsize,text=tdRed!80!black,align=center] at (6,-2.3) {Hide a bug (or virus) behind ``\texttt{if H says this program halts: do the bad thing}''.\\ A perfect analyser would then solve HALT.};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+\begin{itemize}\small\setlength\itemsep{1mm}
+\item Fred Cohen proved in 1987 that perfect virus detection is undecidable. Real scanners use signatures and heuristics: some \bad{false alarms}, some \bad{misses}.
+\item Practical tools aim at one side: tests find real bugs (no false alarms, miss some); static analysers warn about possible bugs (catch more, some false alarms).
+\end{itemize}
+\srcline{F.\ Cohen, ``Computer viruses: theory and experiments'', Computers \& Security 6(1), 1987.}
+\end{frame}
+
+\begin{frame}{Rice's theorem, in plain words}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\begin{tikzpicture}\node[card=tdRed,text width=54mm,align=left,inner sep=7pt]{\textbf{Rice (1953).} Every non-trivial question about what a program \emph{does} (its behaviour, not its text) is undecidable.};\end{tikzpicture}
+\vspace{2mm}
+
+{\small ``Non-trivial'': some programs have the property, some do not. Behaviour means the function the program computes.}
+\vspace{2mm}
+
+\begin{tikzpicture}\node[card=tdBlue,text width=62mm,align=left]{\textbf{Test.} Could two programs with identical behaviour, but different text, give different answers? If yes, it is a question about \emph{text} (decidable). If no, it is about \emph{behaviour} (undecidable).};\end{tikzpicture}
+\end{column}
+\begin{column}{0.46\textwidth}
+\small
+\begin{tabular}{@{}L{34mm}L{34mm}@{}}
+\toprule
+\good{Text: decidable} & \bad{Behaviour: not}\\\midrule
+has more than 100 lines? & ever prints ``hello''?\\
+uses the word \texttt{while}? & always returns a square number?\\
+has a syntax error? & ever crashes?\\
+imports \texttt{os}? & same as that other program?\\
+ & is a virus?\\\bottomrule
+\end{tabular}
+\end{column}
+\end{columns}
+\srcline{H.\ G.\ Rice, ``Classes of recursively enumerable sets and their decision problems'', Trans.\ Amer.\ Math.\ Soc.\ 74, 1953.}
+\end{frame}
+
+\begin{frame}{How to show a new problem is undecidable: reduce HALT to it}
+\begin{sfig}[0.55]
+\begin{tikzpicture}[font=\footnotesize,node distance=9mm]
+  \node[card=tdAmber,text width=28mm] (i) {instance of HALT $(P,x)$};
+  \node[card=tdBlue,text width=34mm,right=of i] (t) {\textbf{translate}\\{\scriptsize easy program}};
+  \node[card=tdPurple,text width=34mm,right=of t] (b) {\textbf{solver for B} (assumed)};
+  \node[pill=tdGreen,right=of b,yshift=4mm] (y) {yes};
+  \node[pill=tdRed,right=of b,yshift=-4mm] (n) {no};
+  \draw[arr] (i) -- (t); \draw[arr] (t) -- node[lbl,above]{instance of B} (b); \draw[arr] (b) -- (y); \draw[arr] (b) -- (n);
+  \draw[decorate,decoration={brace,amplitude=4pt,mirror},thick,tdGreen] (3.8,-1.4) -- (12.4,-1.4) node[midway,below=2mm,font=\scriptsize,text=tdGreen!70!black]{together: a solver for HALT};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+\small If B were decidable, the chain would decide HALT. HALT is not decidable, so \bad{B is not decidable either}. Same pattern as ``solving B solves hard thing A'' that you will meet again for NP-completeness, but with \emph{computability} instead of \emph{speed}.
+\end{frame}
+
+\begin{frame}{More undecidable problems, some surprising}
+\begin{columns}[T]
+\begin{column}{0.58\textwidth}
+\small
+\begin{itemize}\setlength\itemsep{1.5mm}
+\item \key{Hilbert's tenth problem}: does a polynomial equation with integer coefficients have an integer solution? (Matiyasevich 1970, building on Davis, Putnam, Robinson.)
+\item \key{Tiling}: can given tile types cover the infinite plane? (Berger 1966, Wang tiles.)
+\item \key{Post correspondence problem} (Post 1946): can a list of domino pairs spell the same word on top and bottom?
+\item \key{Word problem for groups} (Novikov 1955, Boone 1958).
+\item \key{Program equivalence}, ``is this program ever wrong'', optimal compression (\emph{Kolmogorov complexity}).
+\end{itemize}
+\end{column}
+\begin{column}{0.4\textwidth}
+\begin{sfig}[0.55]
+\begin{tikzpicture}[x=11mm,y=11mm,font=\scriptsize]
+  \foreach \x/\y/\c in {0/0/tdBlue,1/0/tdGreen,2/0/tdAmber,0/1/tdGreen,1/1/tdAmber,2/1/tdBlue,0/2/tdAmber,1/2/tdBlue,2/2/tdGreen}{
+    \fill[\c!25] (\x,\y) rectangle (\x+0.95,\y+0.95);\draw[\c!70!black] (\x,\y) rectangle (\x+0.95,\y+0.95);}
+  \node[lbl,align=center] at (1.5,-0.7) {Wang tiles: colours on edges must match.\\ A finite tile set, an infinite question.};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\end{columns}
+\srcline{Matiyasevich, Hilbert's Tenth Problem, MIT Press 1993. Berger, Memoirs AMS 66, 1966. Post, Bull.\ AMS 52, 1946. Novikov 1955; Boone 1958.}
+\end{frame}
+
+
+
+\begin{frame}{In practice: tools that say ``yes'', ``no'' or ``unknown''}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[font=\footnotesize]
+  \draw[rounded corners=10pt,fill=tdGreen!10,draw=tdGreen!60] (0,0) rectangle (4.6,3.6);
+  \draw[rounded corners=10pt,fill=tdAmber!12,draw=tdAmber!70] (4.9,0) rectangle (9.5,3.6);
+  \draw[rounded corners=10pt,fill=tdRed!8,draw=tdRed!60] (9.8,0) rectangle (14.4,3.6);
+  \node[align=center] at (2.3,2.6) {\textbf{Proved safe}\\{\scriptsize e.g.\ type checker: no type errors}};
+  \node[align=center] at (7.2,2.6) {\textbf{Don't know}\\{\scriptsize tool gives up or warns}};
+  \node[align=center] at (12.1,2.6) {\textbf{Proved broken}\\{\scriptsize e.g.\ failing test}};
+  \node[font=\scriptsize,text=tdMuted,align=center] at (7.2,0.8) {Undecidability guarantees this middle zone \emph{never disappears},\\ but better tools make it smaller.};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+\begin{columns}[T]
+\begin{column}{0.33\textwidth}\small\key{Compilers} reject programs they cannot prove safe (Rust's borrow checker): may refuse some good programs.\end{column}
+\begin{column}{0.33\textwidth}\small\key{Static analysis} flags ``possible'' null pointers: some false alarms.\end{column}
+\begin{column}{0.33\textwidth}\small\key{Formal verification} proves chosen properties, with human help, for chosen programs.\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Part 3 in one slide, and check yourself}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdRed,text width=62mm,align=left] (a) {\textbf{1.} HALT is undecidable: the diagonal argument.};
+  \node[card=tdRed,text width=62mm,align=left,below=of a] (b) {\textbf{2.} Rice: all non-trivial behaviour questions are undecidable.};
+  \node[card=tdRed,text width=62mm,align=left,below=of b] (c) {\textbf{3.} Tools must accept ``unknown'' or some mistakes.};
+  \node[card=tdGreen,text width=62mm,align=left,below=of c] (d) {\textbf{4.} But: decidable $\neq$ practical. Next question: how \emph{fast}?};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.44\textwidth}
+\begin{block}{Check yourself}
+\small
+\begin{enumerate}\setlength\itemsep{1mm}
+\item Why does the timeout version of HALT become decidable?
+\item In the diagonal table, what are the entries of D in terms of the diagonal?
+\item Classify: ``has a loop'', ``prints 7'', ``never crashes''.
+\item Could an AI model that reads the source decide HALT on all programs? Why not?
+\end{enumerate}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}

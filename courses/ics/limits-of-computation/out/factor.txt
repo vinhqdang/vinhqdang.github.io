@@ -1,0 +1,4 @@
+ 7 digits  multiply   0.5 us   factor    0.000 s
+11 digits  multiply   0.5 us   factor    0.005 s
+15 digits  multiply   0.2 us   factor    0.503 s
+17 digits  multiply   0.4 us   factor    5.027 s

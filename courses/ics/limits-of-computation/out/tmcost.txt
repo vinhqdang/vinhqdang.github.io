@@ -1,0 +1,6 @@
+len  palindrome steps  increment steps
+2             6                 6
+4            15                10
+8            45                18
+16          153                34
+30          496                62

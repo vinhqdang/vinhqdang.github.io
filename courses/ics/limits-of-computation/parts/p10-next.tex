@@ -1,0 +1,195 @@
+%% ================= PART 10: WHAT TO EXPECT =================
+\partfooter{10}
+\divider{10}{What to expect}{tdPurple}{Honest scenarios, open problems, and what to learn}
+
+\begin{frame}{Three honest scenarios (our judgement, not a forecast)}
+\begin{sfig}[0.8]
+\begin{tikzpicture}[font=\footnotesize,node distance=3mm]
+  \node[card=tdGreen,text width=46mm,minimum height=48mm,align=left] (a) {\textbf{A. Powerful assistants plus verifiers}\\[1mm]{\scriptsize AI proposes, exact tools check. Programmers, scientists and analysts work with it daily. Biggest gains where checking is cheap (code, formal maths, optimisation).}\\[2mm]{\tiny\bfseries Signpost: more claims arrive with machine-checked artefacts.}};
+  \node[card=tdBlue,text width=46mm,minimum height=48mm,align=left,right=3mm of a] (b) {\textbf{B. A formalisation wave}\\[1mm]{\scriptsize important proofs and critical software increasingly come with proof-assistant certificates. Human work shifts toward stating the right theorems and understanding.}\\[2mm]{\tiny\bfseries Signpost: Lean/Coq checks become routine for journals and standards.}};
+  \node[card=tdAmber,text width=46mm,minimum height=48mm,align=left,right=3mm of b] (c) {\textbf{C. Surprise and diversification}\\[1mm]{\scriptsize scaling slows in some areas; world models, hybrids or new ideas take over there. Or a theory surprise, such as the ETH claim, reshapes what we assume.}\\[2mm]{\tiny\bfseries Signpost: independent benchmarks and replications disagree with lab claims.}};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small None of these changes the maps of Parts 3--5: halting stays undecidable and NP-complete problems stay (apparently) hard unless a proof says otherwise. What can change fast is \emph{how much of the typical case} machines handle.}
+\end{frame}
+
+\begin{frame}{Open problems that are still open (and a few that moved)}
+\begin{sfig}[0.78]
+\begin{tabular}{@{}L{42mm}L{52mm}L{44mm}@{}}
+\toprule
+\textbf{Problem} & \textbf{Why it matters} & \textbf{Status, 23 Nov 2026}\\\midrule
+P versus NP & efficient search, security, AI & open; Clay prize\\
+Is P = BPP? & is randomness needed? & open; believed equal\\
+Can factoring be done fast classically? & RSA and its replacements & open\\
+Is NP inside BQP? & what quantum can do & open; believed no\\
+Exponential Time Hypothesis & basis of fine-grained lower bounds & \claim{claimed refuted (Part 7)}\\
+Riemann hypothesis & primes, number theory & \claim{claimed proved (Part 7)}\\
+Collatz conjecture & simple loops, hard to analyse & open\\
+Do world models beat LLMs? & future of AI systems & open, empirical\\\bottomrule
+\end{tabular}
+\end{sfig}
+\vspace{1mm}
+{\small Open problems are where the field is alive. Notice how many are ``is X really hard?''. Hardness is, for now, mostly an \emph{assumption}.}
+\end{frame}
+
+\begin{frame}{What to learn to stay relevant}
+\begin{sfig}[0.78]
+\begin{tikzpicture}[font=\footnotesize,node distance=3mm]
+  \node[card=tdBlue,text width=44mm,minimum height=30mm,align=left] (a) {{\Large\faSitemap}\\[1mm]\textbf{Algorithms and cost}\\[1mm]{\scriptsize read a program's cost, spot the exponential hiding in a loop, know when to use a solver.}};
+  \node[card=tdGreen,text width=44mm,minimum height=30mm,align=left,right=3mm of a] (b) {{\Large\faCheckDouble}\\[1mm]\textbf{Verification}\\[1mm]{\scriptsize tests, types, invariants, proofs; how to check AI output cheaply and exactly.}};
+  \node[card=tdAmber,text width=44mm,minimum height=30mm,align=left,right=3mm of b] (c) {{\Large\faCalculator}\\[1mm]\textbf{Logic and probability}\\[1mm]{\scriptsize reason about claims, errors, and uncertainty; read a proof sketch.}};
+  \node[card=tdPurple,text width=44mm,minimum height=30mm,align=left,below=3mm of a] (d) {{\Large\faTerminal}\\[1mm]\textbf{Programming with tools}\\[1mm]{\scriptsize Python, SQL, version control; use AI as a collaborator you supervise.}};
+  \node[card=tdRed,text width=44mm,minimum height=30mm,align=left,right=3mm of d] (e) {{\Large\faSearch}\\[1mm]\textbf{Source criticism}\\[1mm]{\scriptsize the claims checklist from Part 7: primary source, replication, incentives.}};
+  \node[card=tdInk,text width=44mm,minimum height=30mm,align=left,right=3mm of e] (f) {{\Large\faComments}\\[1mm]\textbf{Domain and communication}\\[1mm]{\scriptsize understand a field deeply; explain results to people who must act on them.}};
+\end{tikzpicture}
+\end{sfig}
+\end{frame}
+
+
+
+\begin{frame}{Recap: ten sentences}
+\begin{sfig}[0.8]
+\begin{tabular}{@{}rL{128mm}@{}}
+1 & A Turing machine (tape, head, states, rules) captures what ``computing'' means; every known computer can be simulated by one.\\
+2 & Church--Turing thesis: the informal idea of ``mechanical computation'' equals what Turing machines compute.\\
+3 & A universal machine runs any program given as data; programs can be fed to programs, including themselves.\\
+4 & Halting problem: no program decides, for every program and input, whether it stops (diagonal argument).\\
+5 & Rice: every non-trivial question about a program's behaviour is undecidable; real tools say ``unknown'' or accept errors.\\
+6 & Cost = steps as a function of input size; polynomial is feasible, exponential defeats faster hardware.\\
+7 & P: quick to solve. NP: quick to check. P $\subseteq$ NP; whether they are equal is open (\$1M).\\
+8 & NP-complete problems (SAT, TSP, Sudoku, \ldots) are all equivalent via reductions; solvers and heuristics work well on real instances.\\
+9 & Quantum computers do not change computability and are not believed to solve NP-complete problems; cryptography rests on assumed hardness.\\
+10 & AI systems are programs: they inherit these limits. Verify what matters, and rate claims by evidence, not by headlines.\\
+\end{tabular}
+\end{sfig}
+\end{frame}
+
+\begin{frame}{Review questions, part 1: concepts}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\small
+\begin{enumerate}\setlength\itemsep{2.5mm}
+\item Name the four parts of a Turing machine and say what each does.
+\item Why is the Church--Turing thesis a \emph{thesis} and not a theorem?
+\item Explain, in three sentences, the diagonal argument for the halting problem.
+\item Give two examples of undecidable questions that matter to a software company.
+\item What is Rice's theorem, and why does it stop a perfect antivirus?
+\end{enumerate}
+\end{column}
+\begin{column}{0.46\textwidth}
+\small
+\begin{enumerate}\setcounter{enumi}{5}\setlength\itemsep{2.5mm}
+\item Why does a 1000$\times$ faster computer not rescue an exponential algorithm?
+\item Define P and NP. Why is NP \emph{not} ``non-polynomial''?
+\item What is a reduction? Why does reducing A to B show B is at least as hard as A?
+\item Give three reasons experts believe P $\neq$ NP.
+\item Why can quantum computers not simply ``try all answers at once''?
+\end{enumerate}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Review questions, part 2: AI, claims and calculations}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\small
+\begin{enumerate}\setlength\itemsep{2.5mm}
+\item[11.] A news article says ``AI proves famous conjecture''. List five questions you ask before believing it.
+\item[12.] What does a Lean-checked proof guarantee, and what does it \emph{not}?
+\item[13.] Why can no AI model decide halting for all programs? Why can it still be useful on most?
+\item[14.] Explain ``generate and verify'' with an example from your own coding.
+\item[15.] What is the central idea of JEPA, and what is representation collapse?
+\end{enumerate}
+\end{column}
+\begin{column}{0.46\textwidth}
+\small
+\begin{enumerate}\setlength\itemsep{2.5mm}
+\item[16.] A solver needs $2^n\,\mu$s. How long for $n=40$? For $n=60$?
+\item[17.] A model is 97\% right per step. Chance a 20-step chain is fully right (independent errors)?
+\item[18.] A tour problem has 12 cities. How many distinct tours $(n-1)!/2$?
+\item[19.] Sketch a Turing machine that decides whether a binary number is even.
+\item[20.] Classify: \emph{sorting}, \emph{SAT}, \emph{halting}, $n\times n$ \emph{chess}. (P, NP-complete, undecidable, EXP-complete)
+\end{enumerate}
+\vspace{1mm}
+{\tiny Answers 16--18: 13 days; 36,000 years; 0.54; 19,958,400.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Hands-on: five things to try this week}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdBlue,text width=64mm,align=left] (a) {\textbf{1.} Run \texttt{python3.14 tm.py}. Change one rule of \texttt{inc} so it \emph{subtracts} one. Test it on 1, 10, 1000.};
+  \node[card=tdGreen,text width=64mm,align=left,below=of a] (b) {\textbf{2.} Write a Turing machine for ``is the binary number even?'' and count its steps.};
+  \node[card=tdAmber,text width=64mm,align=left,below=of b] (c) {\textbf{3.} Run \texttt{brute.py}. Predict the time for 24 items before running. How far off were you?};
+  \node[card=tdPurple,text width=64mm,align=left,below=of c] (d) {\textbf{4.} Encode a 4$\times$4 Sudoku as clauses and feed it to \texttt{sat.py}.};
+  \node[card=tdRed,text width=64mm,align=left,below=of d] (e) {\textbf{5.} Apply the claims checklist to one news item.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.42\textwidth}
+\small
+\begin{block}{Files (all Python 3.14)}
+\ttfamily\scriptsize
+tm.py\ \ \ \ \ \ Turing machine\\
+tmcost.py\ \ \ step counts\\
+halting.py\ \ diagonal demo\\
+collatz.py\ \ open loop\\
+growth.py\ \ \ growth table\\
+verify.py\ \ \ check vs find\\
+brute.py\ \ \ \ brute-force timing\\
+sat.py\ \ \ \ \ \ tiny SAT solver\\
+satphase.py\ phase transition\\
+factor.py\ \ \ trial division\\
+run\_all.sh\ \ regenerate outputs
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Where to read next}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\small
+\textbf{Books}
+\begin{itemize}\setlength\itemsep{1mm}
+\item M.\ Sipser, \emph{Introduction to the Theory of Computation}, 3rd ed., 2012.
+\item S.\ Arora and B.\ Barak, \emph{Computational Complexity: A Modern Approach}, CUP 2009.
+\item C.\ Petzold, \emph{The Annotated Turing}, Wiley 2008.
+\item S.\ Aaronson, \emph{Quantum Computing since Democritus}, CUP 2013.
+\item M.\ Garey and D.\ Johnson, \emph{Computers and Intractability}, Freeman 1979.
+\end{itemize}
+\end{column}
+\begin{column}{0.46\textwidth}
+\small
+\textbf{Original papers and sources used in this deck}
+\begin{itemize}\setlength\itemsep{1mm}
+\item Turing 1936; Cook 1971; Karp 1972; Shor 1994; Grover 1996.
+\item OpenAI, 26 Oct 2026 (ETH); Fortnow blog, 28 Oct 2026.
+\item arXiv:2611.00517; 2611.02650; 2310.07923; 2305.18654; 2506.06941; 2506.09250; 2509.04664.
+\item arXiv:2301.08243; 2404.08471; 2506.09985; 2511.08544; 2610.39302; 2408.13687.
+\item AFP via Phys.org, 20 Nov 2026 (Riemann claim).
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Sources for the claims in Parts 7--9 (checked 23 Nov 2026)}
+\begin{sfig}[0.86]
+\scriptsize\begin{tabular}{@{}L{46mm}L{90mm}@{}}
+\toprule
+\textbf{Item} & \textbf{Source (URL)}\\\midrule
+OpenAI ETH announcement & openai.com/\allowbreak{}index/\allowbreak{}building-scientific-understanding-with-academic-communities/\allowbreak{}\\
+OpenAI ETH preprint (not read) & github.com/\allowbreak{}openai/\allowbreak{}math, folder ``The-Exponential-Time-Hypothesis-is-False-October-25-2026''\\
+Expert comment, Fortnow & blog.computationalcomplexity.org/\allowbreak{}2026/\allowbreak{}10/\allowbreak{}the-exponential-time-refutation.html\\
+Critique, Dias and Lima & arxiv.org/\allowbreak{}abs/\allowbreak{}2611.00517\\
+MIT Hardness Group & arxiv.org/\allowbreak{}abs/\allowbreak{}2611.02650\\
+ETH background and claim summary & en.wikipedia.org/\allowbreak{}wiki/\allowbreak{}Exponential\_time\_hypothesis\\
+Riemann claim, AFP & phys.org/\allowbreak{}news/\allowbreak{}2026-11-anthropic-claude-math-greatest-riddle.html\\
+Lean certification (secondary) & officechai.com/ai/ (``Lean Community Certifies Levent Alp\"oge's Claude-Assisted Proof'', 21 Nov 2026)\\
+AMI Labs & en.wikipedia.org/\allowbreak{}wiki/\allowbreak{}Advanced\_Machine\_Intelligence\_Labs\\
+JEPA and LLM papers & arxiv.org/\allowbreak{}abs/\allowbreak{} + numbers on the previous slide\\\bottomrule
+\end{tabular}
+\end{sfig}
+\end{frame}

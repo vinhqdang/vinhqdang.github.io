@@ -1,0 +1,2 @@
+check a given answer: True (1 microseconds)
+search all 2,704,156 subsets: 1.1 s

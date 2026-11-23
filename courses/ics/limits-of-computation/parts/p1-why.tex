@@ -1,0 +1,134 @@
+%% ================= PART 1: WHY =================
+\partfooter{1}
+\begin{frame}{The story of this lecture}
+\begin{sfig}[0.78]
+\begin{tikzpicture}[node distance=3mm and 2mm,font=\footnotesize]
+  \node[card=tdBlue,text width=24mm,minimum height=22mm] (a) {{\large\faQuestionCircle}\\ \textbf{1 Why}\\ what can a computer do?};
+  \node[card=tdGreen,text width=24mm,minimum height=22mm,right=of a] (b) {{\large\faCogs}\\ \textbf{2 Turing}\\ the simplest computer};
+  \node[card=tdRed,text width=24mm,minimum height=22mm,right=of b] (c) {{\large\faBan}\\ \textbf{3 Halting}\\ problems no program solves};
+  \node[card=tdAmber,text width=24mm,minimum height=22mm,right=of c] (d) {{\large\faStopwatch}\\ \textbf{4 Cost}\\ solvable, but how fast?};
+  \node[card=tdPurple,text width=24mm,minimum height=22mm,right=of d] (e) {{\large\faKey}\\ \textbf{5 P vs NP}\\ one million dollars};
+  \node[card=tdBlue,text width=24mm,minimum height=22mm,below=of a] (f) {{\large\faAtom}\\ \textbf{6 Beyond}\\ quantum, randomness, crypto};
+  \node[card=tdGreen,text width=24mm,minimum height=22mm,right=of f] (g) {{\large\faNewspaper}\\ \textbf{7 Now}\\ news of Oct--Nov 2026};
+  \node[card=tdRed,text width=24mm,minimum height=22mm,right=of g] (h) {{\large\faRobot}\\ \textbf{8 AI limits}\\ what LLMs cannot guarantee};
+  \node[card=tdAmber,text width=24mm,minimum height=22mm,right=of h] (i) {{\large\faGlobe}\\ \textbf{9 World models}\\ JEPA and LeCun};
+  \node[card=tdPurple,text width=24mm,minimum height=22mm,right=of i] (j) {{\large\faCompass}\\ \textbf{10 Next}\\ what to expect, what to learn};
+  \foreach \x/\y in {a/b,b/c,c/d,d/e,f/g,g/h,h/i,i/j}{\draw[arr] (\x) -- (\y);}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small Each part: a \key{question}, a \key{picture}, a small \key{demo} you can run, and one \key{take-away}. All code on the slides is real and was run with Python 3.14.}
+\end{frame}
+
+\begin{frame}{Two questions that sit under all of computing}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\begin{tikzpicture}
+  \node[card=tdRed,text width=64mm,align=left,minimum height=34mm] {{\large\faBan}\ \textbf{Question 1: computability}\\[2mm] Is there \emph{any} program, however clever, that solves the problem for every input?\\[2mm]{\footnotesize If not, no amount of money, data, GPUs or AI changes that.}};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{tikzpicture}
+  \node[card=tdAmber,text width=64mm,align=left,minimum height=34mm] {{\large\faStopwatch}\ \textbf{Question 2: complexity}\\[2mm] If a program exists, can it finish before the sun burns out?\\[2mm]{\footnotesize Solvable in principle is not the same as solvable in practice.}};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\vspace{4mm}
+\begin{center}
+\begin{tikzpicture}
+  \node[card=tdBlue,text width=120mm] {\textbf{Third question, for 2026:} what do these limits say about \emph{AI systems} that write code, prove theorems and claim discoveries?};
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}{A traffic light for problems}
+\begin{sfig}[0.8]
+\begin{tikzpicture}[font=\footnotesize]
+  \node[card=tdGreen,text width=48mm,minimum height=58mm,align=left] (g) {{\Large\color{tdGreen}\faCheckCircle}\ \textbf{Easy for computers}\\[2mm]
+   sort a million names\\[1mm] shortest route on a map\\[1mm] search the web\\[1mm] check a password hash\\[1mm] multiply two big numbers\\[1mm] play a perfect game of noughts and crosses};
+  \node[card=tdAmber,text width=48mm,minimum height=58mm,align=left,right=4mm of g] (a) {{\Large\color{tdAmber}\faHourglassHalf}\ \textbf{Solvable but explosive}\\[2mm]
+   timetable for a whole university\\[1mm] best tour through 60 cities\\[1mm] pack parcels perfectly\\[1mm] fold a protein exactly\\[1mm] break a good password by guessing\\[1mm] solve any Sudoku of any size};
+  \node[card=tdRed,text width=48mm,minimum height=58mm,align=left,right=4mm of a] (r) {{\Large\color{tdRed}\faTimesCircle}\ \textbf{Impossible, provably}\\[2mm]
+   will this program ever stop?\\[1mm] is this program free of bugs?\\[1mm] is this file a virus (always right)?\\[1mm] do two programs do the same thing?\\[1mm] does this code ever print ``hello''?};
+  \node[lbl,below=1mm of g] {polynomial time, class P};
+  \node[lbl,below=1mm of a] {best known: exponential time};
+  \node[lbl,below=1mm of r] {undecidable: no algorithm exists};
+\end{tikzpicture}
+\end{sfig}
+\end{frame}
+
+\begin{frame}{Hook: five lines, nobody knows if they always stop}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\code{collatz.py}
+\vspace{1mm}
+\outp{collatz.txt}
+\vspace{1mm}\pyline
+\end{column}
+\begin{column}{0.52\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdBlue,text width=62mm,align=left] (a) {\textbf{Rule.} Take any whole number $n$. If even, halve it. If odd, triple it and add 1. Repeat until you reach 1.};
+  \node[card=tdGreen,text width=62mm,align=left,below=of a] (b) {\textbf{Checked.} Every start up to about $2^{68}$ reaches 1 (computer searches).};
+  \node[card=tdRed,text width=62mm,align=left,below=of b] (c) {\textbf{Unknown.} No proof that \emph{every} start stops. This is the \emph{Collatz conjecture}, open since 1937.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\srcline{Open problem. Check bound (about $2^{68}$): D.\ Barina, J.\ Supercomputing 2021.}
+\end{frame}
+
+\begin{frame}{Why should a first-year data-science student care?}
+\begin{columns}[T]
+\begin{column}{0.32\textwidth}
+\begin{tikzpicture}\node[card=tdBlue,text width=44mm,minimum height=48mm,align=left]{{\Large\faBug}\\[1mm]\textbf{Software}\\[1mm]\footnotesize Why no tool finds all your bugs, and why tests, types and proofs each catch only some.};\end{tikzpicture}
+\end{column}
+\begin{column}{0.32\textwidth}
+\begin{tikzpicture}\node[card=tdAmber,text width=44mm,minimum height=48mm,align=left]{{\Large\faProjectDiagram}\\[1mm]\textbf{Data and AI}\\[1mm]\footnotesize Training, clustering, scheduling and planning are often NP-hard. Knowing this tells you to reach for heuristics, not exact answers.};\end{tikzpicture}
+\end{column}
+\begin{column}{0.32\textwidth}
+\begin{tikzpicture}\node[card=tdRed,text width=44mm,minimum height=48mm,align=left]{{\Large\faLock}\\[1mm]\textbf{Security}\\[1mm]\footnotesize Passwords, HTTPS and banking are safe only because some problems are hard. If that changes, the internet changes.};\end{tikzpicture}
+\end{column}
+\end{columns}
+\vspace{3mm}
+\centering\begin{tikzpicture}\node[card=tdGreen,text width=120mm]{\textbf{Career.} Hype cycles come and go. Limits stay. People who know them judge claims (``AI solved X'') faster and better.};\end{tikzpicture}
+\end{frame}
+
+
+
+\begin{frame}{The map we will fill in}
+\begin{sfig}[0.82]
+\begin{tikzpicture}[font=\footnotesize]
+  \draw[rounded corners=14pt,fill=tdRed!8,draw=tdRed!60] (-7.8,-3.5) rectangle (7.8,3.6);
+  \node[font=\scriptsize\bfseries,text=tdRed!80!black,anchor=north east] at (7.6,3.5) {Undecidable: no algorithm at all (Part 3)};
+  \draw[rounded corners=14pt,fill=tdAmber!10,draw=tdAmber!70] (-7,-3.1) rectangle (7,2.6);
+  \node[font=\scriptsize\bfseries,text=tdAmber!80!black,anchor=north east] at (6.8,2.5) {Decidable, but may need exponential time (EXP)};
+  \draw[rounded corners=14pt,fill=tdPurple!8,draw=tdPurple!70] (-6.2,-2.7) rectangle (4.4,1.7);
+  \node[font=\scriptsize\bfseries,text=tdPurple,anchor=north east] at (4.2,1.6) {NP: answers easy to check};
+  \draw[rounded corners=14pt,fill=tdGreen!12,draw=tdGreen!70] (-5.6,-2.3) rectangle (0.2,0.9);
+  \node[font=\scriptsize\bfseries,text=tdGreen!70!black,align=center] at (-2.7,0.1) {P\\ solved fast\\{\tiny sorting, shortest path}};
+  \node[card=tdPurple,font=\scriptsize,text width=22mm] at (2.2,-0.4) {NP-complete\\ SAT, TSP, Sudoku};
+  \node[card=tdRed,font=\scriptsize,text width=26mm] at (-1,2.9) {halting problem};
+  \node[font=\tiny,text=tdMuted,align=center] at (-2.7,-1.7) {Is P = NP?\\ Part 5};
+\end{tikzpicture}
+\end{sfig}
+\end{frame}
+
+\begin{frame}{Warm-up poll: which of these can a computer always answer?}
+\begin{columns}[T]
+\begin{column}{0.58\textwidth}
+\begin{enumerate}\setlength\itemsep{3mm}
+\item Is a given number prime?
+\item Does a given program contain the word \texttt{while}?
+\item Does a given program ever stop?
+\item What is the shortest tour of 25 given cities?
+\item Is this Sudoku solvable?
+\item Does a given program contain a bug?
+\end{enumerate}
+\end{column}
+\begin{column}{0.4\textwidth}
+\begin{tikzpicture}\node[card=tdGreen,text width=52mm,align=left]{\textbf{Think first, then check at the end of the lecture.}\\[1mm]\footnotesize Three different things can go wrong: no algorithm at all, an algorithm that is too slow, or a question that is not precise enough.};\end{tikzpicture}
+\vspace{2mm}
+
+{\footnotesize Answers: 1 yes, fast. 2 yes, trivial. 3 \bad{no}. 4 yes but slow (exponential best known). 5 yes, fast for 9$\times$9. 6 \bad{no} (depends on what ``bug'' means; Rice).}
+\end{column}
+\end{columns}
+\end{frame}

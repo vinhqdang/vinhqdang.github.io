@@ -1,0 +1,476 @@
+%% ================= PART 5: P vs NP =================
+\partfooter{5}
+\divider{5}{P versus NP}{tdPurple}{Easy to check, hard to find? The million-dollar question}
+
+\begin{frame}{Finding is hard. Checking is easy.}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}[node distance=2.4mm]
+  \node[card=tdBlue,text width=60mm,align=left,font=\footnotesize] (a) {\textbf{A hard Sudoku} may take you an hour. \textbf{A finished one} takes a minute to check.};
+  \node[card=tdGreen,text width=60mm,align=left,below=of a,font=\footnotesize] (b) {\textbf{Jigsaw, maze, crossword:} same story. Solving needs search; verifying needs a scan.};
+  \node[card=tdAmber,text width=60mm,align=left,below=of b,font=\footnotesize] (c) {\textbf{Big question:} is verifying really easier than finding, or are we just not clever enough?};
+\end{tikzpicture}
+\vspace{2mm}
+\outp{verify.txt}
+\vspace{1mm}\pyline
+\end{column}
+\begin{column}{0.48\textwidth}
+\code{verify.py}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{NP: problems whose answers are quick to check}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\begin{tikzpicture}\node[card=tdPurple,text width=66mm,align=left,inner sep=7pt]{\textbf{NP} = decision problems where a \key{yes} answer has a short \emph{certificate} (a proof) that can be checked in polynomial time.};\end{tikzpicture}
+\vspace{3mm}
+
+\begin{alertblock}{Common mistake}
+NP does \bad{not} mean ``not polynomial''. It means \emph{nondeterministic polynomial}: a machine that could \emph{guess} the certificate, then check it quickly.
+\end{alertblock}
+\end{column}
+\begin{column}{0.44\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdAmber,text width=52mm,align=left] (a) {\textbf{Certificate:} the solved grid, the tour, the variable assignment.};
+  \node[card=tdGreen,text width=52mm,align=left,below=of a] (b) {\textbf{Verifier:} an ordinary polynomial-time program.};
+  \node[card=tdBlue,text width=52mm,align=left,below=of b] (c) {\textbf{Note:} only the \emph{yes} side needs a short proof. ``No'' answers can be harder to certify.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Guess and check, and where P sits}
+\begin{columns}[c]
+\begin{column}{0.55\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[font=\footnotesize,node distance=8mm]
+  \node[card=tdAmber,text width=26mm] (i) {instance};
+  \node[card=tdPurple,text width=28mm,right=of i] (g) {\textbf{guess}\\{\scriptsize a certificate}};
+  \node[card=tdGreen,text width=28mm,right=of g] (c) {\textbf{check}\\{\scriptsize fast verifier}};
+  \node[pill=tdGreen,right=8mm of c] (y) {yes};
+  \draw[arr] (i) -- (g); \draw[arr] (g) -- (c); \draw[arr] (c) -- (y); \draw[arr] (i.south) |- ++(0,-0.8) -| (c.south);
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+
+\small P $\subseteq$ NP: if you can \emph{solve} quickly, you can check quickly (just solve again). The open question is whether the reverse holds.
+\end{column}
+\begin{column}{0.42\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[font=\footnotesize]
+  \draw[rounded corners=14pt,fill=tdPurple!10,draw=tdPurple!70] (0,0) rectangle (6.6,4.2);
+  \node[anchor=north east,font=\scriptsize\bfseries,text=tdPurple] at (6.4,4.1) {NP};
+  \draw[rounded corners=12pt,fill=tdGreen!12,draw=tdGreen!70] (0.4,0.4) rectangle (3.4,2.9);
+  \node[font=\scriptsize\bfseries,text=tdGreen!70!black] at (1.9,2.4) {P};
+  \node[card=tdRed,font=\tiny,text width=17mm] at (4.9,1.5) {NP-complete};
+  \node[font=\tiny,align=center,text=tdMuted] at (1.9,1.1) {?=};
+  \node[lbl,align=center] at (3.3,-0.7) {if P $\neq$ NP (the usual belief)};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Many everyday puzzles are in NP}
+\begin{sfig}[0.62]
+\begin{tabular}{@{}L{33mm}L{50mm}L{54mm}@{}}
+\toprule
+\textbf{Problem} & \textbf{Short certificate} & \textbf{Check}\\\midrule
+Sudoku (any size) & the filled grid & rows, columns, boxes\\
+Subset sum & the chosen numbers & add them up\\
+Travelling salesman (``tour $\le L$?'') & the tour & add the edge lengths\\
+Graph colouring with $k$ colours & a colour for each node & compare neighbours\\
+SAT & a true/false value per variable & evaluate every clause\\
+Timetabling & the timetable & scan for clashes\\
+Factoring (``factor below $k$?'') & the factor & divide\\
+Protein folding (simple models) & a shape & compute its energy\\\bottomrule
+\end{tabular}
+\end{sfig}
+\vspace{1mm}
+{\small Each certificate is \emph{short} (polynomial size) and each check is \emph{fast}. Whether each problem has a fast \emph{solver} is exactly the question.}
+\end{frame}
+
+\begin{frame}{SAT: the most famous problem in the story}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}\node[card=tdBlue,text width=62mm,align=left,inner sep=7pt]{\textbf{SAT.} Given a Boolean formula in the form ``AND of ORs'', is there a way to assign \emph{true}/\emph{false} to the variables that makes the whole formula true?};\end{tikzpicture}
+\vspace{3mm}
+
+\begin{tikzpicture}\node[card=tdInk,text width=62mm,align=left]{\textbf{Example.}\\[1mm]$(x\lor y)\land(\lnot x\lor z)\land(\lnot y\lor\lnot z)$\\[1mm]{\footnotesize Each bracket is a \emph{clause}. Satisfiable: 2 of the 8 assignments work (right). With $n$ variables there are $2^n$ assignments to try.}};\end{tikzpicture}
+\end{column}
+\begin{column}{0.46\textwidth}
+\small
+\begin{tabular}{@{}ccc|c@{}}
+\toprule
+$x$ & $y$ & $z$ & formula\\\midrule
+F & F & F & \bad{F}\\
+F & F & T & \bad{F}\\
+F & T & F & \good{T}\\
+F & T & T & \bad{F}\\
+T & F & F & \bad{F}\\
+T & F & T & \good{T}\\
+T & T & F & \bad{F}\\
+T & T & T & \bad{F}\\\bottomrule
+\end{tabular}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Why SAT is special: any computation is a formula (Cook--Levin)}
+\begin{columns}[c]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}[x=7mm,y=6mm,font=\tiny]
+  \foreach \r in {0,...,4}{\foreach \c in {0,...,6}{
+    \pgfmathparse{int(mod(\r*3+\c*5,3))}
+    \node[draw=tdLine,fill=white,minimum size=6mm,inner sep=0,font=\ttfamily\tiny] at (\c,-\r) {\ifcase\pgfmathresult 0\or 1\or \_\fi};}}
+  \node[anchor=east,font=\scriptsize,text=tdMuted] at (-0.6,0) {time 0};
+  \node[anchor=east,font=\scriptsize,text=tdMuted] at (-0.6,-4) {time 4};
+  \draw[arr,tdBlue] (7.4,0) -- node[right,font=\scriptsize,text=tdBlue,align=left]{time\\ flows\\ down} (7.4,-4);
+  \draw[tdRed,thick,rounded corners=2pt] (1.6,-1.6) rectangle (4.4,-3.4);
+  \node[font=\scriptsize,text=tdRed,anchor=north] at (3,-3.45) {every small window follows a rule};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.48\textwidth}
+\small
+\begin{itemize}\setlength\itemsep{2mm}
+\item Record a Turing machine's run as a grid: row = time, column = tape cell.
+\item ``Row 0 holds the input, each row follows from the previous by the rules, the last row says accept'' is a \key{giant AND of tiny local conditions}: a SAT formula, polynomial in size.
+\item \textbf{Cook 1971, Levin 1973}: every NP problem turns into SAT this way. SAT is \key{NP-complete}: at least as hard as everything in NP.
+\end{itemize}
+\end{column}
+\end{columns}
+\srcline{S.\ Cook, ``The complexity of theorem-proving procedures'', STOC 1971. L.\ Levin, Problems of Information Transmission 9, 1973.}
+\end{frame}
+
+\begin{frame}{NP-complete: the hardest problems in NP}
+\begin{sfig}[0.7]
+\begin{tikzpicture}[font=\footnotesize,node distance=3mm]
+  \node[card=tdPurple,text width=34mm,minimum height=36mm] (np) {\textbf{every problem in NP}\\[1mm]{\scriptsize Sudoku, scheduling, folding, thousands more}};
+  \node[card=tdAmber,text width=34mm,minimum height=16mm,right=26mm of np] (sat) {\textbf{SAT}\\{\scriptsize NP-complete}};
+  \node[card=tdGreen,text width=34mm,minimum height=16mm,right=26mm of sat] (any) {\textbf{your new problem X}};
+  \draw[arr] (np) -- node[above,lbl]{translate quickly} (sat);
+  \draw[arr] (sat) -- node[above,lbl]{translate quickly} (any);
+  \node[font=\scriptsize,text=tdRed!80!black,align=center] at (7,-2.6) {So a fast algorithm for X would give a fast algorithm for SAT,\\ hence for \emph{everything} in NP.};
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+\begin{center}\small A \key{reduction} turns any instance of problem A into an instance of problem B with the \emph{same answer}, in polynomial time. If B is easy, A is easy. Contrapositive: if A is hard, B is hard.\end{center}
+\end{frame}
+
+\begin{frame}{Reduction by example 1: Sudoku as a SAT problem}
+\begin{columns}[c]
+\begin{column}{0.38\textwidth}
+\begin{sfig}[0.65]
+\begin{tikzpicture}[x=8mm,y=8mm,font=\small]
+  \foreach \r/\row in {0/{1,\_,\_,\_},1/{\_,\_,3,\_},2/{\_,4,\_,\_},3/{\_,\_,\_,2}}{
+    \foreach \v [count=\c from 0] in \row{\node[draw=tdLine,fill=white,minimum size=8mm,inner sep=0,font=\bfseries] at (\c,-\r) {\v};}}
+  \draw[very thick,tdInk] (-0.5,-3.5) rectangle (3.5,0.5);
+  \draw[very thick,tdInk] (1.5,0.5) -- (1.5,-3.5); \draw[very thick,tdInk] (-0.5,-1.5) -- (3.5,-1.5);
+  \node[lbl] at (1.5,-4.2) {a 4$\times$4 mini Sudoku};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.6\textwidth}
+\begin{tikzpicture}[node distance=2.4mm]
+  \node[card=tdBlue,text width=70mm,align=left] (a) {\textbf{Variables.} $v_{r,c,d}$ = ``cell $(r,c)$ holds digit $d$''. A 9$\times$9 grid has $9\cdot9\cdot9=729$ of them.};
+  \node[card=tdGreen,text width=70mm,align=left,below=of a] (b) {\textbf{Clauses.} Each cell has \emph{some} digit: $(v_{r,c,1}\lor\cdots\lor v_{r,c,9})$. Never two in one cell: $(\lnot v_{r,c,d}\lor\lnot v_{r,c,d'})$.};
+  \node[card=tdAmber,text width=70mm,align=left,below=of b] (c) {\textbf{Rules.} Each digit appears in each row, column and box. \textbf{Givens}: one-literal clauses $(v_{1,1,1})$.};
+  \node[card=tdPurple,text width=70mm,align=left,below=of c] (d) {Satisfying assignment $=$ solved Sudoku. A SAT solver solves the puzzle without knowing any Sudoku tricks.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Reduction by example 2: 3-SAT to a graph problem}
+\begin{columns}[c]
+\begin{column}{0.58\textwidth}
+\begin{sfig}[0.78]
+\begin{tikzpicture}[font=\scriptsize,lit/.style={circle,draw=tdBlue!70!black,fill=tdBlue!8,minimum size=7mm,inner sep=0},every edge/.style={draw=tdMuted,thick}]
+  % clause triangles
+  \node[lit] (a1) at (0,1.2) {$x$}; \node[lit] (a2) at (-1,0) {$y$}; \node[lit] (a3) at (1,0) {$\bar z$};
+  \node[lit] (b1) at (5,1.2) {$\bar x$}; \node[lit] (b2) at (4,0) {$y$}; \node[lit] (b3) at (6,0) {$z$};
+  \node[lit] (c1) at (2.5,-2.2) {$x$}; \node[lit] (c2) at (1.5,-3.4) {$\bar y$}; \node[lit] (c3) at (3.5,-3.4) {$z$};
+  \draw (a1)--(a2)--(a3)--(a1); \draw (b1)--(b2)--(b3)--(b1); \draw (c1)--(c2)--(c3)--(c1);
+  \draw[tdRed,thick] (a1) -- (b1);
+  \draw[tdRed,thick] (a3) to[bend left=10] (b3);
+  \draw[tdRed,thick] (a3) -- (c3);
+  \draw[tdRed,thick] (b2) -- (c2);
+  \foreach \n in {a1,b2,c3}{\node[lit,fill=tdGreen!35,draw=tdGreen!70!black,thick] at (\n) {};}
+  \node[lit,fill=tdGreen!35,draw=tdGreen!70!black] at (a1) {$x$};
+  \node[lit,fill=tdGreen!35,draw=tdGreen!70!black] at (b2) {$y$};
+  \node[lit,fill=tdGreen!35,draw=tdGreen!70!black] at (c3) {$z$};
+  \node[lbl,anchor=east] at (-1.5,1.2) {$(x\lor y\lor\bar z)$};
+  \node[lbl,anchor=west] at (6.6,1.2) {$(\bar x\lor y\lor z)$};
+  \node[lbl,anchor=west] at (4.2,-2.2) {$(x\lor\bar y\lor z)$};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.4\textwidth}
+\small
+\begin{itemize}\setlength\itemsep{1.5mm}
+\item One \key{triangle per clause}; its three nodes are the literals.
+\item \bad{Red edges} join contradictory literals ($x$ and $\bar x$).
+\item Pick \emph{one node per triangle} with no red edge between picks (an \key{independent set} of size 3).
+\item Green picks say: $x$, $y$, $z$ all true. It satisfies every clause. Formula satisfiable $\iff$ such a set exists.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Karp (1972): a web of reductions}
+\begin{sfig}[0.6]
+\begin{tikzpicture}[font=\scriptsize,node distance=6mm,every node/.style={card=tdPurple,text width=19mm}]
+  \node[card=tdAmber] (sat) at (0,0) {\textbf{SAT}};
+  \node[card=tdAmber] (s3) at (3.1,0) {\textbf{3-SAT}};
+  \node[card=tdPurple] (is) at (6.5,1.7) {Independent set};
+  \node[card=tdPurple] (vc) at (10,1.7) {Vertex cover};
+  \node[card=tdPurple] (cl) at (10,0.4) {Clique};
+  \node[card=tdBlue] (col) at (6.5,-0.1) {3-colouring};
+  \node[card=tdGreen] (ham) at (6.5,-1.8) {Hamiltonian cycle};
+  \node[card=tdGreen] (tsp) at (10,-1.8) {Travelling salesman};
+  \node[card=tdRed] (ss) at (3.1,-2.6) {Subset sum};
+  \node[card=tdRed] (pa) at (3.1,-4.0) {Partition};
+  \node[card=tdRed] (kn) at (6.5,-4.0) {Knapsack};
+  \foreach \a/\b in {sat/s3,s3/is,is/vc,is/cl,s3/col,s3/ham,ham/tsp,s3/ss,ss/pa,pa/kn}{\draw[arr] (\a) -- (\b);}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small Richard Karp showed in 1972 that 21 natural problems are all NP-complete, each via a reduction from an earlier one. Today thousands are known: scheduling, packing, circuit layout, cutting stock, \ldots\ A fast algorithm for \emph{any one} of them solves \emph{all}.}
+\srcline{R.\ Karp, ``Reducibility among combinatorial problems'', in Complexity of Computer Computations, 1972. Garey and Johnson, Computers and Intractability, 1979.}
+\end{frame}
+
+\begin{frame}{Travelling salesman: how many tours?}
+\begin{columns}[c]
+\begin{column}{0.54\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}[x=6mm,y=6mm,font=\scriptsize]
+  \def\P{{0/0, 2/1.5, 4/0.3, 6/2, 5/4, 3/3.5, 1/4, -0.5/2}}
+  \foreach \x/\y [count=\i from 0] in {0/0, 2/1.5, 4/0.3, 6/2, 5/4, 3/3.5, 1/4, -0.5/2}{\coordinate (p\i) at (\x,\y);}
+  \begin{scope}
+    \draw[tdGreen,very thick] (p0)--(p1)--(p2)--(p3)--(p4)--(p5)--(p6)--(p7)--cycle;
+    \foreach \i in {0,...,7}{\fill[tdInk] (p\i) circle (1.2mm);}
+    \node[lbl,font=\scriptsize,text=tdGreen!70!black] at (2.8,-1.3) {tour of length 18.4 (optimal)};
+  \end{scope}
+  \begin{scope}[xshift=95mm]
+    \foreach \x/\y [count=\i from 0] in {0/0, 2/1.5, 4/0.3, 6/2, 5/4, 3/3.5, 1/4, -0.5/2}{\coordinate (q\i) at (\x,\y);}
+    \draw[tdRed,thick] (q0)--(q3)--(q6)--(q1)--(q4)--(q7)--(q2)--(q5)--cycle;
+    \foreach \i in {0,...,7}{\fill[tdInk] (q\i) circle (1.2mm);}
+    \node[lbl,font=\scriptsize,text=tdRed!80!black] at (2.8,-1.3) {a random tour: 36.9};
+  \end{scope}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.44\textwidth}
+\small
+\begin{tabular}{@{}rr@{}}
+\toprule
+cities & tours $(n-1)!/2$\\\midrule
+8 & 2,520\\ 10 & 181,440\\ 15 & $4.4\times10^{10}$\\ 20 & $6.1\times10^{16}$\\ 25 & $3.1\times10^{23}$\\\bottomrule
+\end{tabular}
+\vspace{2mm}
+
+\footnotesize Lengths computed by code. For 8 cities, 2,520 tours are easy to enumerate. 25 cities: more than the number of seconds in $10^{15}$ years at a billion tours per second.
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Worst-case hard is not the same as hard in practice}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdGreen,text width=60mm,align=left] (a) {\textbf{TSP:} the Concorde solver has found \emph{provably optimal} tours for instances with tens of thousands of cities (85,900 for a chip-design instance).};
+  \node[card=tdBlue,text width=60mm,align=left,below=of a] (b) {\textbf{Sudoku:} $9\times9$ is trivial for a backtracking program in milliseconds. The $n^2\times n^2$ generalisation is NP-complete (Yato and Seta 2003).};
+  \node[card=tdAmber,text width=60mm,align=left,below=of b] (c) {\textbf{Lesson:} NP-complete means ``no known algorithm is fast on \emph{all} inputs'', not ``every instance is hopeless''.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdRed,text width=54mm,align=left] (a) {\textbf{Real instances} have structure: geography, symmetry, many constraints that prune the search quickly.};
+  \node[card=tdPurple,text width=54mm,align=left,below=of a] (b) {\textbf{Adversarial instances} exist for every algorithm, and that is what the worst-case theory is about.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\srcline{Applegate, Bixby, Chv\'atal, Cook, The Traveling Salesman Problem: A Computational Study, Princeton UP 2006; Concorde: math.uwaterloo.ca/tsp. Yato and Seta, IEICE Trans.\ Fund.\ E86-A(5), 2003.}
+\end{frame}
+
+\begin{frame}{What if P = NP?}
+\begin{sfig}[0.78]
+\begin{tikzpicture}[font=\footnotesize,node distance=3mm]
+  \node[card=tdGreen,text width=46mm,minimum height=26mm,align=left] (a) {\textbf{Optimisation becomes routine}\\[1mm]{\scriptsize best schedules, routes, chip layouts, protein designs, found fast.}};
+  \node[card=tdRed,text width=46mm,minimum height=26mm,align=left,right=3mm of a] (b) {\textbf{Most cryptography breaks}\\[1mm]{\scriptsize finding a key from a ciphertext would be as easy as checking one.}};
+  \node[card=tdBlue,text width=46mm,minimum height=26mm,align=left,right=3mm of b] (c) {\textbf{Search for proofs gets easy}\\[1mm]{\scriptsize if a proof of length $n$ exists, find it in polynomial time. G\"odel asked this in a 1956 letter to von Neumann.}};
+  \node[card=tdAmber,text width=46mm,minimum height=26mm,align=left,below=3mm of a] (d) {\textbf{Learning becomes easy}\\[1mm]{\scriptsize finding the simplest model that fits the data would be fast.}};
+  \node[card=tdPurple,text width=46mm,minimum height=26mm,align=left,right=3mm of d] (e) {\textbf{Creativity is cheaper}\\[1mm]{\scriptsize the gap between \emph{appreciating} a solution and \emph{finding} it would vanish, a point Aaronson often stresses.}};
+  \node[card=tdInk,text width=46mm,minimum height=26mm,align=left,right=3mm of e] (f) {\textbf{But}\\[1mm]{\scriptsize an algorithm may have $n^{100}$ steps. Proving P=NP is not the same as getting a useful algorithm.}};
+\end{tikzpicture}
+\end{sfig}
+\srcline{Aaronson, ``P $\overset{?}{=}$ NP'', in Open Problems in Mathematics, Springer 2016. G\"odel's letter to von Neumann, 1956.}
+\end{frame}
+
+\begin{frame}{Why most experts believe P $\neq$ NP}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdBlue,text width=60mm,align=left] (a) {\textbf{Decades of failure.} Thousands of NP-complete problems, attacked by the best minds for 50 years, no polynomial algorithm for any.};
+  \node[card=tdGreen,text width=60mm,align=left,below=of a] (b) {\textbf{Asymmetry of experience.} Appreciating a solution is much easier than producing it. P = NP would say that gap is an illusion.};
+  \node[card=tdAmber,text width=60mm,align=left,below=of b] (c) {\textbf{Consequences look too good.} Automatic proofs, perfect scheduling, no secure encryption.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}
+  \fill[tdBlue!20] (0,0) rectangle (8.8,1.1); \fill[tdBlue] (0,0) rectangle (7.74,1.1);
+  \node[font=\scriptsize\bfseries,text=white] at (3.9,0.55) {P $\neq$ NP: 88\%};
+    \node[lbl,align=center] at (4.4,1.8) {2019 poll of complexity theorists};
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+{\footnotesize Opinion is not proof. Experts have been surprised before (e.g.\ primality in P, 2002; the claimed ETH refutation, Part 7).}
+\end{column}
+\end{columns}
+\srcline{W.\ Gasarch, ``The Third P =? NP Poll'', SIGACT News 50(1), 2019 (reported figures: 88\% P $\neq$ NP).}
+\end{frame}
+
+\begin{frame}{Why is it so hard to prove? Known barriers}
+\begin{sfig}[0.7]
+\begin{tikzpicture}[font=\footnotesize,node distance=3mm]
+  \node[card=tdRed,text width=46mm,minimum height=36mm,align=left] (a) {\textbf{Relativization}\\[1mm]{\scriptsize Baker, Gill, Solovay (1975): there are imaginary ``oracle worlds'' where P=NP and others where P$\neq$NP. So any proof that works equally in all worlds fails.}};
+  \node[card=tdAmber,text width=46mm,minimum height=36mm,align=left,right=3mm of a] (b) {\textbf{Natural proofs}\\[1mm]{\scriptsize Razborov and Rudich (1994): a broad family of circuit-lower-bound techniques cannot work, if strong pseudo-random generators exist.}};
+  \node[card=tdPurple,text width=46mm,minimum height=36mm,align=left,right=3mm of b] (c) {\textbf{Algebrization}\\[1mm]{\scriptsize Aaronson and Wigderson (2008): a further family of algebraic techniques is also blocked.}};
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+{\small Any real proof needs a genuinely new idea. This is one reason a claim of ``P $\neq$ NP proved'' appearing on the internet is almost always wrong (see the claims-checking slide in Part 7).}
+\end{frame}
+
+\begin{frame}{A million dollars}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdPurple,text width=66mm,align=left,inner sep=6pt] (a) {\textbf{Clay Mathematics Institute, 2000:} seven Millennium Prize Problems, \$1{,}000{,}000 each. \textbf{P versus NP} is one. The problem is posed as: if it is easy to check that a solution is correct, is it also easy to solve?};
+  \node[card=tdBlue,text width=66mm,align=left,below=of a] (b) {\textbf{Rules:} publication in a qualifying journal, then two years of general acceptance by the mathematical community, before the prize committee considers it.};
+  \node[card=tdGreen,text width=66mm,align=left,below=of b] (c) {\textbf{Status:} only one of the seven (the Poincar\'e conjecture, by Perelman) has been awarded, and he declined the prize.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.42\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[font=\scriptsize,node distance=2mm]
+  \foreach \t/\c [count=\i from 0] in {P versus NP/tdPurple, Riemann hypothesis/tdAmber, Navier--Stokes/tdBlue, Yang--Mills/tdGreen, Hodge/tdBlue, Birch--Swinnerton-Dyer/tdAmber, Poincar\'e (solved)/tdGreen}{
+    \node[card=\c,text width=44mm,anchor=north west] at (0,-\i*9.2mm) {\t};}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\end{columns}
+\srcline{claymath.org/millennium-problems and /millennium/p-vs-np (problem statement). The Riemann hypothesis claim of Nov 2026 is discussed in Part 7.}
+\end{frame}
+
+\begin{frame}{Intractable in practice: the working engineer's toolbox}
+\begin{sfig}[0.78]
+\begin{tikzpicture}[font=\footnotesize,node distance=3mm]
+  \node[card=tdRed,text width=50mm,minimum height=10mm] (c) {\textbf{An NP-hard problem}};
+  \node[card=tdGreen,text width=36mm,minimum height=22mm,below left=10mm and 2mm of c] (a) {\textbf{Exact, with pruning}\\[1mm]{\scriptsize backtracking, branch and bound, SAT/ILP solvers. Good on real inputs, exponential worst case.}};
+  \node[card=tdBlue,text width=36mm,minimum height=22mm,right=3mm of a] (b) {\textbf{Approximation}\\[1mm]{\scriptsize fast algorithm with a \emph{guarantee}: answer within factor $\rho$ of optimal.}};
+  \node[card=tdAmber,text width=36mm,minimum height=22mm,right=3mm of b] (d) {\textbf{Heuristics}\\[1mm]{\scriptsize local search, simulated annealing, genetic algorithms, learned policies. No guarantee, often excellent.}};
+  \node[card=tdPurple,text width=36mm,minimum height=22mm,right=3mm of d] (e) {\textbf{Special structure}\\[1mm]{\scriptsize small treewidth, planar graphs, fixed parameter $k$: easy on the inputs you actually have.}};
+  \foreach \x in {a,b,d,e}{\draw[arr] (c) -- (\x);}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small Knowing a problem is NP-hard does \emph{not} mean give up. It means: stop looking for a perfect fast algorithm, and choose which \key{compromise} you accept.}
+\end{frame}
+
+\begin{frame}{Approximation: a guarantee instead of perfection}
+\begin{columns}[c]
+\begin{column}{0.52\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[font=\footnotesize,v/.style={circle,draw=tdInk!60,fill=white,minimum size=6mm,inner sep=0}]
+  \foreach \i in {1,...,6}{\node[v] (a\i) at (\i*1.4,0) {\i};}
+  \foreach \i/\j in {1/2,2/3,3/4,4/5,5/6}{\draw[thick,tdMuted] (a\i)--(a\j);}
+  \foreach \i/\j in {1/2,3/4,5/6}{\draw[very thick,tdRed] (a\i)--(a\j);}
+  \foreach \i in {1,...,6}{\node[v,fill=tdRed!25,draw=tdRed!70!black] at (a\i) {\i};}
+  \node[lbl,text=tdRed!80!black] at (4.9,0.9) {pick an uncovered edge, take both ends: 6 nodes};
+  \foreach \i in {1,...,6}{\node[v] (b\i) at (\i*1.4,-2.4) {\i};}
+  \foreach \i/\j in {1/2,2/3,3/4,4/5,5/6}{\draw[thick,tdMuted] (b\i)--(b\j);}
+  \foreach \i in {2,4,6}{\node[v,fill=tdGreen!30,draw=tdGreen!70!black] at (b\i) {\i};}
+  \node[lbl,text=tdGreen!70!black] at (4.9,-1.5) {optimal cover: 3 nodes};
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize The greedy rule is never worse than twice optimal: each picked edge needs at least one of its ends in \emph{any} cover. Here it is exactly 2$\times$.}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{tikzpicture}[node distance=2.4mm]
+  \node[card=tdGreen,text width=54mm,align=left,font=\footnotesize] (a) {\textbf{Metric TSP:} Christofides (1976) gives tours at most 1.5$\times$ optimal. In 2021, Karlin, Klein and Oveis Gharan improved the factor by a minuscule amount after 45 years.};
+  \node[card=tdRed,text width=54mm,align=left,below=of a,font=\footnotesize] (b) {\textbf{Some problems resist approximation too:} under standard assumptions, clique cannot be approximated well in polynomial time.};
+  \node[card=tdAmber,text width=54mm,align=left,below=of b,font=\footnotesize] (c) {NP-hard problems differ a lot in \emph{how} hard they are to approximate.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\srcline{Christofides, CMU Tech.\ Report 388, 1976. Karlin, Klein, Oveis Gharan, ``A (slightly) improved approximation algorithm for metric TSP'', STOC 2021.}
+\end{frame}
+
+\begin{frame}{SAT solvers: a tiny one, with real output}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\code[firstline=4,lastline=29,basicstyle=\ttfamily\fontsize{6.2}{7.2}\selectfont]{sat.py}
+\end{column}
+\begin{column}{0.43\textwidth}
+\outp[lastline=11]{sat.txt}
+\vspace{1mm}\pyline
+\vspace{1mm}
+
+{\footnotesize \textbf{Idea (DPLL):} choose a variable, try true, then false; apply the \emph{unit rule} (a clause with one free literal forces it); abandon a branch at the first conflict. 40 variables: $2^{40}\approx10^{12}$ assignments, but about 100 calls.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Random 3-SAT has a phase transition near 4.27 clauses per variable}
+\begin{columns}[c]
+\begin{column}{0.6\textwidth}
+\begin{tikzpicture}
+\begin{axis}[width=\linewidth,height=58mm,xlabel={clauses per variable $m/n$},ylabel={mean DPLL calls ($n=50$)},axis y line*=left,grid=major,grid style={tdLine!50},ymin=0]
+\addplot[tdRed,very thick,mark=*,mark size=1.2pt] table[x=ratio,y=calls] {out/satphase.dat};
+\end{axis}
+\begin{axis}[width=\linewidth,height=58mm,axis y line*=right,axis x line=none,ylabel={fraction satisfiable},ymin=0,ymax=1,ylabel style={blue}]
+\addplot[tdBlue,thick,dashed] table[x=ratio,y=sat] {out/satphase.dat};
+\end{axis}
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.38\textwidth}
+\small Few clauses: almost always satisfiable and easy (many solutions). Many clauses: almost always unsatisfiable, and a conflict appears fast. In between, near $m/n\approx4.27$, the answer flips and the search is \bad{hardest}.
+
+\vspace{2mm}
+\footnotesize Data: 20 random formulas per ratio, \texttt{code/satphase.py}. Threshold: Mitchell, Selman and Levesque, AAAI 1992 (empirical).
+\end{column}
+\end{columns}
+\end{frame}
+
+
+
+
+
+\begin{frame}{Part 5 in one slide, and check yourself}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdPurple,text width=62mm,align=left] (a) {\textbf{1.} NP = quick to check. P = quick to solve. P $\subseteq$ NP.};
+  \node[card=tdPurple,text width=62mm,align=left,below=of a] (b) {\textbf{2.} SAT is NP-complete; reductions spread hardness to thousands of problems.};
+  \node[card=tdPurple,text width=62mm,align=left,below=of b] (c) {\textbf{3.} P = NP is open (\$1M). Most experts bet P $\neq$ NP.};
+  \node[card=tdGreen,text width=62mm,align=left,below=of c] (d) {\textbf{4.} In practice: solvers, heuristics and approximation work wonders on real inputs.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.44\textwidth}
+\begin{block}{Check yourself}
+\small
+\begin{enumerate}\setlength\itemsep{1mm}
+\item Is a problem in P also in NP? Why?
+\item Give a certificate for 3-colouring a graph, and say how to check it.
+\item Does ``NP-hard'' mean ``impossible in practice''? Explain.
+\item If someone finds a polynomial algorithm for TSP, what else follows?
+\end{enumerate}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}

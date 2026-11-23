@@ -1,0 +1,5 @@
+n=   6 stops after   8 steps
+n=  27 stops after 111 steps
+n=  97 stops after 118 steps
+n= 871 stops after 178 steps
+slowest below 100000: 77031 350 steps

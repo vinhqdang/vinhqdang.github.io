@@ -1,0 +1,216 @@
+%% ================= PART 8: LLM LIMITS =================
+\partfooter{8}
+\divider{8}{The limits of large language models}{tdRed}{What complexity and computability say about today's AI, and what the evidence shows}
+
+\begin{frame}{What a language model does, as a loop}
+\begin{sfig}[0.6]
+\begin{tikzpicture}[font=\footnotesize,node distance=8mm]
+  \node[card=tdBlue,text width=34mm] (c) {text so far (the \emph{context})};
+  \node[card=tdPurple,text width=34mm,minimum height=16mm,right=of c] (m) {\textbf{model}\\{\scriptsize one forward pass, fixed size}};
+  \node[card=tdAmber,text width=34mm,right=of m] (p) {probabilities for the \textbf{next token}};
+  \node[card=tdGreen,text width=24mm,right=of p] (t) {pick one token};
+  \draw[arr] (c) -- (m); \draw[arr] (m) -- (p); \draw[arr] (p) -- (t);
+  \draw[arr] (t.south) -- ++(0,-0.9) -| node[lbl,pos=0.25,below]{append, repeat} (c.south);
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\small \key{Strength:} trained on huge text and code corpora, fluent, broad, good at pattern completion and at writing programs.
+\end{column}
+\begin{column}{0.5\textwidth}
+\small \key{Structure to remember:} each token costs the \emph{same} amount of computation, and nothing in the loop checks whether the output is true.
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Fixed computation per token, and what ``thinking'' tokens add}
+\begin{columns}[c]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdRed,text width=58mm,align=left] (a) {\textbf{No intermediate steps:} the answer comes after a fixed number of layers. A \emph{shallow} computation, however wide.};
+  \node[card=tdGreen,text width=58mm,align=left,below=of a] (b) {\textbf{Chain of thought:} each written token is extra computation. Merrill and Sabharwal (2023): more steps, more power; logarithmic steps add little; \emph{polynomially many} steps give, in their model, exactly P.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{sfig}[0.6]
+\begin{tikzpicture}[font=\footnotesize]
+  \node[anchor=west,text=tdMuted,font=\scriptsize] at (0,3.7) {reasoning tokens allowed $\to$ more problems reachable};
+  \foreach \w/\c/\t/\y in {1.2/tdAmber/{none: shallow circuit}/2.6, 3.2/tdBlue/{linear: regular languages and more}/1.6, 5.6/tdGreen/{polynomial: exactly P}/0.6}{
+    \fill[\c!30,draw=\c!70!black] (0,\y) rectangle (\w,\y+0.8);
+    \node[anchor=west,font=\scriptsize] at (\w+0.15,\y+0.4) {\t};}
+  \draw[dashed,tdRed,thick] (8.4,0.3) -- (8.4,3.5);
+  \node[font=\scriptsize,text=tdRed!80!black,anchor=west,align=left] at (8.55,2.0) {NP-complete:\\ no known\\ polynomial\\ method for\\ any machine};
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize Intuition only: more reasoning tokens means more computation, but still polynomial per answer.}
+\end{column}
+\end{columns}
+\srcline{Merrill and Sabharwal, ``The expressive power of transformers with chain of thought'', arXiv:2310.07923 (2023, rev.\ 2024). Idealised theoretical model; not a measurement of any product.}
+\end{frame}
+
+\begin{frame}{Compositional depth: errors multiply}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdBlue,text width=60mm,align=left] (a) {\textbf{Faith and Fate} (Dziri et al., 2023) studied multi-digit multiplication, logic-grid puzzles and a dynamic-programming problem. Accuracy fell as the size of the underlying computation graph grew.};
+  \node[card=tdAmber,text width=60mm,align=left,below=of a] (b) {\textbf{Their reading:} the models often reduce multi-step reasoning to matching patterns seen in training, rather than learning a systematic procedure, and errors in early steps propagate.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{sfig}[0.5]
+\begin{tikzpicture}
+\begin{axis}[width=75mm,height=48mm,xlabel={number of dependent steps $k$},ylabel={chance all steps right},domain=1:60,samples=60,legend pos=north east,ymin=0,ymax=1,grid=major,grid style={tdLine!50}]
+\addplot[tdGreen,thick] {0.99^x}; \addlegendentry{99\% per step}
+\addplot[tdAmber,thick] {0.95^x}; \addlegendentry{95\% per step}
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize Simple arithmetic ($p^k$), \illus: assumes independent errors. Long chains need very high per-step reliability, or checks along the way.}
+\end{column}
+\end{columns}
+\srcline{Dziri et al., ``Faith and Fate: Limits of Transformers on Compositionality'', arXiv:2305.18654 (NeurIPS 2023). Plot is a textbook calculation, not data from the paper.}
+\end{frame}
+
+\begin{frame}{Reasoning models: strong evidence, and a live debate}
+\begin{columns}[c]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+\begin{axis}[width=95mm,height=62mm,xlabel={puzzle complexity},ylabel={accuracy},xtick=\empty,ytick=\empty,ymin=0,ymax=1.05,xmin=0,xmax=10,domain=0:10,samples=60,legend pos=north east,axis lines=left]
+\addplot[tdAmber,very thick] {1/(1+exp(1.6*(x-3.2)))}; \addlegendentry{standard model}
+\addplot[tdBlue,very thick] {1/(1+exp(2.2*(x-6.4)))}; \addlegendentry{reasoning model}
+\node[font=\tiny,text=tdMuted] at (axis cs:1.4,0.1) {low};
+\node[font=\tiny,text=tdMuted] at (axis cs:5,0.1) {medium};
+\node[font=\tiny,text=tdMuted] at (axis cs:8.6,0.1) {high: both fail};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize Schematic of the three regimes reported by Shojaee et al.\ (\illus: curves drawn by hand, not their data).}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{tikzpicture}[node distance=2.6mm]
+  \node[card=tdRed,text width=56mm,align=left] (a) {\textbf{``The Illusion of Thinking''} (Apple, 2025): on puzzles with adjustable difficulty, \emph{complete accuracy collapse} beyond a threshold; reasoning effort even declined near it.};
+  \node[card=tdGreen,text width=56mm,align=left,below=of a] (b) {\textbf{Published reply} (Lawsen, 2025): many failures reflect output-token limits and impossible puzzle instances. Asked for a short program instead of a move list, models did well in preliminary tests.};
+  \node[card=tdBlue,text width=56mm,align=left,below=of b] (c) {\textbf{Lesson:} ask for a \emph{program} and run it. Computation moves from tokens to an exact tool.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\srcline{Shojaee et al., arXiv:2506.06941 (NeurIPS 2025). A.\ Lawsen, arXiv:2506.09250 (2025). Preprint-level debate; later work may change the picture.}
+\end{frame}
+
+\begin{frame}{Hallucination: plausible, confident, wrong}
+\begin{columns}[c]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}[node distance=2.6mm]
+  \node[card=tdRed,text width=58mm,align=left,font=\footnotesize] (a) {\textbf{Kalai, Nachum, Vempala, Zhang (2025):} models hallucinate because training and common benchmarks reward guessing over admitting uncertainty; errors arise even in simple settings where true and false statements are hard to tell apart.};
+  \node[card=tdBlue,text width=58mm,align=left,below=of a,font=\footnotesize] (b) {\textbf{Link to Part 3:} a perfect truth-checker for arbitrary claims about programs would decide undecidable questions. From any source, we cannot have it.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{tikzpicture}
+\begin{axis}[width=\linewidth,height=52mm,xlabel={model's chance of being right, $p$},ylabel={expected score},domain=0:1,samples=20,legend pos=north west,grid=major,grid style={tdLine!50},legend style={font=\tiny},title={\illus\ the incentive, by arithmetic},title style={font=\scriptsize}]
+\addplot[tdRed,very thick] {x}; \addlegendentry{guess, accuracy-only grading}
+\addplot[tdGreen,very thick] {2*x-1}; \addlegendentry{guess, wrong answers cost 1}
+\addplot[tdMuted,dashed,thick] {0}; \addlegendentry{say ``I do not know''}
+\end{axis}
+\end{tikzpicture}
+{\scriptsize With accuracy-only grading, guessing never loses. If wrong answers cost, abstaining wins below $p=0.5$. The paper proposes changing how benchmarks score answers.}
+\end{column}
+\end{columns}
+\srcline{Kalai, Nachum, Vempala, Zhang, ``Why Language Models Hallucinate'', arXiv:2509.04664 (4 Sep 2025). The plot is a textbook calculation of the incentive, not data from the paper.}
+\end{frame}
+
+\begin{frame}{Can an AI solve the halting problem? Can it solve NP-hard problems?}
+\begin{sfig}[0.6]
+\begin{tikzpicture}[font=\footnotesize,node distance=4mm]
+  \node[card=tdRed,text width=64mm,minimum height=32mm,align=left] (h) {\textbf{Halting (and Rice)}\\[1mm]{\scriptsize An AI model, run as a program, is a program. The diagonal construction D can be built against any fixed checker, including a neural one. So \bad{no model can be right on every program}. It can be right on most programs people actually write.}};
+  \node[card=tdAmber,text width=64mm,minimum height=32mm,align=left,right=4mm of h] (n) {\textbf{NP-hard problems}\\[1mm]{\scriptsize A fast, always-correct model for SAT or TSP would be a polynomial algorithm, which would be a breakthrough in complexity theory. Models can propose \emph{good} solutions; optimality and speed on all instances are not promised.}};
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+\begin{center}\small The limits of Parts 3--5 apply to \key{any} computing system. What AI changes is the \emph{typical-case} performance, not the \emph{worst-case} map.\end{center}
+\end{frame}
+
+\begin{frame}{Context limits and cost}
+\begin{columns}[c]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdBlue,text width=58mm,align=left] (a) {\textbf{Context window:} a model reads only a finite number of tokens at once. Older text must be summarised or dropped.};
+  \node[card=tdAmber,text width=58mm,align=left,below=of a] (b) {\textbf{Cost of attention.} In the original transformer, self-attention compares every token with every other: about $n^2$ operations for $n$ tokens per layer (Vaswani et al., 2017).};
+  \node[card=tdGreen,text width=58mm,align=left,below=of b] (c) {\textbf{Reasoning costs tokens.} More ``thinking'' tokens means more time and money per answer.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{tikzpicture}
+\begin{axis}[width=\linewidth,height=52mm,xlabel={tokens in context $n$ (thousands)},ylabel={relative attention cost},domain=1:128,samples=40,legend pos=north west,grid=major,grid style={tdLine!50}]
+\addplot[tdGreen,thick] {x}; \addlegendentry{linear}
+\addplot[tdRed,thick] {x^2/128}; \addlegendentry{$n^2$ (scaled)}
+\end{axis}
+\end{tikzpicture}
+{\scriptsize Schematic, \illus. Many engineering tricks reduce the cost; they do not remove the trade-off between context length and compute.}
+\end{column}
+\end{columns}
+\srcline{Vaswani et al., ``Attention is all you need'', arXiv:1706.03762 (2017): self-attention layer complexity $O(n^2\cdot d)$.}
+\end{frame}
+
+\begin{frame}{Generate and verify: the NP idea in modern AI}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[font=\footnotesize,node distance=9mm]
+  \node[card=tdPurple,text width=36mm,minimum height=18mm] (g) {\textbf{Generator}\\{\scriptsize LLM: fast, creative, \emph{sometimes wrong}}};
+  \node[card=tdGreen,text width=36mm,minimum height=18mm,right=18mm of g] (v) {\textbf{Verifier}\\{\scriptsize exact check: tests, solver, proof checker}};
+  \node[pill=tdGreen,right=12mm of v,yshift=5mm] (a) {accept};
+  \node[pill=tdRed,right=12mm of v,yshift=-5mm] (r) {reject, retry};
+  \draw[arr] (g) -- node[above,lbl]{candidate} (v); \draw[arr] (v) -- (a); \draw[arr] (v) -- (r);
+  \draw[arr] (r.south) |- ++(-3.4,-1.2) -| (g.south);
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}\small This mirrors NP: \key{guessing} may be hard, \key{checking} is cheap and exact. The system is only as trustworthy as the \emph{verifier} and the statement it checks.\end{column}
+\begin{column}{0.5\textwidth}\small Examples: code with unit tests; a SAT solver confirming a plan; a proof assistant (Lean) checking a proof. Outputs that cannot be verified, such as essays, remain opinion.\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Proof assistants and AI-assisted mathematics}
+\begin{columns}[c]
+\begin{column}{0.5\textwidth}
+\begin{sfig}[0.6]
+\begin{tikzpicture}[font=\footnotesize]
+  \foreach \s/\y/\c/\t in {28/1.6/tdBlue/{AlphaProof + AlphaGeometry 2, IMO 2024: 28/42 (silver standard)}, 35/0.4/tdGreen/{Gemini Deep Think, IMO 2025: 35/42 (gold standard)}}{
+    \fill[\c!30,draw=\c!70!black] (0,\y) rectangle (\s*0.2,\y+0.8);
+    \node[anchor=west,font=\scriptsize] at (0.15,\y+0.4) {\t};}
+  \draw[tdMuted] (0,0) -- (8.4,0); \foreach \x in {0,14,28,42}{\node[font=\tiny,below] at (\x*0.2,0) {\x};}
+  \node[lbl] at (4.2,-0.9) {points out of 42 (six problems of seven points)};
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize Different systems: AlphaProof writes Lean proofs; the 2025 system worked in natural language.}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{tikzpicture}[node distance=2.4mm]
+  \node[card=tdBlue,text width=56mm,align=left,font=\footnotesize] (a) {\textbf{AlphaProof} (Google DeepMind): reinforcement learning to write proofs in Lean. Methodology in \emph{Nature}, 12 Nov 2025.};
+  \node[card=tdGreen,text width=56mm,align=left,below=of a,font=\footnotesize] (b) {\textbf{Gemini Deep Think} (IMO 2025): five of six problems solved. The IMO confirmed the answers are correct; its review does not validate the system.};
+  \node[card=tdAmber,text width=56mm,align=left,below=of b,font=\footnotesize] (c) {\textbf{Pattern:} a model proposes, a formal system \emph{certifies}. Limit: a certificate does not say we stated the right theorem.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\srcline{Google DeepMind: ``AI achieves silver-medal standard\ldots'' (25 Jul 2024); Hubert et al., ``Olympiad-level formal mathematical reasoning with reinforcement learning'', Nature, 12 Nov 2025; DeepMind blog on Gemini Deep Think at IMO 2025 (21 Jul 2025).}
+\end{frame}
+
+\begin{frame}{Scorecard: what LLMs do well, and where to be careful}
+\begin{sfig}[0.76]
+\begin{tabular}{@{}L{66mm}L{66mm}@{}}
+\toprule
+\good{Strong evidence of ability} & \bad{Known limits (with sources in this part)}\\\midrule
+Writing and explaining code, drafts, summaries & No built-in guarantee of correctness; hallucination (Kalai et al.)\\
+Competition-level maths when paired with checkers (AlphaProof, IMO 2025) & Long exact computations drift; accuracy can collapse on large instances (Dziri; Shojaee, disputed by Lawsen)\\
+Proposing candidates for humans or solvers to verify & Fixed compute per token; reasoning bounded by token budget (Merrill and Sabharwal)\\
+Using tools: run code, search, call solvers & Finite context; cost grows with length ($\approx n^2$ attention)\\
+Helping formalise and find proofs in Lean & Cannot beat undecidability or worst-case NP-hardness, like any program\\\bottomrule
+\end{tabular}
+\end{sfig}
+\vspace{2mm}
+{\small A sound habit: \key{trust $\propto$ verifiability}. The more cheaply and exactly an output can be checked, the more safely you can use AI to produce it.}
+\end{frame}
+
+

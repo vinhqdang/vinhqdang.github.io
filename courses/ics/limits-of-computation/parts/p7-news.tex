@@ -1,0 +1,210 @@
+%% ================= PART 7: NEWS =================
+\partfooter{7}
+\divider{7}{What is happening now}{tdGreen}{Two big claims from October and November 2026, read with care}
+
+\begin{frame}{First, how to read a headline in science}
+\begin{sfig}[0.52]
+\begin{tikzpicture}[font=\footnotesize,node distance=2.5mm]
+  \node[card=tdRed,text width=24mm,minimum height=15mm] (a) {\textbf{1 Claim}\\{\tiny press release, post, tweet}};
+  \node[card=tdAmber,text width=24mm,minimum height=15mm,right=of a] (b) {\textbf{2 Preprint}\\{\tiny paper public, not reviewed}};
+  \node[card=tdAmber,text width=24mm,minimum height=15mm,right=of b] (c) {\textbf{3 Machine check}\\{\tiny proof assistant accepts it}};
+  \node[card=tdBlue,text width=24mm,minimum height=15mm,right=of c] (d) {\textbf{4 Expert scrutiny}\\{\tiny specialists read it, replicate}};
+  \node[card=tdGreen,text width=24mm,minimum height=15mm,right=of d] (e) {\textbf{5 Peer review}\\{\tiny journal publishes}};
+  \node[card=tdGreen,text width=24mm,minimum height=15mm,right=of e] (f) {\textbf{6 Acceptance}\\{\tiny field builds on it, years}};
+  \foreach \x/\y in {a/b,b/c,c/d,d/e,e/f}{\draw[arr] (\x) -- (\y);}
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\small Each step removes a different kind of error: \emph{typos and false proofs} (3, 4), \emph{wrong problem statements} (4), \emph{hype} (5, 6). Skipping steps is how wrong claims spread.
+\end{column}
+\begin{column}{0.5\textwidth}
+\small In this part, each claim is placed on this ladder using sources shown on the slide. We state \key{only what the sources support} and mark the rest as \claim{claim}.
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{What does ``ETH'' mean here?}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\begin{tikzpicture}[node distance=2.4mm]
+  \node[card=tdBlue,text width=62mm,align=left,font=\footnotesize] (a) {\textbf{Exponential Time Hypothesis (ETH)}, Impagliazzo and Paturi 1999: some constant $s>0$ makes 3-SAT on $n$ variables need time $2^{sn}$. No \emph{subexponential} $2^{o(n)}$ algorithm.};
+  \node[card=tdPurple,text width=62mm,align=left,below=of a,font=\footnotesize] (b) {\textbf{Strong ETH:} $k$-SAT needs time close to $2^n$ as $k$ grows.};
+  \node[card=tdAmber,text width=62mm,align=left,below=of b,font=\footnotesize] (c) {\textbf{Why it matters:} hundreds of papers prove ``no algorithm faster than X unless ETH fails''. ETH $\Rightarrow$ P $\neq$ NP, not the reverse.};
+  \node[card=tdRed,text width=62mm,align=left,below=of c,font=\footnotesize] (d) {\textbf{Not} ETH Zurich (the university) or ETH (Ethereum): here ETH is the hypothesis.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.44\textwidth}
+\begin{tikzpicture}
+\begin{axis}[width=\linewidth,height=56mm,xlabel={variables $n$},ylabel={time (log scale)},ymode=log,domain=1:100,samples=50,legend pos=north west,grid=major,grid style={tdLine!50},ymax=1e12,title={\illus\ shapes of running times},title style={font=\scriptsize}]
+\addplot[tdRed,very thick] {2^x}; \addlegendentry{$2^n$ brute force}
+\addplot[tdAmber,thick] {1.3^x}; \addlegendentry{$1.3^n$ (smarter, still ETH-consistent)}
+\addplot[tdGreen,thick,dashed] {2^(sqrt(x))}; \addlegendentry{$2^{\sqrt n}$ (subexponential)}
+\end{axis}
+\end{tikzpicture}
+{\scriptsize ETH says 3-SAT can never drop to the green dashed shape.}
+\end{column}
+\end{columns}
+\srcline{Source: en.wikipedia.org/wiki/Exponential\_time\_hypothesis (accessed 23 Nov 2026); Impagliazzo and Paturi, J.\ Comput.\ Syst.\ Sci.\ 62(2), 2001.}
+\end{frame}
+
+\begin{frame}{October 2026: a claimed refutation of ETH}
+\begin{columns}[T]
+\begin{column}{0.58\textwidth}
+\begin{tikzpicture}[node distance=2.4mm]
+  \node[card=tdAmber,text width=70mm,align=left,font=\footnotesize] (a) {\textbf{OpenAI (26 Oct 2026):} ``Surprisingly, our system has recently proved that the ETH is false, a result that was subsequently verified in Lean.'' Found 16 Oct, formalised in Lean 17 Oct.};
+  \node[card=tdBlue,text width=70mm,align=left,below=of a,font=\footnotesize] (b) {\textbf{Release:} external ``shepherds'' led by Impagliazzo, Paturi and Williams; OpenAI will publish the AI outputs, and the group asked that all raw data be public.};
+  \node[card=tdGreen,text width=70mm,align=left,below=of b,font=\footnotesize] (c) {\textbf{Also claimed:} Anthropic announced that one of its models independently disproved ETH, with details on GitHub.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.38\textwidth}
+\begin{tikzpicture}
+  \node[card=tdAmber,text width=46mm,align=left,inner sep=7pt]{\textbf{Status, 23 Nov 2026}\\[1mm]\claim{CLAIMED, under review. Not peer reviewed.}\\[2mm]\ladder{3}\\[1mm]{\tiny steps 1--3 done by the lab; step 4 under way}};
+\end{tikzpicture}
+\vspace{2mm}
+
+{\footnotesize We did not read the 67-page PDF ourselves; we rely on OpenAI's page and the expert commentary on the next slide.}
+\end{column}
+\end{columns}
+\srcline{OpenAI, ``Working with academic communities to build scientific understanding'', 26 Oct 2026: openai.com/index/building-scientific-understanding-with-academic-communities. Preprint: github.com/openai/math (preprints/The-Exponential-Time-Hypothesis-is-False-October-25-2026). Anthropic claim: Wikipedia (ETH) and Fortnow, next slide.}
+\end{frame}
+
+\begin{frame}{What independent voices say}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\begin{tikzpicture}[node distance=2.2mm]
+  \node[card=tdBlue,text width=64mm,align=left,font=\footnotesize] (a) {\textbf{Lance Fortnow} (28 Oct): has \emph{not} verified the proof himself, but writes ``it is safe to assume now that the exponential-time hypothesis is toast''. Notes it concerns $k$-SAT, not all of NP.};
+  \node[card=tdGreen,text width=64mm,align=left,below=of a,font=\footnotesize] (b) {\textbf{Dias and Lima} (arXiv, 31 Oct): the claimed bounds beat brute force only at astronomically large $n$: no practical speed-up.};
+  \node[card=tdPurple,text width=64mm,align=left,below=of b,font=\footnotesize] (c) {\textbf{MIT Hardness Group} (arXiv, 2 Nov): most ETH-based lower bounds survive with slightly adjusted exponents (``ETH is dead, long live SH'').};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.42\textwidth}
+\begin{tikzpicture}[node distance=2.2mm]
+  \node[card=tdAmber,text width=52mm,align=left,font=\footnotesize] (a) {\textbf{Reviewers' caution} (reported): their involvement ``should not be taken as certification of the claim''.};
+  \node[card=tdRed,text width=52mm,align=left,below=of a,font=\footnotesize] (b) {\textbf{Sources disagree on details:} the exact running-time bound is reported differently, and the Lean file proves a slightly weaker bound than the paper. We quote no formula.};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\srcline{Fortnow, blog.computationalcomplexity.org/2026/10/the-exponential-time-refutation.html (28 Oct 2026). Dias and Lima, arXiv:2611.00517. MIT Hardness Group et al., arXiv:2611.02650 (v2, 16 Nov). Reviewers' statement: Dataconomy, 4 Nov 2026 (secondary).}
+\end{frame}
+
+\begin{frame}{What it would, and would not, change}
+\begin{sfig}[0.78]
+\begin{tikzpicture}[font=\footnotesize,node distance=3mm]
+  \node[card=tdGreen,text width=46mm,minimum height=36mm,align=left] (a) {\textbf{If it stands}\\[1mm]{\scriptsize 3-SAT and $k$-SAT have subexponential algorithms. Textbooks and papers that say ``assuming ETH'' need new wording.}};
+  \node[card=tdRed,text width=46mm,minimum height=36mm,align=left,right=3mm of a] (b) {\textbf{It does not mean}\\[1mm]{\scriptsize P = NP; broken encryption; solved TSP or Subset Sum (reductions to 3-SAT blow up the number of variables); fast SAT solvers tomorrow.}};
+  \node[card=tdAmber,text width=46mm,minimum height=36mm,align=left,right=3mm of b] (c) {\textbf{Scientific lesson}\\[1mm]{\scriptsize a ``widely believed'' hypothesis can fall. A hypothesis is a bet, not a theorem. Complexity theory keeps changing.}};
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+{\small Compare the ladder: we now have a claim with machine-checked formalisation and serious expert engagement. We \emph{do not yet} have independent, completed community verification or peer review.}
+\srcline{Scope statements: Fortnow (28 Oct 2026); Dias and Lima (arXiv:2611.00517); MIT Hardness Group (arXiv:2611.02650).}
+\end{frame}
+
+\begin{frame}{The Riemann hypothesis: what is it?}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{tikzpicture}[node distance=3mm]
+  \node[card=tdBlue,text width=60mm,align=left] (a) {\textbf{Primes} (2, 3, 5, 7, \ldots) look random, but their count up to $x$ follows a smooth law. How tight is that law? Riemann (1859) tied the error to the zeros of the \emph{zeta function} $\zeta(s)$.};
+  \node[card=tdPurple,text width=60mm,align=left,below=of a] (b) {\textbf{Hypothesis:} every non-trivial zero has real part exactly $\tfrac12$. Checked by computer for trillions of zeros, never proved. It is one of the seven Millennium problems.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{sfig}[0.6]
+\begin{tikzpicture}[font=\scriptsize]
+  \fill[tdBlue!8] (0,-3) rectangle (4,3);
+  \draw[->,tdMuted] (-0.3,0) -- (4.3,0) node[right]{Re $s$}; \draw[->,tdMuted] (0,-3) -- (0,3.3) node[above]{Im $s$};
+  \draw[tdRed,very thick] (2,-3) -- (2,3); \node[text=tdRed,anchor=west] at (2.05,3.1) {Re $s=\tfrac12$};
+  \foreach \y in {0.9,1.5,2.1,2.6,-0.9,-1.5,-2.1,-2.6}{\fill[tdInk] (2,\y) circle (0.9mm);}
+  \node[lbl,align=center] at (2,-3.6) {zeros (dots) conjectured to lie on the red line};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\end{columns}
+\srcline{Riemann, 1859; Clay Mathematics Institute, Millennium Prize Problems (claymath.org). Illustration schematic, not to scale; dot positions are not actual zeros.}
+\end{frame}
+
+\begin{frame}{November 2026: a claimed proof of the Riemann hypothesis}
+\begin{columns}[T]
+\begin{column}{0.58\textwidth}
+\begin{tikzpicture}[node distance=2.2mm]
+  \node[card=tdAmber,text width=70mm,align=left,font=\footnotesize] (a) {\textbf{Claim (20 Nov 2026).} Levent Alp\"oge of Anthropic posted a four-page note: ``I believe I have, working with Claude, discovered a proof of the Riemann hypothesis.'' Only a Lean version was released; no full human-readable argument yet.};
+  \node[card=tdBlue,text width=70mm,align=left,below=of a,font=\footnotesize] (b) {\textbf{Reaction (AFP).} Brian Conrey, a leading specialist, called it ``a monumental moment in human history'' but had seen no manuscript.};
+  \node[card=tdGreen,text width=70mm,align=left,below=of b,font=\footnotesize] (c) {\textbf{Lean communities (21 Nov, as reported).} The Lean FRO and Mathlib Initiative say the library matches Mathlib's definition of the hypothesis and state ``full confidence'' it is correct.};
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.38\textwidth}
+\begin{tikzpicture}
+  \node[card=tdAmber,text width=46mm,align=left,inner sep=7pt]{\textbf{Status, 23 Nov 2026}\\[1mm]\claim{CLAIMED; machine-checked per the Lean community; not human-vetted or accepted.}\\[2mm]\ladder{3}\\[1mm]{\tiny steps 1--3 reported; steps 4--6 pending}\\[1mm]{\footnotesize Clay prize rules need journal publication plus two years.}};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\srcline{AFP via Phys.org, 20 Nov 2026 (phys.org/news/2026-11-anthropic-claude-math-greatest-riddle.html). Lean FRO and Mathlib Initiative statement, 21 Nov 2026, as reported by OfficeChai (secondary); we could not open the primary post (Lean FRO on X, status/2124159121645801562).}
+\end{frame}
+
+\begin{frame}{What a Lean certificate does, and does not, guarantee}
+\begin{sfig}[0.62]
+\begin{tikzpicture}[font=\footnotesize,node distance=7mm]
+  \node[card=tdAmber,text width=30mm,minimum height=22mm] (s) {\textbf{1 Statement}\\{\scriptsize ``Riemann hypothesis'' written in Lean}};
+  \node[card=tdBlue,text width=30mm,minimum height=22mm,right=of s] (d) {\textbf{2 Definitions}\\{\scriptsize Mathlib's $\zeta$, zeros, real part}};
+  \node[card=tdGreen,text width=30mm,minimum height=22mm,right=of d] (k) {\textbf{3 Proof}\\{\scriptsize millions of lines; kernel checks each step}};
+  \node[card=tdPurple,text width=30mm,minimum height=22mm,right=of k] (h) {\textbf{4 Humans}\\{\scriptsize do the definitions mean what we think?}};
+  \draw[arr] (s) -- (d); \draw[arr] (d) -- (k); \draw[arr] (k) -- (h);
+\end{tikzpicture}
+\end{sfig}
+\vspace{2mm}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}\small \good{Machine-checked}: the proof (3) follows from the stated axioms and definitions. That removes the main risk of a \emph{wrong proof}, which is a real risk for arguments said to run to 250,000 pages if written out (as reported).\end{column}
+\begin{column}{0.5\textwidth}\small \bad{Not guaranteed}: that (1) and (2) say what we intend. Statement-matching must be checked by people and tools (the Lean statement describes such checks). Also not given: \emph{understanding}.\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Claims to check: where each claim stands on 23 Nov 2026}
+\begin{sfig}[0.78]
+\begin{tabular}{@{}L{34mm}L{50mm}L{50mm}@{}}
+\toprule
+ & \textbf{ETH refuted (OpenAI, Anthropic)} & \textbf{Riemann hypothesis proved}\\\midrule
+\textbf{Who and when} & OpenAI 26 Oct; an Anthropic claim followed (reported) & Alp\"oge (Anthropic) with Claude, 20 Nov\\
+\textbf{Primary source seen} & OpenAI's announcement page (yes); the preprint PDF (not read) & AFP report quoting the note (yes); Lean statement (secondary only)\\
+\textbf{Machine check} & by the labs, Lean (a weaker bound than the headline) & Lean community statement, 21 Nov (reported)\\
+\textbf{Expert review} & under way; reviewers say ``not certification'' & just starting; experts have not seen a human-readable proof\\
+\textbf{Peer review} & none yet & none; Clay rules need 2 years\\
+\textbf{Our label} & \claim{CLAIMED, serious, unconfirmed} & \claim{CLAIMED, formally checked, unconfirmed}\\\bottomrule
+\end{tabular}
+\end{sfig}
+\vspace{2mm}
+{\small We therefore \bad{do not} say ``ETH is false'' or ``the Riemann hypothesis is solved'' as facts. We say what was \emph{claimed}, by whom, and what checks exist.}
+\end{frame}
+
+\begin{frame}{A checklist for evaluating a claim like this}
+\begin{sfig}[0.78]
+\begin{tikzpicture}[font=\footnotesize,node distance=3mm]
+  \node[card=tdBlue,text width=44mm,minimum height=28mm,align=left] (a) {\textbf{1 Primary source}\\[1mm]{\scriptsize Is there a paper or announcement you can open, not just a news story? Who wrote it? Be careful with copies and AI-generated summaries.}};
+  \node[card=tdGreen,text width=44mm,minimum height=28mm,align=left,right=3mm of a] (b) {\textbf{2 Formal check}\\[1mm]{\scriptsize Is there a machine-checked proof? Does the checked statement match the claim? Who confirmed that?}};
+  \node[card=tdAmber,text width=44mm,minimum height=28mm,align=left,right=3mm of b] (c) {\textbf{3 Independent replication}\\[1mm]{\scriptsize Have people with no stake rebuilt or re-run it? Do named specialists engage, with names and reasoning?}};
+  \node[card=tdPurple,text width=44mm,minimum height=28mm,align=left,below=3mm of a] (d) {\textbf{4 Peer review and time}\\[1mm]{\scriptsize Is it in a journal? Prize rules, such as the Clay Institute's two years, exist because checking takes time.}};
+  \node[card=tdRed,text width=44mm,minimum height=28mm,align=left,right=3mm of d] (e) {\textbf{5 Incentives}\\[1mm]{\scriptsize Who gains from the headline? AFP noted the Riemann announcement came a day after Anthropic's record stock market debut.}};
+  \node[card=tdInk,text width=44mm,minimum height=28mm,align=left,right=3mm of e] (f) {\textbf{6 Consistency}\\[1mm]{\scriptsize Do sources agree on basic facts? Here they differ on bounds and dates. Mismatches are a warning sign.}};
+\end{tikzpicture}
+\end{sfig}
+\srcline{Timing remark: AFP via Phys.org, 20 Nov 2026. The Clay rule is stated in the same report and on claymath.org.}
+\end{frame}
+
+\begin{frame}{Timeline of the claims (from the sources on the previous slides)}
+\begin{sfig}[0.7]
+\begin{tikzpicture}[x=1mm,y=1mm,font=\scriptsize]
+  \draw[thick,tdMuted] (0,0) -- (150,0);
+  \foreach \x/\d/\t/\c/\an/\dy in {5/{16--17 Oct}/{OpenAI says its system found and Lean-checked the ETH disproof}/tdBlue/south/6,
+      32/{26 Oct}/{OpenAI announcement; Anthropic's claim followed}/tdAmber/north/-6,
+      55/{28 Oct}/{Fortnow blog: ``safe to assume\ldots toast''}/tdGreen/south/6,
+      80/{31 Oct--2 Nov}/{arXiv commentary: Dias and Lima; MIT Hardness Group}/tdPurple/north/-6,
+      112/{20 Nov}/{Alp\"oge posts Riemann hypothesis note and Lean proof}/tdRed/south/6,
+      138/{21 Nov}/{Lean FRO and Mathlib statement (as reported)}/tdGreen/north/-6}{
+    \fill[\c] (\x,0) circle (1.6mm);
+    \node[anchor=\an,align=center,text width=27mm] at (\x,\dy) {{\bfseries\color{\c}\d}\\ \t};}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small Honest summary on 23 Nov 2026: \key{two major claims, both by AI labs, both with formal components, neither yet confirmed by the community}. Re-check the primary sources before citing this slide.}
+\end{frame}
