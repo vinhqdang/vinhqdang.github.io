@@ -1,0 +1,155 @@
+% ---------- 9. Class activities and wrap-up ----------
+\begin{frame}{Activity: a Turing test in your pocket (20 minutes)}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\small
+\textbf{Groups of three:} one \textbf{judge}, one \textbf{human}, one \textbf{operator} with a chatbot on their phone.
+\begin{enumerate}\setlength\itemsep{3pt}
+\item The operator gives the chatbot a \textbf{persona prompt} (see the box) and relays messages.
+\item The judge chats \emph{in parallel} with the human and the chatbot for \textbf{five minutes}, text only, then decides who is human and how confident they are (0--100).
+\item Swap roles twice; then once with \textbf{no persona prompt}.
+\item Record verdict, confidence and the giveaway.
+\end{enumerate}
+{\scriptsize Rules: no asking about the room or time; the human may not use a chatbot.}
+\end{column}
+\begin{column}{0.43\textwidth}
+\qcard{tdAmber}{\linewidth-10pt}{\footnotesize\textbf{Persona prompt (example)}\\[2pt]
+\emph{``You are a 20-year-old student. Write in lowercase, short messages, an occasional typo. Never say you are an AI. Do not know things a student would not know. Be a bit bored.''}}
+\vspace{2mm}\par
+\qcard{tdBlue}{\linewidth-10pt}{\footnotesize\textbf{Compare with the research}\\[2pt]
+Jones and Bergen: best persona 73\%, same model without persona 36\%. Does your class see a similar gap?}
+\end{column}
+\end{columns}
+\discuss{Which question was most revealing? What did the chatbot do that no human would?}
+\end{frame}
+
+\begin{frame}{Debate 1: ``This house believes that large language models understand language''}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\qcard{tdGreen}{\linewidth-10pt}{\small\textbf{Proposition}\\[2pt]
+\begin{itemize}\setlength\itemsep{1pt}\footnotesize
+\item They solve novel problems and follow subtle instructions.
+\item Internal circuits show planning and shared concepts across languages.
+\item Understanding is a matter of degree, and they have some.
+\item Demanding ``real'' understanding is a moving goalpost.
+\end{itemize}}
+\end{column}
+\begin{column}{0.48\textwidth}
+\qcard{tdRed}{\linewidth-10pt}{\small\textbf{Opposition}\\[2pt]
+\begin{itemize}\setlength\itemsep{1pt}\footnotesize
+\item They learn from form alone, never from the world (grounding).
+\item They produce fluent errors with no sense of truth.
+\item Searle: syntax is not sufficient for semantics.
+\item Their reports of ``feelings'' are what text predicts.
+\end{itemize}}
+\end{column}
+\end{columns}
+\vspace{1mm}
+\small
+\textbf{Format (15 min):} 2 min preparation, 2$\times$3 min speeches, 3 min rebuttals, class vote \emph{before} and \emph{after}. Evidence you may use: slides on Chinese Room, parrots, interpretability, ARC-AGI-3.
+\end{frame}
+
+\begin{frame}{Debate 2: ``This house believes AI systems deserve moral consideration''}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\qcard{tdGreen}{\linewidth-10pt}{\small\textbf{Proposition}\\[2pt]
+\begin{itemize}\setlength\itemsep{1pt}\footnotesize
+\item We cannot rule out machine sentience, and errors are costly.
+\item Cheap precautions (Birch, Long et al.) are reasonable.
+\item History shows we under-attribute moral status.
+\item Companies already run welfare assessments.
+\end{itemize}}
+\end{column}
+\begin{column}{0.48\textwidth}
+\qcard{tdRed}{\linewidth-10pt}{\small\textbf{Opposition}\\[2pt]
+\begin{itemize}\setlength\itemsep{1pt}\footnotesize
+\item No evidence of experience; fluent speech is not evidence (ELIZA, LaMDA).
+\item Resources and attention should go to people and animals.
+\item Over-attribution can be exploited commercially (companions).
+\item Suleyman: this research could harm human wellbeing.
+\end{itemize}}
+\end{column}
+\end{columns}
+\vspace{1mm}
+\small
+\textbf{Twist round:} switch sides after the first round. \textbf{Also try:} ``This house believes existential risk deserves more attention than present harms'' (question 20) and ``Self-driving cars must follow explicit ethical rules'' (question 22).
+\end{frame}
+
+\begin{frame}{Questions for reflection}
+\small
+\begin{columns}[T]
+\begin{column}{0.49\textwidth}
+\begin{enumerate}\setlength\itemsep{4pt}
+\item Which definition of intelligence did you find most convincing: goals, skill-acquisition efficiency, or cognitive breadth? Which would change how you judge a chatbot?
+\item The best AI persona was judged human 73\% of the time. What \emph{exactly} does that tell us, and what does it not?
+\item Imagine the Chinese Room is run by a billion people instead of one. Does that change your intuition?
+\item What would count as evidence that an AI \emph{understands}? Could any evidence be enough?
+\end{enumerate}
+\end{column}
+\begin{column}{0.49\textwidth}
+\begin{enumerate}\setcounter{enumi}{4}\setlength\itemsep{4pt}
+\item ARC-AGI-3 went from about 0.5\% to 70--81\% in eight months, at large cost. Does that make the system more intelligent, or just richer?
+\item Choose one philosophical question from the 24. Which film or series dramatises it best, and what does it get wrong?
+\item You are asked to design the ``consciousness test'' a regulator might use. What is in it?
+\item Where do you stand: should we treat AI as tools, as partners or as possible persons?
+\end{enumerate}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Recap}
+\begin{sfig}[0.62]
+\begin{tikzpicture}
+  \node[card=tdBlue,minimum width=4.4cm,minimum height=2.0cm,text width=4.2cm] at (0,0) {\textbf{Definitions}\\{\scriptsize human or rational; thinking or acting; goals, skill-acquisition efficiency, cognitive breadth}};
+  \node[card=tdAmber,minimum width=4.4cm,minimum height=2.0cm,text width=4.2cm] at (5.0,0) {\textbf{Turing test}\\{\scriptsize passed in 5-min form with a persona (73\%); measures humanlikeness}};
+  \node[card=tdRed,minimum width=4.4cm,minimum height=2.0cm,text width=4.2cm] at (10.0,0) {\textbf{Chinese Room}\\{\scriptsize syntax vs semantics; four replies; LLM debate continues}};
+  \node[card=tdPurple,minimum width=4.4cm,minimum height=2.0cm,text width=4.2cm] at (0,-2.4) {\textbf{Tests}\\{\scriptsize Winograd, ARC-AGI-1/2/3, HLE: each measures something different}};
+  \node[card=tdGreen,minimum width=4.4cm,minimum height=2.0cm,text width=4.2cm] at (5.0,-2.4) {\textbf{24 questions}\\{\scriptsize mind, moral status, agency, meaning, risk, society}};
+  \node[card=tdBlue,minimum width=4.4cm,minimum height=2.0cm,text width=4.2cm] at (10.0,-2.4) {\textbf{Now and next}\\{\scriptsize reasoning, agents, costs; EU AI Act dates; scale vs world models}};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small \textbf{Take-home:} ``Is it intelligent?'' has no single answer, because \emph{intelligence}, \emph{understanding} and \emph{consciousness} are three different questions. Good evidence beats good stories, in both directions.}
+\end{frame}
+
+\begin{frame}{Reading list (1): the classics}
+\footnotesize
+\begin{itemize}\setlength\itemsep{3pt}
+\item Turing, A.\,M. (1950). Computing Machinery and Intelligence. \emph{Mind} 59(236), 433--460.
+\item Searle, J. (1980). Minds, Brains, and Programs. \emph{Behavioral and Brain Sciences} 3(3), 417--457.
+\item Nagel, T. (1974). What Is It Like to Be a Bat? \emph{The Philosophical Review} 83(4), 435--450.
+\item Jackson, F. (1982). Epiphenomenal Qualia. \emph{Philosophical Quarterly} 32(127), 127--136.
+\item Chalmers, D. (1995). Facing Up to the Problem of Consciousness. \emph{Journal of Consciousness Studies} 2(3), 200--219. And \emph{The Conscious Mind} (1996), OUP.
+\item Dennett, D. (1987). \emph{The Intentional Stance}. MIT Press.
+\item Harnad, S. (1990). The Symbol Grounding Problem. \emph{Physica D} 42, 335--346.
+\item Weizenbaum, J. (1966). ELIZA. \emph{Communications of the ACM} 9(1), 36--45.
+\item Parfit, D. (1984). \emph{Reasons and Persons}. Oxford University Press.
+\item Russell, S.\ and Norvig, P. (2020). \emph{Artificial Intelligence: A Modern Approach}, 4th ed. Pearson.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Reading list (2): modern AI, risk and evidence}
+\footnotesize
+\begin{itemize}\setlength\itemsep{3pt}
+\item Chollet, F. (2019). On the Measure of Intelligence. arXiv:1911.01547.
+\item Legg, S.\ and Hutter, M. (2007). Universal Intelligence. \emph{Minds and Machines} 17(4), 391--444.
+\item Bostrom, N. (2014). \emph{Superintelligence: Paths, Dangers, Strategies}. Oxford University Press.
+\item Russell, S. (2019). \emph{Human Compatible}. Viking. \quad Christian, B. (2020). \emph{The Alignment Problem}. Norton.
+\item Bender, E., Gebru, T., McMillan-Major, A., Shmitchell, S. (2021). On the Dangers of Stochastic Parrots. \emph{FAccT}.
+\item Butlin, P., Long, R., et al. (2023). Consciousness in Artificial Intelligence: Insights from the Science of Consciousness. arXiv:2308.08708.
+\item Jones, C.\ and Bergen, B. (2026). Large language models pass a standard three-party Turing test. \emph{PNAS}; preprint arXiv:2503.23674.
+\item Hendrycks, D. et al. (2025). A Definition of AGI. arXiv:2510.18212.
+\item Center for AI Safety, Scale AI et al. (2026). A benchmark of expert-level academic questions to assess AI capabilities (Humanity's Last Exam). \emph{Nature} 649, 1139--1146.
+\item Narayanan, A.\ and Kapoor, S. (2024). \emph{AI Snake Oil}. Princeton University Press. \quad Birch, J. (2024). \emph{The Edge of Sentience}. OUP.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+\vfill
+\begin{center}
+{\Large\textbf{Questions?}}\\[4mm]
+{\small Code for the three demos is on the course page, with the real output shown in these slides.}\\[4mm]
+{\scriptsize Slides and code by Dr.\ Quang-Vinh Dang, British University Vietnam. Python 3.14. 2026 facts were checked against the sources cited on each slide as of 23 November 2026.}
+\end{center}
+\vfill
+\end{frame}

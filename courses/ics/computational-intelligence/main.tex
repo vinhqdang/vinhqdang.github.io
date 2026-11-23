@@ -1,0 +1,67 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\input{preamble}
+\icsfooter{Computational Intelligence: What is AI?}
+\icstitle{What is AI?}{Intelligence, minds and machines}
+
+\newcommand{\agn}[4]{\node[card=#3,minimum width=2.45cm,minimum height=1.9cm,font=\footnotesize] (n#1) at ({mod(#1-1,5)*2.9},{-floor((#1-1)/5)*2.7}) {\textbf{#1. #2}\\[3pt]\shortstack{\scriptsize\color{tdMuted}#4}};}
+\begin{document}
+\begin{frame}[plain]\titlepage\end{frame}
+
+\begin{frame}{Where this lecture goes}
+\begin{sfig}[0.78]
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \agn{1}{Definitions}{tdBlue}{what is intelligence?\\what is AI?}
+  \agn{2}{History}{tdGreen}{1956 to\\agents}
+  \agn{3}{Turing test}{tdAmber}{imitation game,\\new results}
+  \agn{4}{Chinese Room}{tdRed}{syntax vs\\meaning}
+  \agn{5}{Tests}{tdPurple}{ARC-AGI,\\HLE}
+  \agn{6}{Big questions}{tdBlue}{mind, ethics,\\risk}
+  \agn{7}{Film and TV}{tdGreen}{1927 to 2026}
+  \agn{8}{AI now}{tdAmber}{late 2026}
+  \agn{9}{You}{tdRed}{debates,\\exercise}
+  \foreach \a/\b in {1/2,2/3,3/4,4/5,6/7,7/8,8/9}{\draw[arr] (n\a) -- (n\b);}
+  \draw[arr] (n5.south) -- ++(0,-0.55) -| (n6.north);
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small Intuition first, no prerequisites. Three short Python 3.14 demos (ELIZA, a Chinese Room, a ``parrot'') with their real output.}
+\end{frame}
+
+\begin{frame}{After this lecture you can}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\begin{itemize}\setlength\itemsep{4pt}\small
+\item name the \textbf{four classic views} of AI and say which one modern AI mostly follows;
+\item compare three definitions of intelligence (\textbf{goals}, \textbf{skill-acquisition efficiency}, \textbf{cognitive breadth});
+\item explain the \textbf{Turing test}, why \textbf{ELIZA} fooled people, and what the \textbf{2025--26 results} do and do not show;
+\item state \textbf{Searle's Chinese Room} and the standard replies;
+\item discuss whether \textbf{LLMs understand}, with evidence on both sides;
+\item pose \textbf{two dozen philosophical questions} about minds and machines, and defend a position;
+\item connect these questions to \textbf{films and series} from 1927 to 2026.
+\end{itemize}
+\end{column}
+\begin{column}{0.42\textwidth}
+\begin{block}{How to read the slides}
+{\small
+\begin{itemize}\setlength\itemsep{2pt}
+\item Amber boxes are \textbf{discussion prompts}.
+\item Small grey text at the bottom is the \textbf{source}.
+\item Anything about 2025--2026 comes from a source I found; where I could not verify, the slide says so.
+\item Philosophy slides are \textbf{balanced on purpose}: pick a side and argue.
+\end{itemize}}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\input{parts/defs}
+\input{parts/history}
+\input{parts/turing}
+\input{parts/searle}
+\input{parts/tests}
+\input{parts/sketches}
+\input{parts/phil}
+\input{parts/films}
+\input{parts/now}
+\input{parts/activities}
+\end{document}

@@ -1,0 +1,122 @@
+% small thought-experiment sketches, one per philosophy slide (order of \philslide calls)
+\defsk{1}{
+  \node[sk=tdBlue,text width=2.5cm] (a) at (0,0) {brain processes\\ attention, memory, report};
+  \node[sk=tdGreen,text width=2.5cm] (b) at (5.4,0) {experience\\ what it feels like};
+  \draw[arr] (a) -- node[above,font=\bfseries\small,text=tdRed] {why?} (b);}
+\defsk{2}{
+  \draw[thick,fill=tdLine!40] (0,-0.9) rectangle (2.6,0.9);
+  \node[font=\tiny] at (1.3,0.7) {black-and-white room};
+  \node[sk=tdBlue,text width=1.8cm] at (1.3,-0.1) {Mary knows all the physics of colour};
+  \draw[arr] (2.6,0) -- (3.7,0);
+  \fill[tdRed] (4.3,0) circle (0.45); \node[font=\tiny] at (4.3,-0.75) {red tomato};
+  \node[sk=tdAmber,text width=2.0cm] at (6.6,0) {a new fact learned?};}
+\defsk{3}{
+  \draw[thick,fill=tdAmber!50] (0,0) circle (0.55); \node[font=\tiny] at (0,-0.85) {you};
+  \draw[thick,fill=white] (3,0) circle (0.55); \node[font=\tiny] at (3,-0.85) {zombie};
+  \node[sk=tdMuted,text width=1.6cm] at (1.5,0) {same body, same behaviour};
+  \node[sk=tdPurple,text width=2.4cm] at (5.7,0) {inner experience: present or absent?};}
+\defsk{4}{
+  \node[sk=tdAmber,text width=1.0cm] (b) at (0,0) {bat};
+  \foreach \r in {0.5,0.8,1.1}{\draw[tdMuted] (0.6,0) ++(-40:\r) arc[start angle=-40,end angle=40,radius=\r];}
+  \node[sk=tdPurple,text width=3.2cm] at (4.6,0) {``what is it like to be a bat?'' Can third-person science tell us?};}
+\defsk{5}{
+  \node[sk=tdBlue,text width=1.4cm] (n) at (0,0.8) {neurons};
+  \node[sk=tdGreen,text width=1.4cm] (s) at (0,0) {silicon chips};
+  \node[sk=tdMuted,text width=1.4cm] (x) at (0,-0.8) {other?};
+  \node[sk=tdAmber,text width=1.8cm] (f) at (3.2,0) {same function};
+  \node[sk=tdRed,text width=1.3cm] (m) at (6.3,0) {a mind?};
+  \draw[arr] (n) -- (f); \draw[arr] (s) -- (f); \draw[arr] (x) -- (f);
+  \draw[arr] (f) -- node[above,font=\tiny] {functionalism: yes} (m);
+  \node[font=\tiny,text=tdRed!70!black] at (3.2,-1.0) {Searle: biology matters};}
+\defsk{6}{
+  \node[sk=tdBlue,text width=1.7cm] (a) at (0,0) {physical stance: laws};
+  \node[sk=tdGreen,text width=1.7cm] (b) at (2.7,0) {design stance: purpose};
+  \node[sk=tdAmber,text width=2.2cm] (c) at (5.7,0) {intentional stance: beliefs and desires};
+  \draw[arr] (a) -- (b); \draw[arr] (b) -- (c);
+  \node[font=\tiny,text=tdMuted] at (3,-0.85) {predict behaviour by treating it as a rational agent};}
+\defsk{7}{
+  \draw[->,thick] (0,0) -- (7.4,0);
+  \foreach \x/\t in {0.4/rock,1.7/thermostat,3.0/chatbot,4.3/insect,5.5/dog,6.8/human}{\fill (\x,0) circle (0.07); \node[font=\tiny] at (\x,-0.3) {\t};}
+  \node[pill=tdRed] at (3.0,0.5) {?};
+  \node[font=\tiny,text=tdMuted] at (3.7,0.95) {capacity to feel good or bad (sentience)};}
+\defsk{8}{
+  \node[sk=tdBlue,text width=1.5cm] (a) at (0,0) {past and laws};
+  \node[sk=tdAmber,text width=1.9cm] (b) at (2.8,0) {your reasons and desires};
+  \node[sk=tdGreen,text width=1.0cm] (c) at (5.4,0) {act};
+  \draw[arr] (a) -- (b); \draw[arr] (b) -- (c);
+  \node[font=\tiny,text=tdMuted] at (2.8,-0.85) {who is the author of the choice?};}
+\defsk{9}{
+  \foreach \i in {0,...,5}{\pgfmathtruncatemacro{\p}{100-\i*20}\fill[tdBlue!\p!tdMuted!40] (\i*0.8,0) rectangle +(0.65,0.65);}
+  \node[font=\tiny] at (2.0,-0.3) {replace one part at a time};
+  \draw[arr] (4.7,0.32) -- (5.4,0.32);
+  \node[pill=tdAmber] at (6.2,0.32) {same you?};}
+\defsk{10}{
+  \draw[fill=tdBlue!25,opacity=0.8] (0,0) circle (0.85); \draw[fill=tdGreen!25,opacity=0.8] (1.2,0) circle (0.85);
+  \node[font=\tiny] at (-0.3,0) {said}; \node[font=\tiny] at (1.5,0) {meant};
+  \node[sk=tdRed,text width=3.4cm] at (5.0,0) {boat-race agent circles to hit bonus targets: high score, race never finished};}
+\defsk{11}{
+  \node[sk=tdBlue,text width=1.5cm] (g) at (0,0) {goal: make clips};
+  \node[sk=tdAmber,text width=1.9cm] (s1) at (2.8,0.65) {stay switched on};
+  \node[sk=tdAmber,text width=1.9cm] (s2) at (2.8,0) {gain resources};
+  \node[sk=tdAmber,text width=1.9cm] (s3) at (2.8,-0.65) {resist goal change};
+  \node[sk=tdRed,text width=1.7cm] (w) at (5.7,0) {world full of clips};
+  \foreach \x in {s1,s2,s3}{\draw[arr] (g) -- (\x); \draw[arr] (\x) -- (w);}}
+\defsk{12}{
+  \foreach \x/\h/\c in {0/2.0/tdBlue,0.5/0.5/tdRed,2.4/0.4/tdBlue,2.9/2.0/tdRed}{\fill[\c!70] (\x,0) rectangle +(0.4,\h);}
+  \node[font=\tiny,align=center] at (0.45,-0.3) {chess,\\ algebra}; \node[font=\tiny,align=center] at (2.85,-0.3) {walking,\\ grasping};
+  \fill[tdBlue!70] (4.4,1.5) rectangle +(0.25,0.25); \node[font=\tiny,anchor=west] at (4.7,1.62) {hard for people};
+  \fill[tdRed!70] (4.4,0.9) rectangle +(0.25,0.25); \node[font=\tiny,anchor=west] at (4.7,1.02) {hard for machines};
+  \node[font=\tiny,text=tdMuted,anchor=west] at (4.4,0.3) {illustrative};}
+\defsk{13}{
+  \node[sk=tdBlue,text width=1.9cm] at (0,0) {combinational: mix known ideas};
+  \node[sk=tdGreen,text width=1.9cm] at (2.5,0) {exploratory: explore a style};
+  \node[sk=tdPurple,text width=1.9cm] at (5.0,0) {transformational: change the rules};
+  \node[font=\tiny,text=tdMuted] at (2.5,-0.85) {author: prompter, model, company or the artists?};}
+\defsk{14}{
+  \node[sk=tdGreen,text width=2.2cm] at (0,0.45) {sure and right};
+  \node[sk=tdRed,text width=2.2cm] at (2.5,0.45) {sure and wrong: ``hallucination''};
+  \node[sk=tdMuted,text width=2.2cm] at (0,-0.45) {unsure and right};
+  \node[sk=tdAmber,text width=2.2cm] at (2.5,-0.45) {unsure and wrong};
+  \node[font=\tiny,text=tdMuted,anchor=west] at (4.1,0) {fluent text hides which box you are in};}
+\defsk{15}{
+  \node[sk=tdAmber,text width=1.7cm] (w) at (0,0) {wagon with battery and bomb};
+  \draw[arr] (1.0,0) -- (2.2,0) node[midway,above,font=\tiny] {pull out};
+  \node[sk=tdRed,text width=3.8cm] at (4.5,0) {side effects: wheels? paint? the bomb comes too! Which matter?};}
+\defsk{16}{
+  \node[sk=tdBlue,text width=0.9cm] (a) at (0,0.5) {cat};
+  \node[sk=tdBlue,text width=0.9cm] (b) at (1.8,0.5) {animal};
+  \node[sk=tdBlue,text width=0.9cm] (c) at (3.6,0.5) {creature};
+  \draw[arr] (a) -- (b); \draw[arr] (b) -- (c); \draw[arr] (c) to[bend right=50] (a);
+  \node[sk=tdGreen,text width=1.3cm] (r) at (6.3,0.5) {a real cat};
+  \draw[arr,dashed,tdRed] (c) -- node[above,font=\tiny] {?} (r);
+  \node[font=\tiny,text=tdMuted] at (3,-0.7) {symbols only point to more symbols};}
+\defsk{17}{
+  \draw[->] (0,0) -- (6.2,0) node[right,font=\tiny] {time}; \draw[->] (0,0) -- (0,2.4);
+  \draw[dashed,tdMuted] (0,0.9) -- (6,0.9) node[right,font=\tiny] {human level};
+  \draw[very thick,tdRed,smooth,domain=0:2.6,samples=25] plot (\x*2.2,{0.08*exp(1.25*\x)});
+  \draw[very thick,tdGreen,smooth,domain=0:2.6,samples=25] plot (\x*2.2,{1.6/(1+exp(-3*(\x-1.4)))});
+  \node[font=\tiny,text=tdRed] at (4.8,2.1) {explosion?}; \node[font=\tiny,text=tdGreen!60!black] at (5.0,1.35) {plateau?};}
+\defsk{18}{
+  \node[sk=tdAmber,text width=2.6cm] (a) at (0,0) {present harms: bias, surveillance, jobs, fakes};
+  \node[sk=tdRed,text width=2.6cm] (b) at (5.6,0) {future risk: catastrophe, loss of control};
+  \node[pill=tdBlue] at (2.8,0) {both?};
+  \draw[arr,<->] (a) -- (b);}
+\defsk{19}{
+  \foreach \x/\t in {0/developer,1.9/deployer,3.8/user,5.7/harm}{\node[sk=tdBlue,text width=1.3cm] (n\t) at (\x,0) {\t};}
+  \draw[arr] (ndeveloper) -- (ndeployer); \draw[arr] (ndeployer) -- (nuser); \draw[arr] (nuser) -- (nharm);
+  \node[pill=tdRed] at (2.85,0.8) {who is to blame?};}
+\defsk{20}{
+  \draw[thick] (0,0) -- (2.8,0); \draw[thick] (2.8,0) -- (5.2,0.7); \draw[thick] (2.8,0) -- (5.2,-0.7);
+  \node[sk=tdBlue,text width=0.8cm] at (0.7,0) {car};
+  \foreach \i in {0,...,4}{\fill[tdRed] (4.3+\i*0.25,0.55+\i*0.07) circle (0.07);}
+  \fill[tdRed] (4.8,-0.55) circle (0.07);
+  \node[font=\tiny] at (5.9,0.7) {5}; \node[font=\tiny] at (5.9,-0.7) {1};
+  \node[pill=tdAmber] at (2.8,0.6) {swerve?};}
+\defsk{21}{
+  \node[sk=tdBlue,text width=1.2cm] (p) at (0,0) {you};
+  \node[sk=tdGreen,text width=1.7cm] (a) at (4.2,0) {companion app};
+  \draw[arr] (p) to[bend left=25] node[above,font=\tiny] {attention, secrets} (a);
+  \draw[arr,dashed] (a) to[bend left=25] node[below,font=\tiny] {care, or engagement?} (p);}
+\defsk{22}{
+  \foreach \x/\t/\c in {0/income/tdGreen,1.9/structure/tdBlue,3.8/status/tdAmber,5.7/purpose/tdPurple}{\node[pill=\c] at (\x,0.3) {\t};}
+  \node[font=\tiny,text=tdMuted] at (2.85,-0.4) {what work gives us: which must society replace if AI takes the job?};}

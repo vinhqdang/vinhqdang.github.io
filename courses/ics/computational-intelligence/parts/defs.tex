@@ -1,0 +1,185 @@
+% ---------- 1. Definitions ----------
+\begin{frame}{Warm-up: which of these is ``AI''?}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\small
+Vote with your hand for each item. There is no right answer yet.
+\begin{enumerate}\setlength\itemsep{3pt}
+\item A thermostat that keeps a room at 22\,$^\circ$C.
+\item A spam filter that learns from your ``report spam'' clicks.
+\item A chess program that beats every human.
+\item A calculator.
+\item A chatbot that writes essays.
+\item A robot vacuum that maps your flat.
+\item A search engine ranking pages.
+\end{enumerate}
+\end{column}
+\begin{column}{0.42\textwidth}
+\qcard{tdBlue}{\linewidth-10pt}{\textbf{Notice what you used to decide}\\[2pt]
+Did it \emph{learn}? Does it \emph{act} sensibly? Is it \emph{hard for humans}? Does it \emph{seem} to understand?\\[2pt]
+These are different definitions of AI. The rest of this part makes them precise.}
+\vspace{2mm}\par
+\qcard{tdAmber}{\linewidth-10pt}{\textbf{The ``AI effect''}\\[2pt]
+Tasks that once counted as AI (chess, route planning, OCR) are often renamed ``just software'' once they work. The target keeps moving.}
+\end{column}
+\end{columns}
+\discuss{Where did your class disagree most? What does that say about the word ``intelligence''?}
+\end{frame}
+
+\begin{frame}{What is intelligence? Even experts do not agree}
+\begin{columns}[T]
+\begin{column}{0.49\textwidth}
+\qcard{tdBlue}{\linewidth-10pt}{\textbf{Wechsler (1944), psychology}\\ ``the aggregate or global capacity of the individual to act purposefully, to think rationally and to deal effectively with his environment.''}\par\vspace{2mm}
+\qcard{tdGreen}{\linewidth-10pt}{\textbf{Gottfredson (1997), psychology}\\ ``a very general mental capability that, among other things, involves the ability to reason, plan, solve problems, think abstractly, comprehend complex ideas, learn quickly and learn from experience.''}
+\end{column}
+\begin{column}{0.49\textwidth}
+\qcard{tdAmber}{\linewidth-10pt}{\textbf{Legg and Hutter (2007), AI}\\ ``Intelligence measures an agent's ability to achieve goals in a wide range of environments.''}\par\vspace{2mm}
+\qcard{tdPurple}{\linewidth-10pt}{\textbf{Chollet (2019), AI}\\ ``The intelligence of a system is a measure of its skill-acquisition efficiency over a scope of tasks, with respect to priors, experience, and generalization difficulty.''}
+\end{column}
+\end{columns}
+\vspace{1mm}
+{\small Common threads: \key{goals}, \key{adapting}, \key{learning}, \key{breadth}. Legg and Hutter collected \textbf{over 70} published definitions before proposing their own.}
+\src{Wechsler, \emph{The Measurement of Adult Intelligence} (1944); Gottfredson, Intelligence 24(1), 1997; Legg and Hutter, ``Universal Intelligence: A Definition of Machine Intelligence'', Minds and Machines 17, 2007; Chollet, ``On the Measure of Intelligence'', arXiv:1911.01547, 2019.}
+\end{frame}
+
+\begin{frame}{Four views of AI (Russell and Norvig)}
+\begin{sfig}[0.62]
+\begin{tikzpicture}
+  \node[lbl,font=\footnotesize\bfseries] at (2.6,2.3) {Human-like};
+  \node[lbl,font=\footnotesize\bfseries] at (8.1,2.3) {Rational (ideal)};
+  \node[lbl,font=\footnotesize\bfseries,rotate=90] at (-0.8,0.6) {Thinking};
+  \node[lbl,font=\footnotesize\bfseries,rotate=90] at (-0.8,-2.0) {Acting};
+  \node[card=tdBlue,text width=4.9cm,minimum height=2.1cm] at (2.6,0.6) {\textbf{Thinking humanly}\\ model how people think\\ {\scriptsize cognitive science, brain models}};
+  \node[card=tdGreen,text width=4.9cm,minimum height=2.1cm] at (8.1,0.6) {\textbf{Thinking rationally}\\ ``laws of thought'', logic\\ {\scriptsize Aristotle's syllogisms, theorem provers}};
+  \node[card=tdAmber,text width=4.9cm,minimum height=2.1cm] at (2.6,-2.0) {\textbf{Acting humanly}\\ behave so people cannot tell\\ {\scriptsize the Turing test}};
+  \node[card=tdRed,text width=4.9cm,minimum height=2.1cm] at (8.1,-2.0) {\textbf{Acting rationally}\\ do the best thing given what is known\\ {\scriptsize the rational agent}};
+  \node[pill=tdRed,anchor=north] at (8.1,-3.25) {the view most of modern AI follows};
+\end{tikzpicture}
+\end{sfig}
+\src{Russell and Norvig, \emph{Artificial Intelligence: A Modern Approach}, 4th ed., Pearson, 2020, ch.\ 1.}
+\end{frame}
+
+\begin{frame}{Why ``acting rationally'' won}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\small
+\begin{itemize}\setlength\itemsep{4pt}
+\item \textbf{Measurable.} Rationality is defined mathematically: maximise expected performance.
+\item \textbf{General.} Covers logic, learning, perception, control.
+\item \textbf{Not tied to humans.} People are not perfectly rational, and we may not want machines to copy our mistakes.
+\end{itemize}
+\vspace{1mm}
+Analogy used by Russell and Norvig: aeronautical engineers did not succeed by building machines that fly exactly like pigeons.
+\end{column}
+\begin{column}{0.47\textwidth}
+\begin{sfig}[0.55]
+\begin{tikzpicture}
+  \node[card=tdBlue,minimum width=2.6cm,minimum height=1.7cm] (ag) at (0,0) {\textbf{Agent}\\\shortstack{\scriptsize chooses the action\\ that maximises\\ expected performance}};
+  \node[card=tdGreen,minimum width=2.6cm,minimum height=1.7cm] (en) at (5,0) {\textbf{Environment}\\\shortstack{\scriptsize world, users,\\ other agents}};
+  \draw[arr] (en.north west) to[bend right=25] node[above,lbl] {percepts (sensors)} (ag.north east);
+  \draw[arr] (ag.south east) to[bend right=25] node[below,lbl] {actions (actuators)} (en.south west);
+  \node[lbl] at (2.5,-1.7) {performance measure: what counts as ``good''};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\end{columns}
+\discuss{A self-driving car is a rational agent. Who chooses its performance measure, and what should it include?}
+\end{frame}
+
+\begin{frame}{Legg and Hutter: intelligence as goal achievement}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\small
+Idea: an agent is more intelligent if it does well in \textbf{more kinds of worlds}, giving more weight to \textbf{simple} worlds.
+\begin{equation*}
+\Upsilon(\pi)=\sum_{\mu\in E} 2^{-K(\mu)}\,V^{\pi}_{\mu}
+\end{equation*}
+{\footnotesize $\pi$: the agent; $\mu$: an environment; $K(\mu)$: its description length (Kolmogorov complexity); $V^{\pi}_{\mu}$: expected reward of $\pi$ in $\mu$.}
+\vspace{2mm}
+
+\textbf{Good:} one number, no mention of humans or brains.\\
+\textbf{Problem:} $K$ is uncomputable, so it is an \emph{ideal}, not a test you can run.
+\end{column}
+\begin{column}{0.45\textwidth}
+\begin{sfig}[0.6]
+\begin{tikzpicture}
+  \draw[->] (0,0) -- (5.2,0) node[right,font=\scriptsize] {environments};
+  \draw[->] (0,0) -- (0,3.2) node[above,font=\scriptsize] {score};
+  \foreach \x/\h in {0.4/2.5,1.1/2.1,1.8/1.2,2.5/0.9,3.2/0.5,3.9/0.4,4.6/0.2}{\fill[tdBlue!35] (\x,0) rectangle (\x+0.5,\h);}
+  \foreach \x/\h in {0.4/2.9,1.1/2.8,1.8/2.6,2.5/2.5,3.2/2.2,3.9/2.0,4.6/1.8}{\draw[tdGreen,very thick] (\x,\h) -- (\x+0.5,\h);}
+  \node[font=\scriptsize,text=tdGreen!60!black,anchor=west] at (2.6,3.1) {broad agent};
+  \node[font=\scriptsize,text=tdBlue,anchor=west] at (2.6,2.7) {narrow agent (bars)};
+  \node[lbl] at (2.6,-0.5) {simple worlds \hspace{2.4cm} complex worlds};
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize\illus}
+\end{column}
+\end{columns}
+\src{Legg and Hutter, ``Universal Intelligence: A Definition of Machine Intelligence'', Minds and Machines 17(4), 2007.}
+\end{frame}
+
+\begin{frame}{Chollet: intelligence is efficient skill acquisition}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\small
+\textbf{Skill is not intelligence.} A system can buy skill with \emph{priors} (built-in knowledge) or \emph{experience} (huge training data).
+
+Chollet's proposal: intelligence = how much new skill you gain per unit of priors and experience, over tasks that are \textbf{new} to you (generalisation).
+
+\vspace{1mm}
+Consequence: beating humans at chess after millions of games shows \textbf{skill}, but says little about the \textbf{efficiency} with which the skill was acquired.
+\end{column}
+\begin{column}{0.47\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}
+  \node[lbl,font=\footnotesize\bfseries] at (1.0,3.4) {Chess engine};
+  \node[lbl,font=\footnotesize\bfseries] at (4.2,3.4) {Child};
+  \fill[tdRed!30] (0.3,0) rectangle (1.7,2.8); \node[lbl] at (1.0,1.4) {experience:\\ millions of\\ games};
+  \fill[tdGreen!30] (3.5,0) rectangle (4.9,0.8); \node[lbl,font=\tiny] at (4.2,0.4) {few\\ examples};
+  \node[pill=tdRed] at (1.0,-0.6) {high skill, low efficiency};
+  \node[pill=tdGreen] at (4.2,-0.6) {lower skill, high efficiency};
+  \draw[tdMuted,dashed] (-0.2,0) -- (5.3,0);
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize\illus: bar height = experience consumed.}
+\end{column}
+\end{columns}
+\src{Chollet, ``On the Measure of Intelligence'', arXiv:1911.01547, 2019. ARC-AGI (later in this lecture) was designed to measure this.}
+\end{frame}
+
+\begin{frame}{AGI: three definitions used today}
+\begin{sfig}[0.62]
+\begin{tikzpicture}
+  \node[card=tdBlue,text width=5.2cm,minimum height=2.6cm,anchor=north west] at (0,0) {\textbf{Economic}\\[2pt] \footnotesize ``highly autonomous systems that outperform humans at most economically valuable work''\\[3pt]{\scriptsize OpenAI Charter (2018)}};
+  \node[card=tdGreen,text width=5.2cm,minimum height=2.6cm,anchor=north west] at (5.6,0) {\textbf{Levels of AGI}\\[2pt] \footnotesize two axes: \emph{performance} (emerging, competent, expert, virtuoso, superhuman) and \emph{generality} (narrow or general)\\[3pt]{\scriptsize Morris et al., Google DeepMind (2023)}};
+  \node[card=tdAmber,text width=5.2cm,minimum height=2.6cm,anchor=north west] at (11.2,0) {\textbf{Cognitive profile}\\[2pt] \footnotesize AGI = matching the cognitive versatility and proficiency of a well-educated adult, scored over ten domains (CHC theory)\\[3pt]{\scriptsize Hendrycks et al. (2025)}};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+\begin{columns}[T]
+\begin{column}{0.58\textwidth}
+\small
+The 2025 paper reports an ``AGI score'': \textbf{GPT-4 (2023) 27\%}, \textbf{GPT-5 (2025) 57\%}, with long-term memory storage scoring 0\% for GPT-5. A number is only as good as the definition behind it.
+\end{column}
+\begin{column}{0.38\textwidth}
+\qcard{tdRed}{\linewidth-10pt}{\scriptsize Note: no definition is agreed. Chollet's (skill-acquisition efficiency) is a fourth, and stricter, option.}
+\end{column}
+\end{columns}
+\src{OpenAI Charter, openai.com/charter; Morris et al., ``Levels of AGI'', arXiv:2311.02462; Hendrycks et al., ``A Definition of AGI'', arXiv:2510.18212 (Oct 2025, rev.\ Dec 2025), Table 1.}
+\end{frame}
+
+\begin{frame}{Narrow, general, super: a popular ladder}
+\begin{sfig}[0.6]
+\begin{tikzpicture}
+  \foreach \i/\t/\d/\c in {0/Narrow AI (ANI)/{one task or domain: spam filter, chess, translation}/tdBlue,1/General AI (AGI)/{broad human-level competence, learns new tasks}/tdGreen,2/Superintelligence (ASI)/{far beyond the best humans in most domains}/tdPurple}{
+    \node[card=\c,minimum width={4.2cm+\i*2.6cm},minimum height=1.3cm,anchor=south west,font=\small] at (0,{\i*1.55}) {\textbf{\t}\\{\scriptsize\d}};
+  }
+  \draw[->,very thick,tdMuted] (-0.5,0) -- (-0.5,4.5) node[above,lbl] {capability};
+  \node[lbl,anchor=west] at (9.2,0.6) {today's systems?};
+  \node[lbl,anchor=west] at (9.2,2.15) {disputed: see AGI slide};
+  \node[lbl,anchor=west] at (9.2,3.7) {hypothetical};
+\end{tikzpicture}
+\end{sfig}
+{\small This ladder is a \textbf{communication device}, not a scientific classification. Modern LLMs blur it: one system handles many tasks but fails others a child finds easy.}
+\discuss{Is ``general'' a yes/no property or a matter of degree?}
+\end{frame}

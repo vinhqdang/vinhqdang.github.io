@@ -1,0 +1,177 @@
+% ---------- 5. Other tests ----------
+\begin{frame}{Winograd schemas: common sense in one word}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\small
+Levesque's alternative to the Turing test: \textbf{sentence pairs differing by one word} that flips who a pronoun refers to. Answering needs everyday knowledge, not keyword tricks.
+
+\vspace{1mm}
+\qcard{tdBlue}{\linewidth-10pt}{The trophy doesn't fit in the suitcase because \textbf{it} is too \textbf{big}. $\rightarrow$ \emph{trophy}\\[3pt]
+The trophy doesn't fit in the suitcase because \textbf{it} is too \textbf{small}. $\rightarrow$ \emph{suitcase}}
+\vspace{1mm}
+
+\textbf{Status.} Fell to large models: GPT-3 (2020) reported roughly 88--90\% on the 273-problem challenge; WinoGrande (44k problems) was built to be harder. Resisting tricks is not resisting \emph{scale}.
+\end{column}
+\begin{column}{0.4\textwidth}
+\begin{sfig}[0.55]
+\begin{tikzpicture}
+  \node[card=tdAmber,minimum width=2.5cm] (t) at (0,1) {trophy};
+  \node[card=tdGreen,minimum width=2.5cm] (s) at (0,-1) {suitcase};
+  \node[pill=tdRed] (p) at (4,0) {``it''};
+  \draw[arr,tdAmber] (p) -- node[above,lbl,sloped] {too big} (t);
+  \draw[arr,tdGreen] (p) -- node[below,lbl,sloped] {too small} (s);
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\end{columns}
+\src{Levesque, Davis, Morgenstern, ``The Winograd Schema Challenge'', KR 2012; Brown et al., ``Language Models are Few-Shot Learners'', NeurIPS 2020; Sakaguchi et al., ``WinoGrande'', AAAI 2020.}
+\end{frame}
+
+\begin{frame}{Benchmarks: a life cycle}
+\begin{sfig}[0.42]
+\begin{tikzpicture}
+  \foreach \i/\t/\c in {0/{New benchmark:\\ models score low}/tdBlue,1/{Labs optimise\\ for it}/tdGreen,2/{Scores climb,\\ maybe leak or overfit}/tdAmber,3/{Saturated:\\ no longer informative}/tdRed,4/{Harder\\ benchmark}/tdPurple}{
+    \node[card=\c,minimum width=2.8cm,minimum height=1.6cm] (b\i) at ({\i*3.4},0) {\t};}
+  \foreach \a/\b in {0/1,1/2,2/3,3/4}{\draw[arr] (b\a)--(b\b);}
+  \draw[arr,dashed] (b4.south) -- ++(0,-0.9) -| (b0.south);
+\end{tikzpicture}
+\end{sfig}
+\small
+\textbf{Goodhart's law:} when a measure becomes a target, it stops being a good measure. The ARC Prize team itself notes it suspects public training data may be \emph{inflating} ARC-AGI-1 and ARC-AGI-2 scores.
+\discuss{Is a saturated benchmark evidence of progress, of overfitting, or both? How would you tell?}
+\src{ARC Prize Foundation, ``ARC Prize 2025 Results and Analysis'', arcprize.org/blog/arc-prize-2025-results-analysis (Dec 2025).}
+\end{frame}
+
+\begin{frame}{ARC-AGI: puzzles that cannot be memorised}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\small
+Chollet's \textbf{Abstraction and Reasoning Corpus} (2019): small coloured grids. You see 2--3 input/output examples, infer the \emph{rule}, and apply it to a new input. No language, no trivia, only priors a child has (objects, counting, symmetry).
+
+\begin{itemize}\setlength\itemsep{2pt}
+\item \textbf{ARC-AGI-1} (2019), \textbf{ARC-AGI-2} (Mar 2025): harder, resists brute force;
+\item \textbf{ARC-AGI-3} (25 Mar 2026): interactive game-like environments (next slides).
+\end{itemize}
+\end{column}
+\begin{column}{0.47\textwidth}
+\begin{sfig}[0.6]
+\begin{tikzpicture}[x=5.5mm,y=5.5mm]
+  \tikzset{g/.style={draw=tdInk!50,minimum size=5.5mm,inner sep=0pt}}
+  \foreach \c/\r in {0/0,1/1,2/2,3/3}{\fill[tdBlue] (\c,-\r) rectangle ++(1,-1);}
+  \foreach \r in {0,...,3}{\foreach \c in {0,...,3}{\draw[tdInk!50] (\c,-\r) rectangle ++(1,-1);}}
+  \node[font=\scriptsize,anchor=north] at (2,-4.2) {example input};
+  \draw[arr] (4.5,-2) -- (6.3,-2);
+  \begin{scope}[xshift=7cm]
+  \foreach \c/\r in {0/0,1/1,2/2,3/3}{\fill[tdBlue] (\c,-\r) rectangle ++(1,-1);}
+  \foreach \c/\r in {1/0,2/0,3/0,2/1,3/1,3/2}{\fill[tdGreen!60] (\c,-\r) rectangle ++(1,-1);}
+  \foreach \r in {0,...,3}{\foreach \c in {0,...,3}{\draw[tdInk!50] (\c,-\r) rectangle ++(1,-1);}}
+  \node[font=\scriptsize,anchor=north] at (2,-4.2) {example output};
+  \end{scope}
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize Toy example in the ARC style (not an actual task): the rule is ``fill above the diagonal in green''. Real tasks are harder to put into words.}
+\end{column}
+\end{columns}
+\src{Chollet, arXiv:1911.01547 (2019); Chollet et al., ``ARC-AGI-2'', arXiv:2505.11831 (2025); ARC Prize, ``Announcing ARC-AGI-3'', arcprize.org (25 Mar 2026).}
+\end{frame}
+
+\begin{frame}{ARC-AGI status, late November 2026}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+\begin{axis}[ybar,width=9.2cm,height=6.0cm,ymin=0,ymax=118,ylabel={best score on leaderboard (\%)},symbolic x coords={ARC-AGI-1,ARC-AGI-2,ARC-AGI-3},xtick=data,bar width=18pt,nodes near coords,every node near coord/.append style={font=\scriptsize},ymajorgrids,grid style={tdLine},enlarge x limits=0.25]
+\addplot[fill=tdBlue,draw=none] coordinates {(ARC-AGI-1,98.5) (ARC-AGI-2,95.8) (ARC-AGI-3,81.2)};
+\draw[tdGreen,dashed,thick] (axis cs:ARC-AGI-1,100) -- (axis cs:ARC-AGI-3,100) node[right,font=\tiny,text=tdGreen!60!black] {};
+\node[font=\tiny,text=tdGreen!60!black,anchor=south west] at (axis cs:ARC-AGI-1,100.5) {humans, ARC-AGI-3: 100\%};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.42\textwidth}
+\small
+Top entries listed on the ARC Prize leaderboard:
+\begin{itemize}\setlength\itemsep{2pt}
+\item ARC-AGI-1: 98.5\% (several models)
+\item ARC-AGI-2: 95.8\%, GPT-6.2 Astra (17 Nov)
+\item ARC-AGI-3: 81.2\%, Claude Fable 5.2 (9 Nov); GPT-6.2 Astra 70.3\%
+\end{itemize}
+\textbf{Caveats.} Runs differ in compute and harness (the top ARC-AGI-3 runs list roughly \$22--24k); ARC-AGI-1/2 are partly public. ARC Prize 2026 (Kaggle) has closed, results due 4 Dec 2026.
+\end{column}
+\end{columns}
+\src{ARC Prize leaderboard, arcprize.org/leaderboard (read 23 Nov 2026; ARC-AGI-3 column is the ``Standard'' score); ARC Prize blog, arcprize.org/blog. Model names and dates are as listed there.}
+\end{frame}
+
+\begin{frame}{ARC-AGI-3 in 2026: from near zero to most of the way}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\begin{sfig}[0.72]
+\begin{tikzpicture}
+\begin{axis}[width=10.2cm,height=6.0cm,xmin=2,xmax=11,ymin=0,ymax=100,xlabel={2026},ylabel={best listed ARC-AGI-3 score (\%)},xtick={3,5,7,9,11},xticklabels={Mar,May,Jul,Sep,Nov},ymajorgrids,grid style={tdLine},ytick={0,25,50,75,100}]
+\addplot[const plot,very thick,tdBlue,mark=*,mark size=1.8pt] coordinates {(2.8,0.5) (6.3,7.8) (6.8,30.2) (8.0,62.7) (10.3,81.2) (10.9,81.2)};
+\node[font=\tiny,anchor=north west,align=left] at (axis cs:2.9,6) {launch, 25 Mar:\\ frontier $\approx$0.5\%};
+\node[font=\tiny,anchor=south east,align=right] at (axis cs:6.2,10) {GPT-5.6 Sol\\ 7.8\% (9 Jul)};
+\node[font=\tiny,anchor=east,align=right] at (axis cs:6.6,36) {Claude Opus 5\\ 30.2\% (24 Jul)};
+\node[font=\tiny,anchor=east,align=right] at (axis cs:7.8,66) {GPT-6 Astra\\ 62.7\% (2 Sep)};
+\node[font=\tiny,anchor=north,align=center] at (axis cs:9.6,76) {Claude Fable 5.2\\ 81.2\% (9 Nov)};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.37\textwidth}
+\small
+\textbf{What it tests.} Hundreds of hand-made, turn-based environments with \textbf{no instructions and no stated goal}: explore, infer the rules, work out how to win, carry knowledge to harder levels. Humans: 100\%.
+
+\textbf{The surprise.} The launch post said frontier AI scored 0.51\%. Within eight months, the best listed entries moved to 70--81\%, at a high compute cost.
+
+\textbf{Open question.} Does this mean the skill is solved, or that the benchmark is now being trained for?
+\end{column}
+\end{columns}
+\src{arcprize.org/blog/arc-agi-3-launch (25 Mar 2026); leaderboard arcprize.org/leaderboard (read 23 Nov 2026). Points are the best listed entry at each date; scores come from different harnesses and budgets, so treat the curve as indicative.}
+\end{frame}
+
+\begin{frame}{Humanity's Last Exam (HLE)}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\small
+\textbf{What.} 2,500 closed-ended, expert-written questions across more than a hundred subjects (multi-modal), built by the Center for AI Safety and Scale AI after older exams (MMLU) saturated. Published in \emph{Nature} on 28 Jan 2026.
+
+\textbf{Why it matters.} It targets \textbf{knowledge and reasoning at the frontier of human expertise}, the opposite end from ARC-AGI's ``simple for humans'' puzzles.
+
+\textbf{Scores.} Gemini 3 Deep Think: 48.4\% (press report, Feb 2026). Scale AI board, 17 Oct 2026: GPT-6 Astra 54.8\,$\pm$\,1.9\%. Aggregators list higher, partly self-reported, figures.
+\end{column}
+\begin{column}{0.47\textwidth}
+\begin{sfig}[0.26]\begin{tikzpicture}[x=0.06cm]
+  \draw[tdMuted] (0,0) -- (100,0);
+  \fill[tdBlue!70] (0,1.0) rectangle (48.4,1.6); \node[font=\scriptsize,anchor=west] at (50,1.3) {Gemini 3 Deep Think 48.4\% (Feb)};
+  \fill[tdBlue] (0,0.2) rectangle (54.8,0.8); \node[font=\scriptsize,anchor=west] at (56,0.5) {GPT-6 Astra 54.8\% (17 Oct)};
+  \node[font=\tiny,text=tdMuted,anchor=north] at (50,-0.1) {score (\%), not like-for-like};
+\end{tikzpicture}\end{sfig}
+\begin{block}{Two kinds of ``hard''}
+{\small
+\begin{itemize}\setlength\itemsep{3pt}
+\item \textbf{HLE:} hard for \emph{experts}.
+\item \textbf{ARC-AGI:} easy for \emph{people}.
+\item Leading on one says little about the other.
+\end{itemize}}
+\end{block}
+\end{column}
+\end{columns}
+\src{Center for AI Safety, Scale AI, HLE Contributors, ``A benchmark of expert-level academic questions to assess AI capabilities'', Nature 649, 1139--1146 (2026); livescience.com (Gemini 3 Deep Think 48.4\%); Scale Labs leaderboard (as of 17 Oct 2026, via search snippet; lastexam.ai); llm-stats.com, artificialanalysis.ai.}
+\end{frame}
+
+\begin{frame}{What does each test actually measure?}
+\small
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}\begin{tabularx}{\linewidth}{@{}p{2.6cm}YYY@{}}
+\toprule
+\textbf{Test} & \textbf{Probes} & \textbf{Main weakness} & \textbf{Status (late 2026)}\\
+\midrule
+Turing test (1950) & conversational humanlikeness & rewards deception; judge-dependent & passed in 5-min three-party form with a persona (2025--26)\\[2pt]
+Chinese Room (1980) & a \emph{philosophical} challenge, not a test & no agreed way to detect understanding & still debated\\[2pt]
+Winograd schemas (2012) & everyday common sense & fell to scale & near human on classic sets\\[2pt]
+ARC-AGI (2019--26) & fast abstraction on novel tasks & partly public; compute-heavy solutions & v1/v2 nearly saturated; v3 now at 70--81\% on the leaderboard\\[2pt]
+HLE (2025--26) & expert academic knowledge & closed-ended; contamination risk & roughly 50--60\% for the best systems\\
+\bottomrule
+\end{tabularx}
+\discuss{If all of these were passed, would you say the system is intelligent? What is still missing?}
+\end{frame}

@@ -1,0 +1,104 @@
+% Preamble for the Computational Intelligence slides (Beamer, Metropolis)
+\usetheme[progressbar=frametitle,numbering=fraction,background=light,block=fill,sectionpage=none]{metropolis}
+\usepackage[T1]{fontenc}
+\usepackage{FiraSans}
+\usepackage[scaled=.85]{FiraMono}
+\usepackage{amsmath,amssymb}
+\usefonttheme[onlymath]{serif}
+\usepackage{booktabs,array,tabularx}
+\usepackage{tikz,pgfplots}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{adjustbox}
+\usepackage{fontawesome5}
+\hyphenpenalty=10000\exhyphenpenalty=10000
+\newenvironment{sfig}[1][0.80]{\begin{adjustbox}{max width=\linewidth,max totalheight=#1\textheight,center}}{\end{adjustbox}}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,shapes.misc,fit,calc,backgrounds,decorations.pathreplacing,patterns,matrix,chains}
+\pgfplotsset{compat=1.17}
+
+\definecolor{tdInk}{HTML}{1D2330}
+\definecolor{tdMuted}{HTML}{5D6678}
+\definecolor{tdLine}{HTML}{D9D5CA}
+\definecolor{tdPaper}{HTML}{FBFAF7}
+\definecolor{tdBlue}{HTML}{2457D6}
+\definecolor{tdGreen}{HTML}{17855A}
+\definecolor{tdAmber}{HTML}{B7791F}
+\definecolor{tdRed}{HTML}{C8362F}
+\definecolor{tdPurple}{HTML}{7A4FD1}
+\setbeamercolor{normal text}{fg=tdInk,bg=tdPaper}
+\setbeamercolor{alerted text}{fg=tdRed}
+\setbeamercolor{example text}{fg=tdGreen}
+\setbeamercolor{frametitle}{bg=tdInk,fg=white}
+\setbeamercolor{progress bar}{fg=tdBlue,bg=tdLine}
+\setbeamercolor{title separator}{fg=tdBlue}
+\setbeamercolor{block title}{bg=tdBlue!12,fg=tdInk}
+\setbeamercolor{block body}{bg=tdBlue!5,fg=tdInk}
+\setbeamercolor{block title alerted}{bg=tdRed!12,fg=tdRed!80!black}
+\setbeamercolor{block body alerted}{bg=tdRed!5,fg=tdInk}
+\setbeamercolor{block title example}{bg=tdGreen!14,fg=tdGreen!70!black}
+\setbeamercolor{block body example}{bg=tdGreen!6,fg=tdInk}
+\setbeamerfont{frametitle}{size=\large,series=\bfseries}
+\makeatletter\setlength{\metropolis@frametitle@padding}{1.15ex}\makeatother
+\setbeamertemplate{navigation symbols}{}
+\setbeamerfont{block title}{size=\small}
+
+% ---- code listings (Python 3.14) ----
+\lstdefinestyle{py}{language=Python,
+  basicstyle=\ttfamily\fontsize{8.4}{10.1}\selectfont\color{tdInk},
+  keywordstyle=\color{tdBlue}\bfseries, commentstyle=\color{tdMuted}\itshape, stringstyle=\color{tdGreen},
+  morekeywords={match,case,type,self,True,False,None},
+  emph={print,len,range,sorted,min,max,sum,enumerate,zip,heappush,heappop,cache},emphstyle=\color{tdPurple},
+  showstringspaces=false, columns=fullflexible, keepspaces=true, frame=single, rulecolor=\color{tdLine},
+  backgroundcolor=\color{white}, xleftmargin=2pt, xrightmargin=2pt, aboveskip=2pt, belowskip=0pt, framesep=3pt}
+\lstdefinestyle{out}{basicstyle=\ttfamily\fontsize{8}{9.6}\selectfont\color{tdInk}, columns=fullflexible, keepspaces=true,
+  frame=single, rulecolor=\color{tdGreen!60}, backgroundcolor=\color{tdGreen!6}, xleftmargin=2pt, xrightmargin=2pt, aboveskip=2pt, belowskip=0pt, framesep=3pt}
+% \pycode[size]{snippet} shows snippets/<snippet>.py ; \pyout[size]{snippet} shows snippets/<snippet>.out
+\newcommand{\pycode}[2][\relax]{{#1\lstinputlisting[style=py]{snippets/#2.py}}}
+\newcommand{\pyout}[2][\relax]{{#1\lstinputlisting[style=out]{snippets/#2.out}}}
+
+% ---- tikz styles ----
+\tikzset{>={Stealth[length=2.2mm]},
+  card/.style={rounded corners=4pt,draw=#1!70!black,fill=#1!10,align=center,inner sep=5pt,font=\small}, card/.default=tdBlue,
+  pill/.style={rounded corners=7pt,draw=none,fill=#1,text=white,inner sep=3pt,font=\scriptsize\bfseries,align=center}, pill/.default=tdBlue,
+  arr/.style={->,thick,draw=tdMuted},
+  cell/.style={draw=tdInk!70,minimum width=7.5mm,minimum height=7.5mm,inner sep=0pt,font=\small\ttfamily,fill=white},
+  tn/.style={circle,draw=tdInk!80,fill=white,minimum size=7mm,inner sep=0pt,font=\small\bfseries}}
+\newcommand{\key}[1]{\textbf{\color{tdBlue}#1}}
+\newcommand{\bad}[1]{\textbf{\color{tdRed}#1}}
+\newcommand{\good}[1]{\textbf{\color{tdGreen!70!black}#1}}
+\newcommand{\icsfooter}[1]{\setbeamertemplate{footline}{\begin{tikzpicture}[remember picture,overlay]\node[anchor=south east,font=\tiny,text=tdMuted,inner sep=0pt] at ([xshift=-7mm,yshift=1.6mm]current page.south east) {Introduction to Computing Science \,|\, #1 \,|\, BUV\hspace{1.2em}\insertframenumber/\inserttotalframenumber};\end{tikzpicture}}}
+\newcommand{\icstitle}[2]{\title{#1}\subtitle{#2}\author{Dr.\ Quang-Vinh Dang\\ {\small Senior Lecturer (Assoc.\ Prof)}}\institute{British University Vietnam}\date{Introduction to Computing Science \,|\, BSc Data Science and AI \,|\, Python 3.14}}
+\usepackage{multicol}
+\pgfplotsset{every axis/.append style={tick label style={font=\scriptsize},label style={font=\scriptsize},legend style={font=\scriptsize,draw=none,fill=none}}}
+\tikzset{soft/.style={rounded corners=4pt,draw=tdLine,fill=white,align=center,inner sep=4pt,font=\small},
+  lbl/.style={font=\scriptsize,text=tdMuted,align=center}}
+% source footnote at the bottom of a slide
+\newcommand{\src}[1]{\par\vfill{\fontsize{5.5}{6.4}\selectfont\color{tdMuted}#1}\vspace{1mm}}
+% discussion prompt bar
+\newcommand{\discuss}[1]{\par\vfill\noindent\begin{tikzpicture}\node[rounded corners=4pt,draw=tdAmber!80!black,fill=tdAmber!12,inner sep=5pt,text width=\linewidth-12pt,align=left,font=\small]{\textbf{\color{tdAmber!80!black}Discuss.}\ #1};\end{tikzpicture}\par}
+% philosophy slide: \philslide{title}{source}{framing}{A label}{A}{B label}{B}{voices}{discussion}; sketch k = \psk<k>
+\newcounter{pscount}
+\newcommand{\defsk}[2]{\expandafter\gdef\csname psk#1\endcsname{#2}}
+\tikzset{sk/.style={rounded corners=3pt,draw=#1!70!black,fill=#1!10,inner sep=2.5pt,font=\scriptsize,align=center,text width=2.3cm},sk/.default=tdBlue}
+\newcommand{\philslide}[9]{\stepcounter{pscount}\begin{frame}{#1}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\footnotesize #3}\par\vspace{1mm}
+\begin{sfig}[0.18]\begin{tikzpicture}\csname psk\arabic{pscount}\endcsname\end{tikzpicture}\end{sfig}
+\end{column}
+\begin{column}{0.47\textwidth}
+\begin{tikzpicture}\node[rounded corners=4pt,draw=tdGreen!70!black,fill=tdGreen!9,inner sep=4pt,text width=\linewidth-10pt,align=left,font=\footnotesize]{\textbf{\color{tdGreen!60!black}#4}\\[1pt] #5};\end{tikzpicture}\par\vspace{1.5mm}
+\begin{tikzpicture}\node[rounded corners=4pt,draw=tdPurple!70!black,fill=tdPurple!8,inner sep=4pt,text width=\linewidth-10pt,align=left,font=\footnotesize]{\textbf{\color{tdPurple!70!black}#6}\\[1pt] #7};\end{tikzpicture}\par\vspace{1mm}
+{\scriptsize\color{tdMuted}\textbf{Key voices:} #8}
+\end{column}
+\end{columns}
+\discuss{#9}
+\src{#2}
+\end{frame}}
+\newcommand{\qcard}[3]{\begin{tikzpicture}\node[rounded corners=4pt,draw=#1!70!black,fill=#1!8,inner sep=4pt,text width=#2,align=left,font=\footnotesize]{#3};\end{tikzpicture}}
+\newcommand{\illus}{\textit{illustrative}}
+
+\lstdefinestyle{pys}{style=py,basicstyle=\ttfamily\fontsize{7.3}{8.5}\selectfont\color{tdInk}}
+\lstdefinestyle{outs}{style=out,basicstyle=\ttfamily\fontsize{7.3}{8.8}\selectfont\color{tdInk}}
+\newcommand{\pycodes}[1]{\lstinputlisting[style=pys]{snippets/#1.py}}
+\newcommand{\pyouts}[1]{\lstinputlisting[style=outs]{snippets/#1.out}}

@@ -1,0 +1,182 @@
+% ---------- 4. Searle and understanding ----------
+\begin{frame}{Searle's Chinese Room (1980)}
+\begin{columns}[T]
+\begin{column}{0.36\textwidth}
+\small
+\textbf{Thought experiment.} You, who understand no Chinese, sit in a closed room with a big rule book (in English) and baskets of Chinese symbols.
+
+Slips with Chinese questions come in. You follow the rules, match shapes, and pass out other slips.
+
+To the people outside, your answers are \textbf{fluent Chinese}. Inside, you understand \textbf{nothing}.
+
+\vspace{1mm}
+\textbf{Searle's point:} a program only manipulates symbols by their \emph{form} (syntax). That cannot, by itself, give \emph{meaning} (semantics).
+\end{column}
+\begin{column}{0.61\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}[scale=1.0,every node/.append style={font=\small}]
+  \draw[rounded corners=6pt,thick,draw=tdInk!70,fill=tdPaper!60!tdLine!30] (2.2,-1.9) rectangle (8.2,1.9);
+  \node[font=\scriptsize\bfseries,anchor=north west] at (2.3,1.85) {the room};
+  \node[card=tdBlue,minimum width=1.6cm] (p) at (4.0,0) {\textbf{you}\\{\scriptsize no Chinese}};
+  \node[card=tdAmber,minimum width=1.7cm] (r) at (6.6,0.7) {\textbf{rule book}\\\shortstack{\scriptsize if shape X,\\ send shape Y}};
+  \node[card=tdGreen,minimum width=1.7cm] (s) at (6.6,-0.9) {\textbf{symbols}\\{\scriptsize baskets}};
+  \draw[arr] (p) -- (r); \draw[arr] (p) -- (s);
+  \node[soft,minimum width=1.5cm] (in) at (-0.4,0.8) {\scriptsize\ttfamily ni hao ma?};
+  \node[soft,minimum width=1.5cm] (out) at (10.5,-0.8) {\scriptsize\ttfamily wo hen hao};
+  \draw[arr] (in) -- (2.2,0.4); \draw[arr] (8.2,-0.4) -- (out);
+  \node[lbl] at (-0.4,1.6) {question in}; \node[lbl] at (10.5,0.0) {answer out};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\end{columns}
+\src{Searle, ``Minds, Brains, and Programs'', Behavioral and Brain Sciences 3(3), 417--457, 1980.}
+\end{frame}
+
+\begin{frame}{The argument, step by step}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\small
+\begin{enumerate}\setlength\itemsep{4pt}
+\item A computer program is purely \textbf{syntactic}: it manipulates symbols by their form.
+\item Minds have \textbf{semantics}: thoughts are \emph{about} things.
+\item Syntax is not sufficient for semantics (the room shows this).
+\item \textbf{So} running a program is not sufficient for having a mind.
+\end{enumerate}
+\vspace{1mm}
+Searle's targets: \textbf{strong AI} (the right program \emph{is} a mind) versus \textbf{weak AI} (programs are useful tools for studying or simulating minds). He accepts weak AI.
+
+{\footnotesize He does \emph{not} say machines cannot think: brains are physical machines that cause minds. He says the \emph{causal powers of brains} matter, not just the program.}
+\end{column}
+\begin{column}{0.42\textwidth}
+\begin{sfig}[0.6]
+\begin{tikzpicture}
+  \node[card=tdBlue,minimum width=4cm] (a) at (0,2.2) {\textbf{Programs}\\{\scriptsize syntax only}};
+  \node[card=tdGreen,minimum width=4cm] (b) at (0,0.2) {\textbf{Minds}\\{\scriptsize have meaning (semantics)}};
+  \node[card=tdRed,minimum width=4cm] (c) at (0,-2.0) {\textbf{Conclusion}\\\shortstack{\scriptsize programs alone do\\ not suffice for minds}};
+  \draw[arr] (a) -- node[right,lbl] {syntax $\neq$ semantics} (c);
+  \draw[arr] (b) -- (c);
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Demo 2: a Chinese Room in a dozen lines}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\pycodes{chinese_room_room}
+\vspace{1mm}
+{\footnotesize The rule book is a Python dictionary: 4 rules, written in romanised Chinese.}
+\end{column}
+\begin{column}{0.47\textwidth}
+\pyouts{chinese_room_run}
+\vspace{1mm}
+\pyouts{chinese_room_stats}
+\vspace{1mm}
+{\footnotesize On the four known slips the room \emph{looks} competent. On a new question it stalls with ``please say that again''. A real room would need an astronomically large book, which is exactly what the replies below argue about.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Four classic replies, and Searle's answers}
+\begin{sfig}[0.66]
+\begin{tikzpicture}
+  \node[card=tdBlue,text width=6.4cm,minimum height=2.8cm] at (0,0) {\textbf{Systems reply}\\{\footnotesize The \emph{whole system} (you + book + room) understands, not the man alone.}\\[3pt]{\scriptsize\color{tdRed!70!black}Searle: let the man memorise everything; still no understanding.}};
+  \node[card=tdGreen,text width=6.4cm,minimum height=2.8cm] at (7.2,0) {\textbf{Robot reply}\\{\footnotesize Put the program in a robot with cameras and limbs: symbols get \emph{grounded} in the world.}\\[3pt]{\scriptsize\color{tdRed!70!black}Searle: camera input is more symbols; the man still just shuffles them.}};
+  \node[card=tdAmber,text width=6.4cm,minimum height=2.8cm] at (0,-3.3) {\textbf{Brain simulator reply}\\{\footnotesize Simulate every neuron of a Chinese speaker's brain.}\\[3pt]{\scriptsize\color{tdRed!70!black}Searle: simulating a storm does not make you wet; simulation is not duplication.}};
+  \node[card=tdPurple,text width=6.4cm,minimum height=2.8cm] at (7.2,-3.3) {\textbf{Other minds reply}\\{\footnotesize We attribute understanding to people only from behaviour. Same standard for machines?}\\[3pt]{\scriptsize\color{tdRed!70!black}Searle: the issue is what understanding \emph{is}, not how we find out about it.}};
+\end{tikzpicture}
+\end{sfig}
+\discuss{Which reply do you find strongest? Which of Searle's answers feels like a dodge?}
+\src{Searle (1980) and the open peer commentary printed with it; Stanford Encyclopedia of Philosophy, ``The Chinese Room Argument''.}
+\end{frame}
+
+\begin{frame}{Do large language models understand?}
+\begin{sfig}[0.55]
+\begin{tikzpicture}
+  \node[card=tdRed,text width=7.0cm,minimum height=3.7cm,anchor=north east] at (-0.2,0) {\textbf{``Stochastic parrots''}\\[2pt]\footnotesize Bender et al.\ (2021): LMs stitch together text by probability, without reference to meaning. Bender and Koller (2020): form alone cannot teach meaning (the ``octopus test'').\\[2pt]{\scriptsize\color{tdMuted} Warns of bias, cost, and people mistaking fluency for a mind.}};
+  \node[card=tdGreen,text width=7.0cm,minimum height=3.7cm,anchor=north west] at (0.2,0) {\textbf{``Something more is going on''}\\[2pt]\footnotesize LLMs solve novel problems, use abstractions and show internal structure: world-model-like features (board-game and spatial probes), planning in circuits. Prediction at scale may force useful internal models.\\[2pt]{\scriptsize\color{tdMuted} Evidence is partial and contested.}};
+  \node[pill=tdAmber] at (0,-4.2) {middle positions exist: some competence, little grounding, unclear what ``understanding'' means};
+\end{tikzpicture}
+\end{sfig}
+\discuss{What observable evidence would convince you that a model understands? What would convince you it does not?}
+\src{Bender and Koller, ACL 2020; Bender, Gebru, McMillan-Major, Shmitchell, ``On the Dangers of Stochastic Parrots'', FAccT 2021; Li et al., ``Emergent World Representations'', ICLR 2023.}
+\end{frame}
+
+\begin{frame}[fragile]{Demo 3: a tiny ``parrot''}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\pycodes{parrot_parrot}
+\end{column}
+\begin{column}{0.45\textwidth}
+\pyouts{parrot_run}
+\vspace{1mm}
+{\footnotesize
+Each word is chosen using \textbf{only the previous word}. The text is locally plausible and globally empty.
+
+\textbf{Careful:} an LLM is \emph{not} a bigram table. It conditions on thousands of earlier tokens and has billions of learned parameters. The demo shows what ``predicting the next word'' alone does \emph{not} prove: that fluency needs no understanding at tiny scale. Whether that stays true at scale is the debate.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Emergent abilities: real or a mirage?}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\small
+\textbf{Claim (Wei et al.\ 2022).} Some abilities (multi-step arithmetic, certain reasoning tasks) are \textbf{absent in small models and appear abruptly} past a scale threshold.
+
+\textbf{Challenge (Schaeffer et al.\ 2023).} Much of the ``jump'' comes from the \textbf{metric}: all-or-nothing scores (exact match) hide smooth underlying progress. Use a continuous metric and the cliff often becomes a slope.
+
+\vspace{1mm}
+Take-away: be careful with stories about sudden ``sparks''. Ask what was measured.
+\end{column}
+\begin{column}{0.47\textwidth}
+\begin{sfig}[0.6]
+\begin{tikzpicture}
+\begin{axis}[width=7.4cm,height=5.2cm,xlabel={model scale (log)},ylabel={task score},ymin=-0.05,ymax=1.1,xmin=0,xmax=10,xtick=\empty,ytick={0,0.5,1},legend pos=north west]
+\addplot[very thick,tdRed,domain=0:10,samples=60] {1/(1+exp(-(x-6.5)*3.0))};
+\addplot[very thick,tdGreen,domain=0:10,samples=60] {0.05+0.9*x/10};
+\legend{exact-match metric,continuous metric}
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize\illus: the same hypothetical improvement, scored two ways.}
+\end{column}
+\end{columns}
+\src{Wei et al., ``Emergent Abilities of Large Language Models'', TMLR 2022; Schaeffer, Miranda, Koyejo, ``Are Emergent Abilities of Large Language Models a Mirage?'', NeurIPS 2023.}
+\end{frame}
+
+\begin{frame}{Looking inside: mechanistic interpretability}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\small
+Instead of arguing from outside, \textbf{open the box}: find the features and circuits a network uses.
+
+Anthropic's March 2025 \emph{circuit tracing} study of Claude 3.5 Haiku reported, for example:
+\begin{itemize}\setlength\itemsep{3pt}
+\item when writing a rhyming couplet, the model \textbf{chooses the rhyme word before writing the line}; editing that internal ``plan'' changes the ending;
+\item shared, language-independent concepts across languages;
+\item in one hard maths case, a plausible-sounding explanation that \textbf{did not match} the computation actually done.
+\end{itemize}
+\end{column}
+\begin{column}{0.45\textwidth}
+\begin{sfig}[0.3]\begin{tikzpicture}
+  \node[sk=tdBlue,text width=2.0cm] (a) at (0,0) {line 1 of a couplet ends};
+  \node[sk=tdAmber,text width=2.2cm] (b) at (3.4,0) {internal feature: rhyme word chosen};
+  \node[sk=tdGreen,text width=2.0cm] (c) at (6.8,0) {line 2 written toward it};
+  \draw[arr] (a) -- (b); \draw[arr] (b) -- (c);
+  \node[font=\tiny,text=tdRed!70!black] at (3.4,-1.0) {suppress ``rabbit'': ending changes};
+\end{tikzpicture}\end{sfig}
+\begin{block}{Honest limits (from the authors)}
+{\small
+\begin{itemize}\setlength\itemsep{2pt}
+\item only a \textbf{fraction} of the computation;
+\item hours of effort per \textbf{short prompt};
+\item possible artefacts of the method.
+\end{itemize}}
+\end{block}
+{\footnotesize Planning and internal representations count \emph{against} the ``pure parrot'' picture, but say nothing about \textbf{consciousness}.}
+\end{column}
+\end{columns}
+\src{Anthropic, ``Tracing the thoughts of a large language model'' (27 Mar 2025) and ``On the Biology of a Large Language Model'', transformer-circuits.pub (2025); open-source tooling announced 29 May 2025.}
+\end{frame}

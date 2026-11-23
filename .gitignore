@@ -36,3 +36,10 @@ courses/*/src/**/main.pdf
 courses/*/*/main.pdf
 courses/**/snippets/
 __pycache__/
+
+# LaTeX build artifacts (courses/ics/computational-intelligence)
+courses/ics/computational-intelligence/main.pdf
+courses/ics/computational-intelligence/*.bbl
+courses/ics/computational-intelligence/*.blg
+courses/ics/computational-intelligence/*.bcf
+courses/ics/computational-intelligence/*.run.xml

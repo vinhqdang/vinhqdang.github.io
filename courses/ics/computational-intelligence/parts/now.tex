@@ -1,0 +1,206 @@
+% ---------- 8. Where AI is now (late 2026) ----------
+\begin{frame}{Where AI is now: the frontier, late November 2026}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\begin{sfig}[0.7]
+\begin{tikzpicture}
+  \node[card=tdGreen,text width=5.2cm,minimum height=1.5cm,anchor=north west,font=\footnotesize] at (0,0) {\textbf{OpenAI} GPT-6.2 Astra and Sol\\ {\scriptsize listed 17 Nov 2026}};
+  \node[card=tdAmber,text width=5.2cm,minimum height=1.5cm,anchor=north west,font=\footnotesize] at (5.6,0) {\textbf{Anthropic} Claude Fable 5.2\\ {\scriptsize listed 9 Nov 2026}};
+  \node[card=tdBlue,text width=5.2cm,minimum height=1.5cm,anchor=north west,font=\footnotesize] at (0,-1.9) {\textbf{Google} Gemini 4 (Carbon, Hydrogen, Argon)\\ {\scriptsize Carbon listed 10 Nov 2026}};
+  \node[card=tdPurple,text width=5.2cm,minimum height=1.5cm,anchor=north west,font=\footnotesize] at (5.6,-1.9) {\textbf{Open-weight and others}\\ {\scriptsize DeepSeek V4.1 Flash (Oct), Kimi K3 (Jul), Qwen3.8, GLM-5.3}};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.41\textwidth}
+\small
+\textbf{Reading the names.} These are the model families on the ARC Prize leaderboard in the week of 23 Nov 2026, with the dates listed there (release or evaluation date). New versions arrive every few weeks; any list is out of date quickly.
+
+\textbf{Trend.} Releases are now routinely \emph{families} (small, medium, large, ``max reasoning'') and are tested on \emph{agentic} tasks, not only on chat.
+\end{column}
+\end{columns}
+\discuss{Why do you think labs release several tiers of the same model at once? Who is each tier for?}
+\src{ARC Prize leaderboard, arcprize.org/leaderboard (read 23 Nov 2026); model names and dates exactly as listed there. Cross-checked against third-party roundups (benchlm.ai, teamday.ai), which agree on the main releases but not on every date.}
+\end{frame}
+
+\begin{frame}{Benchmarks saturate: ARC-AGI-2 in 13 months}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\begin{sfig}[0.72]
+\begin{tikzpicture}
+\begin{axis}[width=10.2cm,height=6.0cm,xmin=0,xmax=14,ymin=0,ymax=105,xlabel={months since Oct 2025},ylabel={best listed ARC-AGI-2 score (\%)},ymajorgrids,grid style={tdLine},ytick={0,25,50,75,100}]
+\addplot[const plot,very thick,tdBlue,mark=*,mark size=1.8pt] coordinates {(0.2,18.3) (1.8,37.6) (2.4,54.2) (4.4,84.6) (8.3,89.2) (9.3,92.5) (11.0,95.0) (13.5,95.8) (14,95.8)};
+\node[font=\tiny,anchor=north west,align=left] at (axis cs:0.3,16) {GPT-5 Pro\\ 18.3\% (6 Oct 2025)};
+\node[font=\tiny,anchor=north west,align=left] at (axis cs:1.9,34) {Claude Opus 4.5\\ 37.6\% (24 Nov)};
+\node[font=\tiny,anchor=north west,align=left] at (axis cs:2.6,50) {GPT-5.2 Pro 54.2\%\\ (11 Dec)};
+\node[font=\tiny,anchor=north,align=center] at (axis cs:5.4,81) {Gemini 3 Deep Think\\ 84.6\% (12 Feb 2026)};
+\node[font=\tiny,anchor=north,align=center] at (axis cs:11.8,88) {GPT-6.2 Astra\\ 95.8\% (17 Nov 2026)};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.37\textwidth}
+\small
+\textbf{What happened.} A benchmark designed in early 2025 to be hard for frontier models went from about 18\% to about 96\% in 13 months. ARC-AGI-1 is at 98.5\%.
+
+\textbf{Why.} Reasoning models and refinement loops, more test-time compute, and perhaps leaked or similar training data (the ARC Prize team says it suspects the latter plays a role).
+
+\textbf{Consequence.} The community moves to harder tests (ARC-AGI-3, HLE) and asks whether the old ones measured what we hoped.
+\end{column}
+\end{columns}
+\src{ARC Prize leaderboard, arcprize.org/leaderboard (read 23 Nov 2026). Each point is the best entry listed up to that date. ARC Prize Foundation, ``ARC Prize 2025 Results and Analysis'' (5 Dec 2025).}
+\end{frame}
+
+\begin{frame}{Reasoning and agents: more thinking, bigger bills}
+\begin{columns}[T]
+\begin{column}{0.58\textwidth}
+\begin{sfig}[0.72]
+\begin{tikzpicture}
+\begin{axis}[width=10cm,height=6.0cm,xmode=log,xmin=200,xmax=40000,ymin=-5,ymax=95,xlabel={cost of the evaluation run (US\$)},ylabel={ARC-AGI-3 score (\%)},ymajorgrids,grid style={tdLine},xmajorgrids]
+\addplot[only marks,mark=*,mark size=2.3pt,tdBlue] coordinates {(24200,70.3) (21900,81.2) (5500,54.9) (7200,65.1) (5800,49.8) (7400,24.3) (26100,62.7) (7600,52.7)};
+\addplot[only marks,mark=*,mark size=2.3pt,tdMuted] coordinates {(858,0.3) (333,0.1) (1000,0.2) (388,0.5) (3900,0.1)};
+\node[font=\tiny,anchor=west] at (axis cs:25000,81.2) {Fable 5.2};
+\node[font=\tiny,anchor=west] at (axis cs:25500,70.3) {GPT-6.2 Astra};
+\node[font=\tiny,anchor=east] at (axis cs:5200,55) {GPT-6.2 Sol};
+\node[font=\tiny,anchor=south] at (axis cs:2500,5) {smaller models: 0--1\%};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.39\textwidth}
+\small
+\textbf{Reading the plot.} Each dot is one model run on ARC-AGI-3. Only runs costing several thousand dollars score high. Intelligence-as-skill is now bought with \textbf{inference compute}.
+
+\textbf{Agents.} Vendors and developer tools now emphasise long-running, tool-using agents; one roundup reports OpenAI's persistent ``Dots'' agents and Google's Antigravity coding app. These come from secondary sources.
+
+\textbf{Chollet's question.} High score at high cost: is that \emph{efficient} skill acquisition?
+\end{column}
+\end{columns}
+\src{ARC Prize leaderboard (cost per run as listed, read 23 Nov 2026; grey = low-scoring and cheaper runs). Agents: demandsphere.com and wikipedia.org/wiki/Google\_Antigravity (secondary).}
+\end{frame}
+
+\begin{frame}{AI for science: from benchmarks to discoveries}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+{\small \textbf{AlphaEvolve} (Google DeepMind, update of 7 May 2026): an evolutionary coding agent. Reported results:}\par\vspace{1mm}
+\begin{sfig}[0.3]
+\begin{tikzpicture}
+  \foreach \x/\y/\n/\t/\c in {0/0/{$-20\%$}/{write amplification in Spanner's storage}/tdBlue,4.7/0/{$-30\%$}/{variant-detection errors in DeepConsensus}/tdGreen,0/-2.5/{14\%$\to$88\%}/{feasibility of a GNN on AC optimal power flow}/tdAmber,4.7/-2.5/{10x}/{lower error in suggested quantum circuits (Willow)}/tdPurple}{
+    \node[card=\c,text width=4.1cm,minimum height=2.1cm,anchor=north west] at (\x,\y) {{\Large\bfseries\n}\\[2pt]{\footnotesize\t}};}
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize Also: used to design next-generation TPUs; with Terence Tao and others, helped solve some Erd\H{o}s problems and improved Ramsey and TSP bounds.}
+\end{column}
+\begin{column}{0.41\textwidth}
+\begin{block}{Be careful with the headline}
+{\small
+\begin{itemize}\setlength\itemsep{2pt}
+\item These are the \textbf{developer's own} reports.
+\item Many solved Erd\H{o}s problems turned out to be fairly elementary; wins are mostly individual results.
+\item Proposal: record the \emph{autonomy and novelty} of each AI-assisted result.
+\end{itemize}}
+\end{block}
+\end{column}
+\end{columns}
+\discuss{If an AI proves a theorem no human has checked, who ``discovered'' it? Who must check it?}
+\src{Google DeepMind, ``AlphaEvolve: impact'' (7 May 2026), deepmind.google/blog/alphaevolve-impact; arXiv:2602.10177 and arXiv:2605.22763 (preprints on AI and Erd\H{o}s problems, via search summaries).}
+\end{frame}
+
+\begin{frame}{Robotics and embodied AI: real, but small}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\small
+\textbf{What the reporting says (2026)}
+\begin{itemize}\setlength\itemsep{3pt}
+\item Robot ``foundation models'' (for example Google DeepMind's Gemini Robotics line and Figure's in-house Helix) aim to control humanoids from vision and language.
+\item A July 2026 review: Figure AI and Agility Robotics have \textbf{better-documented} deployments than Tesla's Optimus; headline unit counts \textbf{do not come from the companies}.
+\item BMW plans to extend humanoid deployment to its Leipzig plant from summer 2026.
+\end{itemize}
+\end{column}
+\begin{column}{0.45\textwidth}
+\qcard{tdBlue}{\linewidth-10pt}{\small\textbf{Moravec in 2026}\\[2pt] Language and code leapt ahead of folding laundry. Pilots in factories exist; fleets of general household robots do not. Embodiment (question 14) remains the slow frontier.}
+\vspace{2mm}\par
+\begin{sfig}[0.34]\begin{tikzpicture}
+  \foreach \y/\c/\t/\v/\vc in {0/tdRed/{Figure: 10,000 deployments}/{not from the company}/tdRed,-1.0/tdRed/{Optimus: 50,000 units}/{not from Tesla}/tdRed,-2.0/tdGreen/{BMW Leipzig humanoids, summer 2026}/{plan reported}/tdGreen}{
+    \node[soft,anchor=west,text width=4.2cm,align=left,font=\footnotesize] at (0,\y) {\t};
+    \node[pill=\vc,anchor=west] at (4.5,\y) {\v};}
+\end{tikzpicture}\end{sfig}
+{\scriptsize Claim versus source, as found in the July 2026 review.}
+\end{column}
+\end{columns}
+\src{Interesting Engineering, ``The Humanoid Robot Reality Check'' (Jul 2026); humanoid.guide; Google DeepMind and Figure announcements as summarised in search results. I could not verify individual unit counts.}
+\end{frame}
+
+\begin{frame}{Regulation: the EU AI Act timeline}
+\begin{sfig}[0.52]
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \draw[very thick,tdMuted] (0,0) -- (150,0);
+  \foreach \x/\t/\c/\u in {5/{1 Aug 2024\\ Act in force}/tdBlue/1,30/{2 Feb 2025\\ bans on unacceptable-risk AI}/tdRed/0,55/{2 Aug 2025\\ general-purpose AI duties}/tdGreen/1,80/{24--27 Jul 2026\\ Digital Omnibus published, in force}/tdAmber/0,95/{2 Aug 2026\\ transparency (Art.\ 50), general application}/tdPurple/1,120/{2 Dec 2027\\ stand-alone high-risk (Annex III)}/tdBlue/0,145/{2 Aug 2028\\ high-risk in products (Annex I)}/tdRed/1}{
+    \fill[\c] (\x,0) circle (1.4mm);
+    \ifnum\u=1 \draw[\c!60] (\x,0) -- (\x,6); \node[font=\tiny,text width=27mm,align=center,anchor=south] at (\x,6) {\t};
+    \else \draw[\c!60] (\x,0) -- (\x,-6); \node[font=\tiny,text width=27mm,align=center,anchor=north] at (\x,-6) {\t};\fi}
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+\small
+\textbf{Omnibus (Regulation (EU) 2026/1744).} Council approved 29 Jun 2026, signed 8 Jul, published 24 Jul, in force 27 Jul 2026. It fixes the new high-risk dates above, adds a ban on non-consensual sexually explicit deepfakes of identifiable people, and gives the AI Office exclusive supervision of AI systems built on a provider's own general-purpose models. For generative-content marking, sources differ on a grace period to 2 Dec 2026 for systems already on the market.
+\src{Gibson Dunn, ``EU AI Act Omnibus Agreement'' (May 2026); White \& Case, ``EU AI Omnibus enters into force'' (Jul 2026); Lewis Silkin (27 Jul 2026); Orrick (Jul 2026). The first three dates are from the Act itself, Regulation (EU) 2024/1689.}
+\end{frame}
+
+\begin{frame}{Open debate: scale, or new architectures?}
+\begin{columns}[T]
+\begin{column}{0.49\textwidth}
+\qcard{tdBlue}{\linewidth-10pt}{\small\textbf{Scaling and reasoning keep working}\\[2pt]
+Leaderboards moved quickly in 2026: ARC-AGI-2 near 96\%, ARC-AGI-3 from about 0.5\% to 70--81\% at high compute. Scale up data, compute and test-time search, and capabilities follow (Sutton's ``bitter lesson'').}
+\end{column}
+\begin{column}{0.49\textwidth}
+\qcard{tdGreen}{\linewidth-10pt}{\small\textbf{We need world models}\\[2pt]
+Yann LeCun, formerly Meta's chief AI scientist, argues that predicting text is not enough and that systems must learn \textbf{world models} from sensory data (his JEPA proposal). His start-up \textbf{AMI Labs} raised about \textbf{US\$1.03 billion} in March 2026 at a US\$3.5 billion pre-money valuation; World Labs (Fei-Fei Li) raised about \$1 billion in early 2026 for world models too.}
+\end{column}
+\end{columns}
+\vspace{1mm}
+\small
+\textbf{Reading the evidence.} Scaling explains the benchmark curve; the cost curve and ARC's ``explore, then infer rules'' tasks fuel the architecture camp. Funding does not settle it.
+\discuss{What result in the next two years would make you change your mind about scale versus new architectures?}
+\src{TechCrunch, ``Yann LeCun's AMI Labs raises \$1.03 billion to build world models'' (9 Mar 2026); SiliconANGLE (10 Mar 2026); LeCun, ``A Path Towards Autonomous Machine Intelligence'' (2022); Sutton (2019).}
+\end{frame}
+
+\begin{frame}{Open debates, in one slide}
+\begin{sfig}[0.62]
+\begin{tikzpicture}
+  \node[card=tdBlue,text width=5.1cm,minimum height=2.5cm] at (0,0) {\textbf{Benchmarks}\\{\scriptsize Old ones saturate; new ones are expensive; public tasks leak. How do we measure ability?}};
+  \node[card=tdGreen,text width=5.1cm,minimum height=2.5cm] at (5.4,0) {\textbf{Architectures}\\{\scriptsize Scale transformers, or add world models, memory, planning (JEPA)?}};
+  \node[card=tdAmber,text width=5.1cm,minimum height=2.5cm] at (10.8,0) {\textbf{Agents and cost}\\{\scriptsize High scores need thousands of dollars per run. Who can afford them, and who is accountable?}};
+  \node[card=tdRed,text width=5.1cm,minimum height=2.5cm] at (0,-2.9) {\textbf{Law and safety}\\{\scriptsize EU high-risk rules delayed to 2027--28 while capabilities grow quickly.}};
+  \node[card=tdPurple,text width=5.1cm,minimum height=2.5cm] at (5.4,-2.9) {\textbf{Minds}\\{\scriptsize Welfare programmes and indicator checklists, but no agreed test of consciousness.}};
+  \node[card=tdBlue,text width=5.1cm,minimum height=2.5cm] at (10.8,-2.9) {\textbf{Definition}\\{\scriptsize One AGI score (27\% to 57\%) or many profiles? Whose definition counts?}};
+\end{tikzpicture}
+\end{sfig}
+\end{frame}
+
+\begin{frame}{What I could not verify (and left out)}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\small
+Found in searches but \textbf{not confirmed} by a primary source, so \emph{not} used as facts here:
+\begin{itemize}\setlength\itemsep{2pt}
+\item Tesla Optimus and Figure unit counts (disputed in the review itself);
+\item the ``15--20\%'' chance of being conscious attributed to Claude and to Anthropic staff (informal, sources disagree);
+\item self-reported or aggregator benchmark figures (for example HLE scores above 60\%) and agent-score rankings;
+\item the exact release date of ``Gemini 4 Neon'' and details of OpenAI's ``Dots'';
+\item the release date of the Neuromancer series.
+\end{itemize}
+\end{column}
+\begin{column}{0.45\textwidth}
+\begin{block}{Limits of this deck}
+{\small
+\begin{itemize}\setlength\itemsep{2pt}
+\item I did not read the PNAS paper itself, only the university release and preprint summaries.
+\item Leaderboard figures are as listed on 23 Nov 2026 and will change.
+\item Some 2026 welfare items rely on secondary summaries of Anthropic documents.
+\item Film assignments to philosophical questions are interpretive.
+\end{itemize}}
+\end{block}
+\end{column}
+\end{columns}
+\discuss{Why is ``I could not verify this'' sometimes the most useful sentence in a lecture on AI?}
+\end{frame}

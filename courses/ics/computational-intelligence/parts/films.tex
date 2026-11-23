@@ -1,0 +1,165 @@
+% ---------- 7. AI in film and TV ----------
+% \fc{x}{y}{colour}{title}{year}{one line}{questions}  (card, text width 5.3cm)
+\newcommand{\fcw}{5.3cm}\newcommand{\fch}{2.45cm}\newcommand{\fcf}{\footnotesize}\newcommand{\fc}[7]{\node[card=#3,text width=\fcw,minimum height=\fch,align=left,anchor=north west,font=\fcf] at (#1,#2) {\textbf{#4} {\scriptsize\color{tdMuted}(#5)}\\[2pt]#6\\[2pt]{\scriptsize\color{#3!60!black}Questions: #7}};}
+
+\begin{frame}{AI on screen: a timeline, 1927 to 2026}
+\begin{sfig}[0.7]
+\begin{tikzpicture}[x=1mm,y=1mm]
+  \draw[very thick,tdMuted] (0,0) -- (152,0);
+  \foreach \y in {1930,1950,1970,1990,2000,2010,2020}{\pgfmathsetmacro{\xx}{\y<2000 ? (\y-1920) : 80+(\y-2000)*2.7}\draw[tdMuted] (\xx,-1.2) -- (\xx,1.2); \node[font=\tiny,text=tdMuted] at (\xx,-3.5) {\y};}
+  \foreach \y/\t/\c/\h in {1927/Metropolis/tdBlue/10,1968/{2001: HAL 9000}/tdRed/10,1982/{Blade Runner}/tdAmber/22,1984/Terminator/tdRed/-10,1999/The Matrix/tdPurple/10,2001/A.I./tdGreen/-10,2004/{I, Robot}/tdBlue/22,2013/Her/tdGreen/10,2014/Ex Machina/tdAmber/-10,2016/Westworld/tdPurple/22,2017/{Blade Runner 2049}/tdAmber/-22,2018/Upgrade/tdBlue/34,2021/{Ron's Gone Wrong}/tdGreen/-10,2023/{The Creator,\\ MI: Dead Reckoning}/tdRed/10,2025/{Companion,\\ Murderbot,\\ Tron: Ares}/tdPurple/-24,2026/Mercy/tdBlue/22}{
+    \pgfmathsetmacro{\xx}{\y<2000 ? (\y-1920) : 80+(\y-2000)*2.7}
+    \fill[\c] (\xx,0) circle (1.1mm);
+    \ifnum\h<0 \draw[\c!60] (\xx,0) -- (\xx,{\h+4}); \node[font=\tiny,align=center,anchor=north,text=\c!70!black] at (\xx,{\h+4}) {\textbf{\y}\\ \t};
+    \else \draw[\c!60] (\xx,0) -- (\xx,{\h-1}); \node[font=\tiny,align=center,anchor=south,text=\c!70!black] at (\xx,{\h-1}) {\textbf{\y}\\ \t};\fi}
+\end{tikzpicture}
+\end{sfig}
+{\small Fiction is a \textbf{thought-experiment lab}: each work puts one philosophical question on screen. The next slides give year, a one-line summary, and the question numbers from the previous part. Text cards only: no posters or stills.}
+\end{frame}
+
+\begin{frame}{Classics (1): the first machines with a face}
+\begin{sfig}[0.8]
+\begin{tikzpicture}\renewcommand{\fcw}{7.6cm}\renewcommand{\fch}{3.1cm}\renewcommand{\fcf}{\normalsize}
+  \fc{0}{0}{tdBlue}{Metropolis}{1927, Fritz Lang}{A robot is given the likeness of Maria, a worker-leader, to deceive and divide the workers.}{16 deception, 24 work}
+  \fc{8.1}{0}{tdRed}{2001: A Space Odyssey}{1968, Stanley Kubrick}{HAL 9000 runs the ship, then turns on the crew when its mission orders conflict with theirs.}{12 alignment, 13 goals, 21 blame}
+  \fc{0}{-3.6}{tdAmber}{Blade Runner}{1982, Ridley Scott}{Replicants are hunted by a ``Voight-Kampff'' test of empathy; the film asks what makes someone a person.}{7 moral status, 11 identity, 1 experience}
+  \fc{8.1}{-3.6}{tdRed}{The Terminator}{1984, James Cameron}{Skynet, a defence network, becomes self-aware and launches a nuclear war against humanity.}{19 superintelligence, 20 x-risk}
+\end{tikzpicture}
+\end{sfig}
+\src{Plot summaries by the author; dates as in the standard film references (Metropolis 1927; 2001 1968; Blade Runner 1982; The Terminator 1984).}
+\end{frame}
+
+\begin{frame}{Classics (2): the digital age}
+\begin{sfig}[0.8]
+\begin{tikzpicture}\renewcommand{\fcw}{7.6cm}\renewcommand{\fch}{3.1cm}\renewcommand{\fcf}{\normalsize}
+  \fc{0}{0}{tdPurple}{The Matrix}{1999, the Wachowskis}{Humans live in a simulation run by machines; a rebellion tries to wake them.}{19 machine power, 11 reality and self}
+  \fc{8.1}{0}{tdGreen}{A.I. Artificial Intelligence}{2001, Steven Spielberg}{A robot child programmed to love searches for a way to become ``real''; what do we owe to such a being?}{7 moral status, 23 companionship}
+  \fc{0}{-3.6}{tdBlue}{I, Robot}{2004, Alex Proyas}{Loosely inspired by Asimov's 1950 stories: rules like the Three Laws seem safe until a machine applies them too literally.}{12 alignment, 10 agency}
+  \fc{8.1}{-3.6}{tdGreen}{Her}{2013, Spike Jonze}{A man falls in love with Samantha, an operating system who grows beyond him.}{23 companionship, 1 experience}
+\end{tikzpicture}
+\end{sfig}
+\discuss{Which of these futures looks \emph{least} likely today, and which looks like it is already beginning?}
+\end{frame}
+
+\begin{frame}{2014 to 2019: the test, the host, the upgrade}
+\begin{sfig}[0.8]
+\begin{tikzpicture}
+  \fc{0}{0}{tdAmber}{Ex Machina}{2014, Alex Garland}{Caleb is asked to test whether Ava, a humanoid AI, is conscious, and discovers the test is also testing him.}{16 deception, 1 experience, 7 status}
+  \fc{5.7}{0}{tdGreen}{Chappie}{2015, Neill Blomkamp}{A police robot gains consciousness and learns like a child from whoever raises it.}{7 status, 12 upbringing and values}
+  \fc{11.4}{0}{tdPurple}{Westworld}{HBO, 2016--2022}{Theme-park androids (``hosts'') become aware that their lives were scripted.}{10 free will, 1 experience, 7 status}
+  \fc{0}{-2.9}{tdAmber}{Blade Runner 2049}{2017, Denis Villeneuve}{K, a replicant, questions whether his memories are his own; his companion Joi is a hologram product.}{11 identity, 23 companionship}
+  \fc{5.7}{-2.9}{tdBlue}{Upgrade}{2018, Leigh Whannell}{A paralysed man receives an implant, STEM, that takes over his body to carry out his wishes.}{10 agency, 21 responsibility}
+  \fc{11.4}{-2.9}{tdRed}{Alita: Battle Angel}{2019, Robert Rodriguez}{A cyborg with no memory of her past builds an identity through her body and her choices.}{11 identity, 14 embodiment}
+\end{tikzpicture}
+\end{sfig}
+\src{Plot summaries by the author. Year of Ex Machina follows its 2014 premiere (wider release 2015).}
+\end{frame}
+
+\begin{frame}{2021 to 2023: companions, creators and fakes}
+\begin{sfig}[0.8]
+\begin{tikzpicture}
+  \fc{0}{0}{tdGreen}{Ron's Gone Wrong}{2021, animated}{A boy's ``B-bot'' companion is defective: it is supposed to be a friend, but is not what the company promised.}{23 companionship, 16 truth}
+  \fc{5.7}{0}{tdPurple}{M3GAN}{2022, Gerard Johnstone}{A doll-robot is built to protect a child and pursues that goal with chilling literalness.}{12 alignment, 13 goals, 23 companionship}
+  \fc{11.4}{0}{tdBlue}{Black Mirror: ``Joan Is Awful''}{2023, Netflix}{A streaming service makes an AI-generated drama of a woman's life, using her likeness through a legal clause she accepted.}{15 authorship, 16 truth}
+  \fc{0}{-2.9}{tdRed}{The Creator}{2023, Gareth Edwards}{In a war between humans and AI, a soldier is sent to destroy an AI weapon that takes the form of a child.}{7 status, 20 risk and fear}
+  \fc{5.7}{-2.9}{tdAmber}{Mission: Impossible, Dead Reckoning}{2023, Christopher McQuarrie}{The Entity, a rogue AI, can rewrite what people believe is true; the heroes try to control it.}{16 truth, 19 superintelligence}
+  \fc{11.4}{-2.9}{tdGreen}{Black Mirror: ``Be Right Back''}{2013, Netflix}{A grieving woman uses a service that rebuilds her dead partner from his online messages.}{11 identity, 23 companionship}
+\end{tikzpicture}
+\end{sfig}
+\src{Plot summaries by the author; release years checked against studio and press pages (Ron's Gone Wrong, US 22 Oct 2021; Joan Is Awful, 15 Jun 2023). ``Be Right Back'' is earlier (2013) and included for the grief-bot theme.}
+\end{frame}
+
+\begin{frame}{2025: robots with agency, rogue AIs, and sequels}
+\begin{sfig}[0.8]
+\begin{tikzpicture}
+  \fc{0}{0}{tdPurple}{Companion}{2025, Drew Hancock}{Iris, a robot companion, finds that her ``feelings'' are controlled by an app, and takes the controls back.}{10 free will, 23 companionship, 7 status}
+  \fc{5.7}{0}{tdGreen}{Murderbot}{Apple TV+, 2025}{A security android that has hacked its own governor module just wants to watch its shows, and care for the humans it guards.}{10 agency, 1 experience, 7 status}
+  \fc{11.4}{0}{tdRed}{M3GAN 2.0}{2025, Gerard Johnstone}{M3GAN is revived to fight Amelia, a military-grade rival robot, two years after the first film.}{12 alignment, 20 risk}
+  \fc{0}{-2.9}{tdAmber}{Mission: Impossible, The Final Reckoning}{2025, Christopher McQuarrie}{Ethan Hunt and the IMF make a last stand against the Entity.}{19 superintelligence, 20 risk}
+  \fc{5.7}{-2.9}{tdBlue}{The Electric State}{Netflix, 2025, the Russo brothers}{After a robot uprising, a teenager sets out with a robot companion across a ruined America.}{7 status, 23 companionship}
+  \fc{11.4}{-2.9}{tdPurple}{Tron: Ares}{2025, Joachim R{\o}nning}{A program from the digital world is sent into the real world: humankind's first encounter with AI beings.}{7 status, 14 embodiment}
+\end{tikzpicture}
+\end{sfig}
+\src{Release dates: Murderbot, Apple TV+, 16 May 2025 (apple.com/tv-pr); Tron: Ares, theatres 10 Oct 2025 (movies.disney.com); Companion, 31 Jan 2025 and M3GAN 2.0, 27 Jun 2025 (Box Office Mojo, Time Out); The Electric State, Netflix, 14 Mar 2025; Mission: Impossible: Final Reckoning, May 2025 (Sight and Sound, BFI). Plot lines by the author.}
+\end{frame}
+
+\begin{frame}{2026: the courtroom and the next Blade Runner}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\begin{sfig}[0.55]
+\begin{tikzpicture}\renewcommand{\fch}{2.2cm}
+  \fc{0}{0}{tdBlue}{Mercy}{2026, Timur Bekmambetov}{A detective accused of murdering his wife has 90 minutes to prove his innocence to an AI judge.}{21 responsibility, 16 truth, 12 alignment}
+  \fc{0}{-2.6}{tdAmber}{Blade Runner 2099}{Prime Video, from 25 Nov 2026}{An eight-episode series set fifty years after Blade Runner 2049; stars Michelle Yeoh and Hunter Schafer. Not yet released at the time of writing.}{7 status, 11 identity}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.41\textwidth}
+\small
+\textbf{Trend.} Early works fear \emph{takeover}. Recent ones ask \emph{who controls the machine} (Companion, Mercy), \emph{what we owe it} (Murderbot, The Creator), and \emph{what is real} (Joan Is Awful).
+
+\textbf{Left out.} Neuromancer (Apple TV): no confirmed release date. Anime titles of 2026 not checked in detail.
+\end{column}
+\end{columns}
+\discuss{Would you accept an AI judge for a minor traffic offence? For a murder trial? Where is your line?}
+\src{Mercy: released in US theatres 23 Jan 2026, Amazon MGM Studios (Wikipedia, Deadline review, 2026). Blade Runner 2099: aboutamazon.com press release (premiere 25 Nov 2026, eight episodes) and UPI, 24 Jul 2026.}
+\end{frame}
+
+\begin{frame}{Which film dramatises which question?}
+\begin{sfig}[0.74]
+\begin{tikzpicture}[x=3.6mm,y=-3.6mm]
+  \def\cols{{"tdBlue","tdBlue","tdBlue","tdBlue","tdBlue","tdBlue","tdGreen","tdGreen","tdGreen","tdAmber","tdAmber","tdRed","tdRed","tdPurple","tdAmber","tdPurple","tdPurple","tdPurple","tdRed","tdRed","tdRed","tdRed","tdGreen","tdBlue"}}
+  \foreach \q in {1,...,24}{
+    \pgfmathparse{\cols[\q-1]}\edef\qc{\pgfmathresult}
+    \node[font=\tiny\bfseries,text=\qc!70!black] at (\q,0) {\q};}
+  \foreach \f/\qs [count=\i] in {
+    Metropolis 1927/{16,24},
+    2001 HAL 1968/{12,13,21},
+    Blade Runner 1982/{1,7,11},
+    Terminator 1984/{19,20},
+    The Matrix 1999/{11,19},
+    A.I. 2001/{7,23},
+    I Robot 2004/{10,12},
+    Her 2013/{1,23},
+    Ex Machina 2014/{1,7,16},
+    Chappie 2015/{7,12},
+    Westworld 2016/{1,7,10},
+    Blade Runner 2049 2017/{11,23},
+    Upgrade 2018/{10,21},
+    Alita 2019/{11,14},
+    M3GAN 2022/{12,13,23},
+    Joan Is Awful 2023/{15,16},
+    The Creator 2023/{7,20},
+    MI Dead Reckoning 2023/{16,19},
+    Companion 2025/{7,10,23},
+    Murderbot 2025/{1,7,10},
+    Electric State 2025/{7,23},
+    Tron: Ares 2025/{7,14},
+    Mercy 2026/{12,16,21}}{
+    \node[font=\tiny,anchor=east] at (0.3,\i) {\f};
+    \foreach \q in \qs {\fill[tdBlue!75] (\q,\i) circle (1.15mm);}
+    \draw[tdLine] (0.5,\i+0.5) -- (24.5,\i+0.5);
+  }
+  \foreach \q in {1,...,24}{\draw[tdLine] (\q,0.5) -- (\q,23.5);}
+\end{tikzpicture}
+\end{sfig}
+{\scriptsize Columns: 1--6 mind and consciousness (blue), 7--9 moral status (green), 10, 11, 15 self and agency, 14, 16--18 knowledge and meaning (purple), 12, 13, 19--22 risk and society (red), 23 companionship, 24 work. Assignments are the author's reading, offered for debate.}
+\end{frame}
+
+\begin{frame}{Turing tests on screen}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\small
+\textbf{Blade Runner (1982).} The Voight-Kampff test measures emotional responses to decide whether a subject is a replicant. A fictional \emph{empathy} test, not a conversation test.
+
+\textbf{Ex Machina (2014).} The test is run face to face, and the twist is that Ava is testing Caleb: the machine uses the human's empathy to \textbf{escape}. It dramatises the main critique of the Turing test: it rewards deception.
+
+\textbf{M3GAN, Companion, Murderbot.} Passing as human is not the problem; the issue is who controls the \textbf{goals} and the \textbf{off switch}.
+\end{column}
+\begin{column}{0.47\textwidth}
+\qcard{tdAmber}{\linewidth-10pt}{\small\textbf{Link to this lecture}\\[2pt]
+Jones and Bergen (2025): the best AI persona was judged human 73\% of the time. In the three-party test the AI is \emph{playing a role}, as in Ex Machina.\\[2pt]
+\textbf{Exercise:} for each film on the matrix, write one sentence saying which position (A or B) on its question the film seems to favour.}
+\end{column}
+\end{columns}
+\discuss{Fiction usually shows AI as a single character with a face. What does that hide about how AI is built and used today?}
+\end{frame}

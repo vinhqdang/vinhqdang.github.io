@@ -1,0 +1,217 @@
+% ---------- 3. Turing test ----------
+\begin{frame}{Turing 1950: replace ``can machines think?'' by a game}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\small
+In ``Computing Machinery and Intelligence'' (\emph{Mind}, 1950) Turing opens: ``I propose to consider the question, `Can machines think?'\,'' and then swaps it for a \textbf{behavioural test}, the \emph{imitation game}.
+
+\begin{itemize}\setlength\itemsep{3pt}
+\item Original game: interrogator C must tell man A from woman B by text; A tries to deceive.
+\item Then a \textbf{machine} takes A's part.
+\item Is C wrong as often as before?
+\end{itemize}
+\vspace{1mm}
+\qcard{tdAmber}{\linewidth-10pt}{\scriptsize\textbf{Turing's prediction:} in about fifty years computers would play so well that an average interrogator would have no more than a \textbf{70\% chance} of identifying the machine after \textbf{five minutes} of questioning.}
+\end{column}
+\begin{column}{0.49\textwidth}
+\begin{sfig}[0.62]
+\begin{tikzpicture}
+  \node[card=tdBlue,minimum width=1.7cm] (c) at (0,0) {\textbf{C}\\{\scriptsize interrogator}};
+  \node[card=tdGreen,minimum width=1.7cm] (a) at (4.6,1.1) {\textbf{A}\\{\scriptsize man, deceives}};
+  \node[card=tdGreen,minimum width=1.7cm] (b) at (4.6,-1.1) {\textbf{B}\\{\scriptsize woman, helps}};
+  \draw[<->,thick,tdMuted] (c) -- node[above,lbl,sloped] {typed text} (a);
+  \draw[<->,thick,tdMuted] (c) -- (b);
+  \node[card=tdRed,minimum width=1.7cm] (m) at (8.2,1.1) {\textbf{machine}\\{\scriptsize takes A's role}};
+  \draw[arr,tdRed] (m) -- node[above,lbl] {replaces} (a);
+  \node[lbl] at (2.3,-2.3) {C sees only the text, never the players};
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\end{columns}
+\src{A.\ M.\ Turing, ``Computing Machinery and Intelligence'', Mind 59(236), 433--460, 1950.}
+\end{frame}
+
+\begin{frame}{The standard three-party Turing test}
+\begin{sfig}[0.55]
+\begin{tikzpicture}
+  \node[card=tdBlue,minimum width=2.4cm,minimum height=1.6cm] (j) at (0,0) {\textbf{Judge}\\\shortstack{\scriptsize chats with both\\ at the same time}};
+  \node[card=tdGreen,minimum width=2.4cm,minimum height=1.2cm] (h) at (6,1.4) {\textbf{Human}\\{\scriptsize tries to seem human}};
+  \node[card=tdRed,minimum width=2.4cm,minimum height=1.2cm] (m) at (6,-1.4) {\textbf{AI system}\\{\scriptsize tries to seem human}};
+  \draw[<->,thick,tdMuted] (j) -- node[above,lbl,sloped] {5-minute text chat} (h);
+  \draw[<->,thick,tdMuted] (j) -- (m);
+  \node[pill=tdAmber] (v) at (11,0) {verdict: ``which one is the human?''};
+  \draw[arr] (j) .. controls (3,-3.4) and (9,-3.4) .. (v.south);
+  \node[lbl,anchor=west] at (7.5,-2.9) {AI ``wins'' if judged human more than 50\% of the time};
+\end{tikzpicture}
+\end{sfig}
+\vspace{1mm}
+{\small Three-party tests are \textbf{stricter} than two-party ones: the judge can compare the two partners directly, so the guess is harder to get right by luck. Chance level is \textbf{50\%}.}
+\discuss{Why might the judge find a human \emph{less} human than a machine? What would you ask in five minutes?}
+\end{frame}
+
+\begin{frame}{ELIZA (1966): a mirror that people mistook for a mind}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\small
+Joseph Weizenbaum (MIT) built \textbf{ELIZA}; its DOCTOR script imitated a Rogerian therapist who reflects the patient's words back as questions.
+\begin{itemize}\setlength\itemsep{3pt}
+\item no model of the world;
+\item keywords + templates + pronoun swapping;
+\item yet some users confided in it.
+\end{itemize}
+Weizenbaum was disturbed by how readily people credited it with understanding: the \textbf{ELIZA effect}.
+\end{column}
+\begin{column}{0.47\textwidth}
+\begin{sfig}[0.55]
+\begin{tikzpicture}
+  \node[soft,text width=5.3cm,align=left] (u) at (0,1.5) {\textbf{User:} I am sad about my exam};
+  \node[card=tdAmber,text width=5.3cm,align=left] (r) at (0,0) {\scriptsize rule \texttt{i am (.*)}\\ swap pronouns: my $\to$ your\\ fill template: \texttt{Why are you \{\}?}};
+  \node[soft,text width=5.3cm,align=left] (b) at (0,-1.6) {\textbf{ELIZA:} Why are you sad about your exam?};
+  \draw[arr] (u) -- (r); \draw[arr] (r) -- (b);
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\end{columns}
+\discuss{People are eager to see minds in text. Is that a flaw in us, or a feature that machines can exploit?}
+\src{Weizenbaum, ``ELIZA: a computer program for the study of natural language communication between man and machine'', CACM 9(1), 1966; Weizenbaum, \emph{Computer Power and Human Reason}, 1976.}
+\end{frame}
+
+\begin{frame}[fragile]{Demo 1: ELIZA in 20 lines of Python 3.14}
+\begin{columns}[T]
+\begin{column}{0.58\textwidth}
+\pycodes{eliza_eliza}
+\end{column}
+\begin{column}{0.4\textwidth}
+\small
+\textbf{How it works}
+\begin{itemize}\setlength\itemsep{2pt}
+\item rules are tried top to bottom; the first regex that \emph{fully matches} wins;
+\item \texttt{reflect} turns ``my'' into ``your'', ``me'' into ``you'';
+\item the last rule matches anything, so ELIZA \textbf{never fails}, it just stalls.
+\end{itemize}
+{\footnotesize Nothing here represents \emph{sadness}, \emph{exams} or \emph{families}: they are just strings.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Demo 1 output: it feels attentive, until it does not}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\pyouts{eliza_talk}
+\end{column}
+\begin{column}{0.42\textwidth}
+\small
+\begin{itemize}\setlength\itemsep{3pt}
+\item The first four replies sound \textbf{engaged}: pure string surgery.
+\item The last one shows the seam: asked about itself, it falls through to the catch-all.
+\end{itemize}
+\vspace{1mm}
+\qcard{tdBlue}{\linewidth-10pt}{\footnotesize \textbf{Lesson.} Passing a short conversation can be done with shallow tricks. That is why the \emph{design} of a test (length, judge training, adversarial questions) matters as much as the result.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Loebner Prize and ``Eugene Goostman''}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\small
+\textbf{Loebner Prize.} An annual chatbot contest run from 1991 on a Turing-style format. Winners typically relied on \emph{tricks}: deflecting, changing the subject, typos, humour.
+
+\vspace{2mm}
+\textbf{Eugene Goostman (2014).} At a Royal Society event organised by the University of Reading, a chatbot posing as a 13-year-old Ukrainian boy was reported to have fooled 33\% of judges (threshold 30\%) and was widely announced as passing the test.
+
+\vspace{2mm}
+\begin{sfig}[0.2]\begin{tikzpicture}[x=0.07cm]
+  \draw[tdMuted] (0,0) -- (100,0);
+  \fill[tdBlue] (0,0.15) rectangle (33,0.65);
+  \draw[tdRed,thick] (30,-0.1) -- (30,0.9);
+  \node[font=\scriptsize,anchor=west] at (35,0.4) {33\% of judges fooled};
+  \node[font=\scriptsize,text=tdRed,anchor=south] at (30,0.9) {30\% threshold};
+\end{tikzpicture}\end{sfig}
+\end{column}
+\begin{column}{0.47\textwidth}
+\begin{block}{Why many experts were not convinced}
+{\small
+\begin{itemize}\setlength\itemsep{2pt}
+\item a persona (young, non-native English) \textbf{excuses} errors and evasions;
+\item only five-minute conversations;
+\item the 30\% figure is a reading of Turing's remark, not a rule he gave;
+\item the bot used the same tricks as ELIZA with a bigger script.
+\end{itemize}}
+\end{block}
+\end{column}
+\end{columns}
+\vspace{1mm}
+{\small \textbf{Persona and context are levers.} Keep this in mind for the 2025 results.}
+\src{Loebner Prize history: loebner.net / AISB; University of Reading press release, 8 June 2014 (``Turing test success marks milestone in computing history'').}
+\end{frame}
+
+\begin{frame}{Updated results: three-party Turing test (Jones and Bergen)}
+\begin{columns}[T]
+\begin{column}{0.6\textwidth}
+\begin{sfig}[0.75]
+\begin{tikzpicture}
+\begin{axis}[xbar,width=9.4cm,height=6.0cm,xmin=0,xmax=100,xlabel={judged human by the interrogator (\%)},symbolic y coords={GPT-4o,ELIZA,GPT-4.5 plain,LLaMa-3.1 plain,LLaMa-3.1 persona,GPT-4.5 persona},ytick=data,bar width=7pt,nodes near coords,nodes near coords align={horizontal},every node near coord/.append style={font=\scriptsize},tick label style={font=\scriptsize},xmajorgrids,grid style={tdLine},enlarge y limits=0.12]
+\addplot[fill=tdMuted!50,draw=none] coordinates {(21,GPT-4o) (23,ELIZA) (36,GPT-4.5 plain) (38,LLaMa-3.1 plain)};
+\addplot[fill=tdBlue,draw=none] coordinates {(56,LLaMa-3.1 persona) (73,GPT-4.5 persona)};
+\draw[tdRed,dashed,thick] (rel axis cs:0.5,0) -- (rel axis cs:0.5,1);
+\node[font=\tiny,text=tdRed,anchor=south west] at (rel axis cs:0.51,0.01) {chance = 50\%};
+\end{axis}
+\end{tikzpicture}
+\end{sfig}
+\end{column}
+\begin{column}{0.37\textwidth}
+\small
+\textbf{Design:} 5-minute chats, one interrogator, one human and one AI at once; two independent groups (UC San Diego undergraduates, Prolific workers), nearly 500 participants.
+
+\textbf{Result:} with a detailed human \emph{persona prompt}, GPT-4.5 was picked as the human \textbf{73\%} of the time, more often than the real human. LLaMa-3.1-405B: 56\%. Without the persona: 36\% and 38\%.
+
+\textbf{Venue:} PNAS, 2026 (preprint March 2025).
+\end{column}
+\end{columns}
+\src{Jones and Bergen, ``Large language models pass a standard three-party Turing test'', PNAS 2026, doi:10.1073/pnas.2524472123; preprint arXiv:2503.23674 (31 Mar 2025); UC San Diego news release, 19 May 2026 (reported via techxplore.com/news/2026-05-ai-human-real-humans-classic.html). Figures are those reported in the release.}
+\end{frame}
+
+\begin{frame}{How to read the result (and what came before)}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\small
+\textbf{What it shows}
+\begin{itemize}\setlength\itemsep{3pt}
+\item In short, text-only, adversarial-free chats a prompted LLM can be \textbf{indistinguishable from, or more ``human'' than}, a human.
+\item Earlier (2024, two-party): GPT-4 \textbf{54\%}, ELIZA 22\%, humans 67\%.
+\end{itemize}
+\textbf{What it does not show}
+\begin{itemize}\setlength\itemsep{3pt}
+\item Without the persona: only 36--38\%.
+\item 5 (or 15) minutes, non-expert judges.
+\item Not evidence of understanding or consciousness.
+\end{itemize}
+\end{column}
+\begin{column}{0.47\textwidth}
+\qcard{tdAmber}{\linewidth-10pt}{\small\textbf{The authors' own reading}\\[2pt]
+Jones: ``The Turing test is a game about lying for the models.''\\[2pt]
+Bergen: ``Increasingly, it's measuring humanlikeness.''\\[2pt]
+\scriptsize UC San Diego news release, May 2026.}
+\vspace{2mm}
+\par\small The models won partly by \emph{human-like mistakes}: informal style, typos, not knowing things.
+\end{column}
+\end{columns}
+\discuss{If a machine must dumb itself down to pass, is that intelligence or acting?}
+\src{Jones and Bergen, ``People cannot distinguish GPT-4 from a human in a Turing test'', arXiv:2405.08007 (2024); UC San Diego news release 19 May 2026 (via techxplore.com).}
+\end{frame}
+
+\begin{frame}{Critiques of the Turing test}
+\begin{sfig}[0.62]
+\begin{tikzpicture}
+  \node[card=tdBlue,text width=4.6cm,minimum height=2.4cm] at (0,0) {\textbf{Tests humanlikeness, not intelligence}\\{\scriptsize A smart system may be easy to spot; a shallow one may fool people (ELIZA, Goostman).}};
+  \node[card=tdGreen,text width=4.6cm,minimum height=2.4cm] at (5.2,0) {\textbf{Rewards deception}\\{\scriptsize The machine must lie about being a machine, and about its nature, tastes and body.}};
+  \node[card=tdAmber,text width=4.6cm,minimum height=2.4cm] at (10.4,0) {\textbf{Anthropocentric}\\{\scriptsize ``Submarines swim'' objection: attributed to Dijkstra, the question is no more useful than whether submarines swim.}};
+  \node[card=tdRed,text width=4.6cm,minimum height=2.4cm] at (0,-3) {\textbf{Behaviour is not the whole story}\\{\scriptsize Searle's Chinese Room: perfect output without understanding (next part).}};
+  \node[card=tdPurple,text width=4.6cm,minimum height=2.4cm] at (5.2,-3) {\textbf{Depends on judge and setup}\\{\scriptsize Duration, expertise, allowed topics and incentives change the outcome.}};
+  \node[card=tdBlue,text width=4.6cm,minimum height=2.4cm] at (10.4,-3) {\textbf{Defence}\\{\scriptsize Turing meant it as a \emph{sufficient} behavioural criterion and a way out of vague definitions, not as the definition of intelligence.}};
+\end{tikzpicture}
+\end{sfig}
+\discuss{Design a better test of intelligence in one sentence. What loophole would a clever machine find?}
+\src{Turing (1950); Searle, ``Minds, Brains, and Programs'', Behavioral and Brain Sciences 3(3), 1980; Hayes and Ford, ``Turing Test Considered Harmful'', IJCAI 1995; Russell and Norvig, AIMA 4th ed., ch.\ 1.}
+\end{frame}
