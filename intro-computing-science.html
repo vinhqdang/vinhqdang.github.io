@@ -9,17 +9,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css" />
+      <script src="./theme.js"></script>
   </head>
   <body>
     <header class="site-header">
       <div class="wrap">
         <a class="brand" href="./index.html">Vinh Dang</a>
         <nav class="site-nav" aria-label="Primary">
+          <a href="./updates.html">News</a>
           <a href="./index.html#research">Research</a>
           <a href="./publications.html">Publications</a>
           <a href="./teaching.html" aria-current="page">Teaching</a>
           <a href="./talks.html">Talks</a>
-          <a href="./updates.html">News</a>
           <a href="./index.html#about">About</a>
         </nav>
       </div>
@@ -39,7 +40,9 @@
       </div>
 
       <div class="lesson-list">
-        <a class="lesson" href="./fetch-execute.html">
+        <a class="lesson has-thumb" href="./fetch-execute.html">
+          <img class="thumb" src="./img/viz-cpu.jpg" alt="Fetch-execute simulator" loading="lazy" />
+          <div>
           <span class="lesson-tag">Week 8 · Systems</span>
           <h2>The Fetch–Execute Cycle</h2>
           <p>
@@ -47,6 +50,7 @@
             Step through any instruction, write your own program, and diagnose programs that go wrong.
           </p>
           <span class="lesson-go">Open the simulator →</span>
+        </div>
         </a>
         <a class="lesson" href="./memory-hierarchy.html">
           <span class="lesson-tag">Week 8 · Systems</span>
@@ -57,23 +61,31 @@
           </p>
           <span class="lesson-go">Open the simulator →</span>
         </a>
-        <a class="lesson" href="./networks.html">
+        <a class="lesson has-thumb" href="./networks.html">
+          <img class="thumb" src="./img/viz-network.jpg" alt="Network graph" loading="lazy" />
+          <div>
           <span class="lesson-tag">Week 8 · Networks</span>
           <h2>Networks and the Internet</h2>
           <p>
             Build and break a network graph, zoom from a home LAN out to the Internet, follow a message hop by hop with tracert, and see how the Internet grew.
           </p>
           <span class="lesson-go">Open the lesson →</span>
+        </div>
         </a>
-        <a class="lesson" href="./protocols.html">
+        <a class="lesson has-thumb" href="./protocols.html">
+          <img class="thumb" src="./img/viz-protocols.jpg" alt="Protocol stack diagram" loading="lazy" />
+          <div>
           <span class="lesson-tag">Week 8 · Networks</span>
           <h2>Network Protocols</h2>
           <p>
             The TCP/IP stack and how headers wrap your data, packet switching versus circuit switching with lost and out-of-order packets, IPv4 and IPv6 addresses, and HTTP.
           </p>
           <span class="lesson-go">Open the lesson →</span>
+        </div>
         </a>
-        <div class="lesson">
+        <div class="lesson has-thumb">
+          <img class="thumb" src="./img/slide-ci.jpg" alt="Title slide of What is AI" loading="lazy" />
+          <div>
           <span class="lesson-tag">Computational Intelligence · Slides + code</span>
           <h2>What is AI? Intelligence, minds and machines</h2>
           <p>
@@ -84,7 +96,10 @@
           <span class="lesson-go"><a href="./courses/ics/slides/computational-intelligence-ai-intelligence-minds.pdf" target="_blank" rel="noopener">Slides (PDF) →</a></span>
           &nbsp;&nbsp;<span class="lesson-go"><a href="./courses/ics/computational-intelligence/code/eliza.py" target="_blank" rel="noopener">eliza.py</a> · <a href="./courses/ics/computational-intelligence/code/chinese_room.py" target="_blank" rel="noopener">chinese_room.py</a> · <a href="./courses/ics/computational-intelligence/code/parrot.py" target="_blank" rel="noopener">parrot.py</a></span>
         </div>
-        <a class="lesson" href="./courses/ics/slides/limits-of-computation.pdf">
+        </div>
+        <a class="lesson has-thumb" href="./courses/ics/slides/limits-of-computation.pdf">
+          <img class="thumb" src="./img/slide-limits.jpg" alt="Limits of Computation title slide" loading="lazy" />
+          <div>
           <span class="lesson-tag">Limits of Computation · Lecture slides (PDF)</span>
           <h2>Limits of Computation</h2>
           <p>
@@ -94,6 +109,7 @@
             world models (JEPA). About 120 slides with Python 3.14 demos and review questions.
           </p>
           <span class="lesson-go">Open the slides (PDF) →</span>
+        </div>
         </a>
       </div>
       <p class="muted" style="font-family:var(--sans);font-size:14px;margin-top:28px">More lessons will be added here during the module.</p>

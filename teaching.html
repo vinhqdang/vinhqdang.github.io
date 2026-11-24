@@ -9,17 +9,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css" />
+      <script src="./theme.js"></script>
   </head>
   <body>
     <header class="site-header">
       <div class="wrap">
         <a class="brand" href="./index.html">Vinh Dang</a>
         <nav class="site-nav" aria-label="Primary">
+          <a href="./updates.html">News</a>
           <a href="./index.html#research">Research</a>
           <a href="./publications.html">Publications</a>
           <a href="./teaching.html" aria-current="page">Teaching</a>
           <a href="./talks.html">Talks</a>
-          <a href="./updates.html">News</a>
           <a href="./index.html#about">About</a>
         </nav>
       </div>
@@ -35,7 +36,9 @@
       </div>
 
       <div class="lesson-list">
-        <a class="lesson" href="./intro-computing-science.html">
+        <a class="lesson has-thumb" href="./intro-computing-science.html">
+          <img class="thumb" src="./img/viz-cpu.jpg" alt="Fetch-execute cycle simulator" loading="lazy" />
+          <div>
           <span class="lesson-tag">British University Vietnam · BSc Data Science and AI</span>
           <h2>Introduction to Computing Science</h2>
           <p>
@@ -43,18 +46,24 @@
             and network protocols. Four interactive simulators and lessons.
           </p>
           <span class="lesson-go">Open the course →</span>
+        </div>
         </a>
 
-        <a class="lesson" href="./algorithms-programming.html">
+        <a class="lesson has-thumb" href="./algorithms-programming.html">
+          <img class="thumb" src="./img/slide-bfs.jpg" alt="Breadth-first search drawn step by step" loading="lazy" />
+          <div>
           <span class="lesson-tag">British University Vietnam · Year 1</span>
           <h2>Algorithms and Programming Concepts</h2>
           <p>
             Seven slide decks with Python 3.14 code demos: searching, sorting, Big-O and complexity, trees, graphs, dynamic programming and optimization.
           </p>
           <span class="lesson-go">Open the course →</span>
+        </div>
         </a>
 
-        <a class="lesson" href="./algorithm-design.html">
+        <a class="lesson has-thumb" href="./algorithm-design.html">
+          <img class="thumb" src="./img/viz-flow.jpg" alt="Flow network with edge labels" loading="lazy" />
+          <div>
           <span class="lesson-tag">FTU · Undergraduate</span>
           <h2>Algorithm Design</h2>
           <p>
@@ -62,6 +71,7 @@
             Network Flow comes first (it is being taught now), and the other chapters will be added over time.
           </p>
           <span class="lesson-go">Open the course →</span>
+        </div>
         </a>
       </div>
       <p class="muted" style="font-family:var(--sans);font-size:14px;margin-top:28px">Materials for my other courses will be added here.</p>

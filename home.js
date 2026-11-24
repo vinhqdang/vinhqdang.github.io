@@ -32,3 +32,20 @@
     chart.innerHTML = html;
   }
 })();
+
+// Decorative network drawn behind the hero (colours follow the active theme through CSS).
+(function () {
+  const host = document.querySelector("[data-hero-art]");
+  if (!host) return;
+  let seed = 7;
+  const rnd = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
+  const W = 1200, H = 520, N = 46;
+  const pts = Array.from({ length: N }, () => ({ x: rnd() * W, y: rnd() * H, r: 1.6 + rnd() * 3.2 }));
+  let edges = "", nodes = "";
+  pts.forEach((p, i) => {
+    const near = pts.map((q, j) => ({ j, d: Math.hypot(p.x - q.x, p.y - q.y) })).filter((o) => o.j > i && o.d < 190).sort((a, b) => a.d - b.d).slice(0, 2);
+    near.forEach((o) => { edges += `<line class="edge" x1="${p.x.toFixed(0)}" y1="${p.y.toFixed(0)}" x2="${pts[o.j].x.toFixed(0)}" y2="${pts[o.j].y.toFixed(0)}"/>`; });
+    nodes += `<circle class="node${p.r > 3.6 ? " big" : ""}" cx="${p.x.toFixed(0)}" cy="${p.y.toFixed(0)}" r="${p.r.toFixed(1)}"/>`;
+  });
+  host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice">${edges}${nodes}</svg>`;
+})();

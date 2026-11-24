@@ -9,17 +9,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css" />
+      <script src="./theme.js"></script>
   </head>
   <body>
     <header class="site-header">
       <div class="wrap">
         <a class="brand" href="./index.html">Vinh Dang</a>
         <nav class="site-nav" aria-label="Primary">
+          <a href="./updates.html">News</a>
           <a href="./index.html#research">Research</a>
           <a href="./publications.html">Publications</a>
           <a href="./teaching.html">Teaching</a>
           <a href="./talks.html" aria-current="page">Talks</a>
-          <a href="./updates.html">News</a>
           <a href="./index.html#about">About</a>
         </nav>
       </div>
@@ -33,7 +34,9 @@
       </div>
 
       <div class="talk-list">
-        <article class="talk">
+        <article class="talk has-thumb">
+          <img class="thumb" src="./img/talk-healthcare.jpg" alt="Title slide of the healthcare AI talk" loading="lazy" />
+          <div>
           <div class="talk-meta">
             <span class="talk-date">8 December 2026</span>
             <span class="talk-role">Invited talk</span>
@@ -48,9 +51,12 @@
             Biomedical case studies anchor the discussion, and the talk closes with opportunities for interdisciplinary collaboration and validation with healthcare partners.
           </p>
           <p class="talk-status">Slides: <a href="talks/slides/Dang_Trustworthy_Healthcare_AI.pdf">PDF, 34 slides</a></p>
+        </div>
         </article>
 
-        <article class="talk">
+        <article class="talk has-thumb">
+          <img class="thumb" src="./img/talk-keynote.jpg" alt="Title slide of the keynote" loading="lazy" />
+          <div>
           <div class="talk-meta">
             <span class="talk-date">15 December 2026</span>
             <span class="talk-role">Keynote</span>
@@ -64,6 +70,7 @@
             intrusion detection, structural monitoring, hallucination correction and federated learning.
           </p>
           <p class="talk-status">Slides: <a href="talks/slides/Dang_TayDo2026_Trustworthy_AI_Smart_Systems.pdf">PDF, 40 slides</a></p>
+        </div>
         </article>
       </div>
     </main>

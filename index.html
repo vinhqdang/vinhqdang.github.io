@@ -9,18 +9,19 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css" />
+      <script src="./theme.js"></script>
   </head>
   <body>
     <header class="site-header">
       <div class="wrap">
         <a class="brand" href="#top">Vinh Dang</a>
         <nav class="site-nav" aria-label="Primary">
+          <a href="#news">News</a>
           <a href="#research">Research</a>
           <a href="#selected">Selected work</a>
           <a href="./publications.html">Publications</a>
           <a href="./teaching.html">Teaching</a>
           <a href="./talks.html">Talks</a>
-          <a href="#news">News</a>
           <a href="#about">About</a>
         </nav>
       </div>
@@ -28,6 +29,8 @@
 
     <main id="top" class="wrap">
       <!-- Hero -->
+      <div class="hero-wrap">
+      <div class="hero-art" data-hero-art aria-hidden="true"></div>
       <section class="hero">
         <div>
           <h1>Vinh Dang</h1>
@@ -62,6 +65,16 @@
           </ul>
         </aside>
       </section>
+      </div>
+
+      <!-- News -->
+      <section class="block" id="news">
+        <div class="block-head">
+          <h2>Latest news</h2>
+          <a class="more" href="./updates.html">All news →</a>
+        </div>
+        <ul class="news clamp" data-updates-list data-updates-limit="4"></ul>
+      </section>
 
       <!-- Research themes -->
       <section class="block" id="research">
@@ -75,41 +88,49 @@
         </p>
         <div class="themes">
           <a class="theme" href="./publications.html?topic=security">
+            <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span>
             <h3>Cyber Security &amp; Intrusion Detection</h3>
             <p>Machine learning to detect intrusions, malware and spam in IoT, SDN and WiFi environments.</p>
             <span class="count" data-theme-count="security">Publications →</span>
           </a>
           <a class="theme" href="./publications.html?topic=graph">
+            <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="8" r="2.5"/><circle cx="8" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8 7l8 1M7 8l1 8M10 18h6M17 10l1 6"/></svg></span>
             <h3>Graph Learning</h3>
             <p>Graph neural networks, community detection and link prediction for fraud, bots and malware.</p>
             <span class="count" data-theme-count="graph">Publications →</span>
           </a>
           <a class="theme" href="./publications.html?topic=privacy">
+            <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
             <h3>Privacy &amp; Federated Learning</h3>
             <p>Federated, Byzantine-robust and privacy-preserving learning, and certifying machine unlearning.</p>
             <span class="count" data-theme-count="privacy">Publications →</span>
           </a>
           <a class="theme" href="./publications.html?topic=explain">
+            <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span>
             <h3>Explainable &amp; Reliable ML</h3>
             <p>Explainability, uncertainty, fairness and conformal methods for models people can trust in operation.</p>
             <span class="count" data-theme-count="explain">Publications →</span>
           </a>
           <a class="theme" href="./publications.html?topic=llm">
+            <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg></span>
             <h3>LLMs &amp; Retrieval</h3>
             <p>Retrieval-augmented generation, transformers and multi-agent LLMs for search, finance and security.</p>
             <span class="count" data-theme-count="llm">Publications →</span>
           </a>
           <a class="theme" href="./publications.html?topic=trust">
+            <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/></svg></span>
             <h3>Trust &amp; Collaborative Systems</h3>
             <p>Computational trust, Wikipedia quality assessment and social recommendation (doctoral work at Inria).</p>
             <span class="count" data-theme-count="trust">Publications →</span>
           </a>
           <a class="theme" href="./publications.html?topic=finance">
+            <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3 2 0 0 0-5 1c0 3 5 1.5 5 4a3 2 0 0 1-5 1M12 6.5v11"/></svg></span>
             <h3>Finance &amp; Fraud</h3>
             <p>Fraud detection, financial documents, trading and portfolio decision-making.</p>
             <span class="count" data-theme-count="finance">Publications →</span>
           </a>
           <a class="theme" href="./publications.html?topic=education">
+            <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg></span>
             <h3>AI in Education</h3>
             <p>Work-integrated learning, assistive AI and equity in higher education and school outreach.</p>
             <span class="count" data-theme-count="education">Publications →</span>
@@ -196,6 +217,25 @@
         </div>
       </section>
 
+      <!-- Teaching and talks -->
+      <section class="block" id="teaching">
+        <div class="block-head">
+          <h2>Teaching and talks</h2>
+          <a class="more" href="./teaching.html">All teaching →</a>
+        </div>
+        <p class="block-intro">
+          Interactive lessons, lecture slides with runnable Python 3.14 code, and recent talks. Every picture below is taken from the real material.
+        </p>
+        <div class="gallery">
+          <a class="tile" href="./network-flow-1.html"><img src="./img/viz-flow.jpg" alt="Flow network with edge labels" loading="lazy" /><div class="cap"><small>Algorithm Design · FTU</small><b>Network Flow, step by step</b><span>Interactive max-flow and min-cut animations.</span></div></a>
+          <a class="tile" href="./courses/apc/slides/05-graphs.pdf"><img src="./img/slide-bfs.jpg" alt="Breadth-first search drawn step by step" loading="lazy" /><div class="cap"><small>Algorithms and Programming · BUV</small><b>BFS, DFS and Dijkstra</b><span>Slides with Python 3.14 demos and worked problems.</span></div></a>
+          <a class="tile" href="./fetch-execute.html"><img src="./img/viz-cpu.jpg" alt="Fetch-execute cycle simulator showing CPU registers and memory" loading="lazy" /><div class="cap"><small>Introduction to Computing Science · BUV</small><b>The Fetch–Execute Cycle</b><span>A computer you can operate and break.</span></div></a>
+          <a class="tile" href="./courses/ics/slides/limits-of-computation.pdf"><img src="./img/slide-limits.jpg" alt="Title slide of Limits of Computation" loading="lazy" /><div class="cap"><small>Lecture slides</small><b>Limits of Computation</b><span>Turing machines, the halting problem, P vs NP, LLMs and world models.</span></div></a>
+          <a class="tile" href="./talks.html"><img src="./img/talk-healthcare.jpg" alt="Title slide of the VinFuture talk on trustworthy healthcare AI" loading="lazy" /><div class="cap"><small>Invited talk · VinFuture</small><b>Trustworthy Healthcare AI</b><span>From collaborative learning to reliable and secure assistants.</span></div></a>
+          <a class="tile" href="./networks.html"><img src="./img/viz-network.jpg" alt="Network graph with nodes N1 to N4" loading="lazy" /><div class="cap"><small>Introduction to Computing Science · BUV</small><b>Networks and the Internet</b><span>Build and break a network, follow a packet hop by hop.</span></div></a>
+        </div>
+      </section>
+
       <!-- Output over time -->
       <section class="block" id="output">
         <div class="block-head">
@@ -203,15 +243,6 @@
         </div>
         <div class="chart" data-year-chart aria-label="Publications per year"></div>
         <p class="chart-note">Publications per year, from the ORCID record.</p>
-      </section>
-
-      <!-- News -->
-      <section class="block" id="news">
-        <div class="block-head">
-          <h2>Latest news</h2>
-          <a class="more" href="./updates.html">All news →</a>
-        </div>
-        <ul class="news" data-updates-list data-updates-limit="4"></ul>
       </section>
 
       <!-- About -->
