@@ -11,11 +11,28 @@
     { id: "midnight", name: "Midnight", sw: ["#12151c", "#7aa2ff", "#e8eaf0"] },
     { id: "aurora", name: "Aurora", sw: ["#0a1a1e", "#4fd1c5", "#e2f4f1"] }
   ];
+  // Each theme can bring its own typeface (loaded on demand from Google Fonts; falls back to system fonts offline).
+  var FONTS = {
+    ocean: { fam: "Lora:ital,wght@0,400;0,500;0,600;1,400", css: '"Lora", Georgia, serif' },
+    forest: { fam: "Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600", css: '"Fraunces", Georgia, serif' },
+    sunset: { fam: "Merriweather:wght@400;700", css: '"Merriweather", Georgia, serif' },
+    orchid: { fam: "Playfair+Display:wght@400;500;600", css: '"Playfair Display", Georgia, serif' },
+    midnight: { fam: "IBM+Plex+Sans:wght@400;500;600", css: '"IBM Plex Sans", system-ui, sans-serif' },
+    aurora: { fam: "Space+Grotesk:wght@400;500;600", css: '"Space Grotesk", system-ui, sans-serif' }
+  };
   var root = document.documentElement;
+  function setFont(id) {
+    var f = FONTS[id], link = document.getElementById("vd-font");
+    if (!f) { root.style.removeProperty("--serif"); if (link) link.remove(); return; }
+    if (!link) { link = document.createElement("link"); link.id = "vd-font"; link.rel = "stylesheet"; document.head.appendChild(link); }
+    link.href = "https://fonts.googleapis.com/css2?family=" + f.fam + "&display=swap";
+    root.style.setProperty("--serif", f.css);
+  }
   function read() { try { return localStorage.getItem(KEY) || "auto"; } catch (e) { return "auto"; } }
   function apply(id) {
     if (!id || id === "auto") root.removeAttribute("data-theme");
     else root.setAttribute("data-theme", id);
+    setFont(id);
     try { if (!id || id === "auto") localStorage.removeItem(KEY); else localStorage.setItem(KEY, id); } catch (e) {}
     document.dispatchEvent(new CustomEvent("themechange", { detail: id }));
   }
