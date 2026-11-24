@@ -5,7 +5,7 @@ window.siteUpdates = [
     type: "Publication",
     title: "Paper on vehicle routing with stochastic demands accepted in Computers and Operations Research",
     summary:
-      "\"Optimal-stopping recourse for vehicle routing with simultaneous pickup, delivery, and stochastic demands\" has been accepted for publication in Computers and Operations Research (Elsevier). The paper studies vehicle routes that pick up and deliver goods on the same trip when the demand at each customer is uncertain, and uses optimal-stopping ideas to decide on recourse actions once those demands are revealed along the route. Computers and Operations Research is a long-established journal that publishes work on operations research and on computational methods for decision-making, such as routing, scheduling and optimisation algorithms.",
+      "\"Optimal-stopping recourse for vehicle routing with simultaneous pickup, delivery, and stochastic demands\" has been accepted for publication in Computers and Operations Research (Elsevier). The paper studies vehicle routes that pick up and deliver goods on the same trip when the demand at each customer is uncertain, and uses optimal-stopping ideas to decide on recourse actions once those demands are revealed along the route. Computers and Operations Research is a long-established journal that publishes work on operations research and on computational methods for decision-making, such as routing, scheduling and optimisation algorithms. The journal is SCIE-indexed, SCImago Q1, and at the 94th Scopus percentile.",
     href: "https://www.sciencedirect.com/journal/computers-and-operations-research",
     cta: "About the journal",
     featured: true
