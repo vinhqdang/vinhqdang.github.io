@@ -3,6 +3,16 @@ window.siteUpdates = [
   {
     date: "November 2026",
     type: "Publication",
+    title: "Paper on vehicle routing with stochastic demands accepted in Computers and Operations Research",
+    summary:
+      "\"Optimal-stopping recourse for vehicle routing with simultaneous pickup, delivery, and stochastic demands\" has been accepted for publication in Computers and Operations Research (Elsevier). The paper studies vehicle routes that pick up and deliver goods on the same trip when the demand at each customer is uncertain, and uses optimal-stopping ideas to decide on recourse actions once those demands are revealed along the route. Computers and Operations Research is a long-established journal that publishes work on operations research and on computational methods for decision-making, such as routing, scheduling and optimisation algorithms.",
+    href: "https://www.sciencedirect.com/journal/computers-and-operations-research",
+    cta: "About the journal",
+    featured: true
+  },
+  {
+    date: "November 2026",
+    type: "Publication",
     title: "New paper at ICONIP 2026 on local LLMs for log anomaly detection",
     summary:
       "\"Local LLM-Guided Counterfactual Augmentation for Low-Label Log Anomaly Detection\" (led by Dat Le, with Anh Vu Le, Sutharshan Rajasegarar, Thanh Thi Nguyen, Minh Ngoc Dinh, Maia Angelova, Wei Luo, Thach Ngo and me) appears in the proceedings of ICONIP 2026 (Springer CCIS, CORE rank B). A local language model is used only offline, to rewrite training log windows into label-changing variants such as a failure becoming a recovery; the deployed detector stays a light TF-IDF classifier with no LLM calls. On a fixed HDFS split this helped in the low-label setting for one generator configuration, while the gains were smaller elsewhere and BGL and Thunderbird were already near ceiling. The paper presents this as feasibility evidence, not a scaling claim.",
