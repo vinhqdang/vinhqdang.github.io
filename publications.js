@@ -79,7 +79,7 @@ window.sitePublications = [
     href: "https://doi.org/10.62441/actainnovations.vi.2708",
     wos: "Not confirmed",
     scopus: "83rd percentile",
-    scimago: "Not confirmed"
+    scimago: "Q2"
   },
   {
     year: "2026",
@@ -157,7 +157,7 @@ window.sitePublications = [
     href: "https://doi.org/10.32604/cmc.2026.087848",
     wos: "Not confirmed",
     scopus: "88th percentile",
-    scimago: "Not confirmed"
+    scimago: "Q2"
   },
   {
     year: "2026",
