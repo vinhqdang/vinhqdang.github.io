@@ -90,7 +90,7 @@ window.sitePublications = [
     type: "Journal Article",
     href: "https://doi.org/10.1016/j.array.2026.101244",
     wos: "Not confirmed",
-    scopus: "Not confirmed",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q1"
   },
   {
@@ -101,7 +101,7 @@ window.sitePublications = [
     type: "Journal Article",
     href: "https://doi.org/10.1016/j.array.2026.101335",
     wos: "Not confirmed",
-    scopus: "Not confirmed",
+    scopus: "Indexed (no percentile found)",
     scimago: "Q1"
   },
   {
