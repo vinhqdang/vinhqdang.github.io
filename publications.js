@@ -26,6 +26,17 @@ window.sitePublications = [
   },
   {
     year: "2026",
+    title: "Does Rubric-Guided Refinement Improve Prompts from Small-Model Optimizers?",
+    authors: "Linh Nguyen, Quang-Vinh Dang, Minh Ngoc Dinh, Thuy Nguyen",
+    venue: "IEEE Access",
+    type: "Journal Article",
+    href: "https://doi.org/10.1109/ACCESS.2026.3757210",
+    wos: "SCIE",
+    scopus: "91st percentile",
+    scimago: "Q1"
+  },
+  {
+    year: "2026",
     title: "From compliance to resilience: a functional framework for AI-enabled environmental governance",
     authors: "Quang-Vinh Dang",
     venue: "Technological Sustainability",

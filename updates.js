@@ -3,6 +3,16 @@ window.siteUpdates = [
   {
     date: "November 2026",
     type: "Publication",
+    title: "New paper in IEEE Access: does a rubric help small models improve their prompts?",
+    summary:
+      "\"Does Rubric-Guided Refinement Improve Prompts from Small-Model Optimizers?\" (led by Linh Nguyen, with Minh Ngoc Dinh, Thuy Nguyen and me) is out in IEEE Access, open access. A popular idea is to ask a language model to grade a prompt against a rubric, rewrite it, and keep the rewrite only if it does better on validation questions. We re-tested this carefully after an earlier evaluation turned out to have a validation leak, with a repaired loop and decision rules fixed in advance. Most failed rewrites had simply lost the required answer format, so the first test could not tell a bad idea from a bad treatment. Once the format was protected, the rubric-guided version won in 1 setting and lost in 3, while a plain rewrite with the same protection gained 3.8 points on average. Larger models improved the prompts too, but again a rubric-free rewrite did about as well. The paper concludes that the rubric is not shown to help, and limits its claims to Qwen3 targets, nine tasks and the optimizers tested. IEEE Access is SCIE-indexed, SCImago Q1 and at the 91st Scopus percentile.",
+    href: "https://doi.org/10.1109/ACCESS.2026.3757210",
+    cta: "Read the paper",
+    featured: true
+  },
+  {
+    date: "November 2026",
+    type: "Publication",
     title: "Paper on vehicle routing with stochastic demands accepted in Computers and Operations Research",
     summary:
       "\"Optimal-stopping recourse for vehicle routing with simultaneous pickup, delivery, and stochastic demands\" (with Hoang-Viet Vu and Phuc-Son Nguyen) has been accepted for publication in Computers and Operations Research (Elsevier). When a vehicle both picks up and delivers, its load drifts randomly along the route, and a capacity breach in the middle forces expensive emergency recourse. Two cheaper options exist: hand the rest of the route to a standby vehicle, or detour to the depot and unload. We treat the choice of when to act, and with which option, as a finite-horizon optimal-stopping problem, and propose BATON, a data-driven policy that estimates the cost of continuing from each stop by backward induction with monotone regression. It needs no tuning threshold and runs in milliseconds per route. We prove why labelling routes by their endpoint and using myopic break-even thresholds both fail, and bound the cost of acting too early; the propositions are machine-checked in Lean 4. On the Dethloff and Salhi-Nagy benchmarks and new instances built from road networks and retail locations in five cities, BATON had the lowest expected cost among the implementable policies we compared under the conservative planning regimes. The paper also reports where it does not win: on deterministic plans it is statistically tied with a strong baseline trained on the same data, and on the city instances returning to the depot rarely pays off. Computers and Operations Research has published operations research since 1974. It is SCIE-indexed, SCImago Q1 in Management Science and Operations Research (SJR 1.584, h-index 202), and at the 94th Scopus percentile.",
